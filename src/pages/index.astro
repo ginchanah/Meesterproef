@@ -2,15 +2,20 @@
 // import MainLayout
 import MainLayout from "../layout/MainLayout.astro"
 
+
+
 // get all files inside the glossaryitems folder
 const modules = import.meta.glob('../pages/glossary-items/*.astro', { eager: true });
+
 
 // get the url and title corresponding to the page, but exclude the example-item.astro page
 const links = Object.entries(modules).filter(([path]) => !path.includes('example-item.astro')).map(([path, module]) => {
 
 	const url = path.replace('../pages', '').replace('.astro', '');
 	const title = module.title || path.split('/').pop()?.replace('.astro', '') || 'Untitled';
-	return { url, title };
+	// the category is later added as a class so you can filter the item based on it
+	const category = module.category || "";
+	return { url, title, category };
 
 });
 
@@ -21,7 +26,7 @@ const links = Object.entries(modules).filter(([path]) => !path.includes('example
 
 	<!-- dynamically add all links to the glossary-item pages -->
 	{links.map(link => (
-		<a href={link.url}>{link.title}</a>
+		<a href={link.url} class={link.category}>{link.title}</a>
 	))}
 	
 	<script src="/js/index.js" is:inline></script>
