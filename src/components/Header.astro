@@ -1,0 +1,36 @@
+---
+// link to the header:
+// src/components/Header.astro
+
+// define two variants for the header
+interface Props {
+    variant?: 'one' | 'two';
+}
+
+// define props to receive from other components
+const { variant = 'one', title } = Astro.props;
+---
+<!-- here we define two different headers for the homepage and for the detail page -->
+<header class={`header header-${variant}`}>
+    <!-- this is the header for the homepage -->
+    {variant === 'one' && (
+
+        <h1>Glossary</h1>
+        <nav>
+            
+        </nav>
+
+
+
+    )}
+    
+    <!-- this is the header for the glossary item pagina -->
+    {variant === 'two' && (
+
+        <div>
+            <a href="/">← Back</a>
+            <h1>{title}</h1>
+        </div>
+
+    )}
+</header>

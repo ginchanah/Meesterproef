@@ -1,0 +1,39 @@
+---
+interface Props {
+    title: string;
+}
+
+import Header from "../components/Header.astro";
+
+const { title } = Astro.props;
+---
+<!-- ===================================== -->
+<!-- MARK: Layout for the homepage                                                                                   -->
+<!-- ===================================== -->
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+        <!-- link all stylesheets here -->
+		<link rel="stylesheet" href="/styles/general.css">
+        <link rel="stylesheet" href="/styles/detail-page.css">
+        <link rel="stylesheet" href="/styles/home-page.css">
+        
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Glossary Items</title>
+	</head>
+	<body>
+        <!-- ---------- Add header variant one ---------- -->
+        <Header variant="one" title={title} />
+		
+        <!-- Main content -->
+		<main>
+            <slot />
+	
+		</main>
+
+	</body>
+	
+</html>

@@ -1,0 +1,111 @@
+/* =====================================
+MARK: Variables
+===================================== */
+:root {
+    /* ---------- Fonts ---------- */
+    --inter-regular: "Inter", Helvetica;
+    --inter-italic: "Inter Italic", Helvetica;
+
+    --courier-prime-regular: "Courier Prime Regular", Courier, Monaco;
+    --courier-prime-italic: "Courier Prime Italic", Courier, Monaco;
+    --courier-prime-bold: "Courier Prime Bold", Courier, Monaco;
+    --courier-prime-bold-italic: "Courier Prime Bold Italic", Courier, Monaco;
+
+
+    /* ---------- Colors ---------- */
+    --black: #000;
+    --white: #ffffff;
+    --grey: grey;
+
+    /* ---------- Margin/Padding ---------- */
+}
+
+
+/* =====================================
+MARK: Fonts
+===================================== */
+/* Inter */
+@font-face {
+    font-family: "Inter";
+    src: url(/public/assets/fonts/Inter/Inter-VariableFont_opsz\,wght.ttf);
+}
+
+@font-face {
+    font-family: "Inter Italic";
+    src: url(/public/assets/fonts/Inter/Inter-Italic-VariableFont_opsz\,wght.ttf);
+}
+
+/* Courier */
+@font-face {
+    font-family: "Courier Prime Regular";
+    src: url(/public/assets/fonts/Courier_Prime/CourierPrime-Regular.ttf);
+}
+
+@font-face {
+    font-family: "Courier Prime Italic";
+    src: url(/public/assets/fonts/Courier_Prime/CourierPrime-Italic.ttf);
+}
+
+@font-face {
+    font-family: "Courier Prime Bold";
+    src: url(/public/assets/fonts/Courier_Prime/CourierPrime-Bold.ttf);
+}
+
+@font-face {
+    font-family: "Courier Prime Bold Italic";
+    src: url(/public/assets/fonts/Courier_Prime/CourierPrime-BoldItalic.ttf);
+}
+
+/* =====================================
+MARK: General Styling
+===================================== */
+/* ---------- Fonts ---------- */
+* {
+    font-family: var(--inter-regular);
+}
+
+
+
+/* =====================================
+MARK: Light & Dark Mode
+===================================== */
+
+* {
+    color: var(--black);
+    background: var(--white);
+}
+
+@media (prefers-color-scheme: dark) {
+  * {
+        color: var(--white);
+        background: var(--black);
+    }
+}
+
+/* =====================================
+MARK: Header
+===================================== */
+/* general header styling */
+
+.header {
+
+}
+
+/* header on the homepage */
+.header-one {
+
+}
+
+/* header on the glossary item page */
+.header-two {
+
+}
+
+/* =====================================
+MARK: Animation
+===================================== */
+/* General animation styling, like scalability */
+
+.animation-section {
+    
+}
