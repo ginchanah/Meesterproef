@@ -1,0 +1,80 @@
+---
+// this is the example code for all glossary item detail pages
+
+// import the components to reuse
+import DetailLayout from "../../layout/DetailLayout.astro";
+
+// export the title
+export const title = "In-between";
+// the category on which you can filter your item
+export const category = "In-between";
+---
+
+<DetailLayout title={title}>
+    <style>
+        .animation-wrapper {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+        }
+
+        svg {
+            width: 800px;
+            overflow: visible;
+            background: white;
+        }
+
+        path {
+            fill: red;
+        }
+    </style>
+
+    <div class="animation-wrapper">
+        <svg viewBox="0 0 800 200">
+            <!-- START WORD -->
+            <path
+                id="word"
+                d="M92.2 0L65.2-90.2H34.8L7.8 0H30.4L35.2-18.2H64.8L69.6 0H92.2Z"
+            ></path>
+
+            <!-- TARGET WORD -->
+            <path
+                id="target"
+                d="M12 0V-90H34V-55L66-90H94L58-50L98 0H70L44-36L34-25V0Z"
+                style="visibility:hidden"></path>
+        </svg>
+    </div>
+</DetailLayout>
+
+<!-- detail page content for the glossary item -->
+<p>detail page</p>
+
+<!-- link script -->
+<!-- <script src="/js/index.js" is:inline></script> -->
+
+<!-- GSAP -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"  is:inline>
+    console.log("eerste tag")
+</script>
+
+<!-- MorphSVG Plugin -->
+<script src="https://assets.codepen.io/16327/MorphSVGPlugin3.min.js"  is:inline>
+    console.log("tweede tag")
+</script>
+
+<!-- codeee -->
+<script is:inline>
+    console.log("derde tag")
+    console.log("fliep")
+    gsap.to("#word", {
+        duration: 2,
+        morphSVG: "#target",
+        repeat: -1,
+        yoyo: true,
+        ease: "power2.inOut",
+    });
+</script>
+<!-- :( -->
