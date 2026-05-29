@@ -5,14 +5,18 @@
 // import the components to reuse
 import DetailLayout from "../../layout/DetailLayout.astro"
 
-
+// add the slug of your file here
+export const slug = "example-item";
 // export the title
 export const title = "Glossary Item";
 // the category on which you can filter your item
 export const category = "threshold";
+
 ---
 
-<DetailLayout title={title}>
+
+
+<DetailLayout title={title} slug={slug}>
 
 	<Animation>
 		<!-- add your animation here -->

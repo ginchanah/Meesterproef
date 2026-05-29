@@ -2,6 +2,8 @@
 // import the components to reuse
 import DetailLayout from "../../layout/DetailLayout.astro"
 
+// add the slug of your file here
+export const slug = "threshold";
 
 // export the title
 export const title = 'Threshold';
@@ -11,10 +13,12 @@ export const category = "category2";
 
 ---
 
-<DetailLayout title={title}>
-
+<DetailLayout title={title} slug={slug}>
+    <div class="threshold-div">
+        <p>detail page</p>
+    </div>
     <!-- detail page content for the glossary item -->
-    <p>detail page</p>
+    
 
     <!-- link script -->
 	<script src="/js/index.js" is:inline></script>
