@@ -1,0 +1,103 @@
+
+/* =====================================
+MARK: Variables
+===================================== */
+
+:root {
+    --terms-transition-time: 0.3s;
+}
+
+/* =====================================
+MARK: Header
+===================================== */
+
+h1 {
+        font-family: inter;
+        font-size: 5em;
+
+        display: flex;
+        flex-direction: column;
+
+        margin: 0;
+        margin-bottom: 3rem;
+
+        span:nth-child(1) {
+            font-size: 0.5em;
+            width: 7em;
+        }
+    }
+
+/* =====================================
+MARK: Term list
+===================================== */ 
+
+.term-list {
+    font-family: inter;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    padding: 0;
+
+    @media (min-width: 1200px) {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    li {
+        transition: var(--terms-transition-time);
+        list-style-type: none;
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    }
+}
+
+/* =====================================
+MARK: Category filter
+===================================== */ 
+
+    .term-categories {
+        padding: 0;
+        margin: 2em 0;
+
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1em;
+
+        li {
+            list-style-type: none;
+        }
+    }
+
+    .term-categories li {
+        position: relative;
+        padding: 0.5em;
+        margin: 0;
+        border: 2px var(--color-border) solid;
+    }
+
+    .term-categories input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+    }
+
+    .term-categories li:has(:checked) {
+        background-color: var(--color-text);
+        label {
+            color: var(--color-background);
+        }
+    }
+
+
+
+/* When ANY category is checked, dim all terms */
+.term-categories:has(:checked) ~ .term-list li {
+    opacity: 0.2;
+    transition: var(--terms-transition-time);
+    pointer-events: none;
+}
