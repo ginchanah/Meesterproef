@@ -1,0 +1,9 @@
+---
+const { slug } = Astro.props;
+console.log(slug)
+---
+
+<!-- adds a link to a stylesheet for a specific animation -->
+{slug && (
+  <link rel="stylesheet" href={`/styles/animation-css/${slug}.css`} />
+)}
