@@ -19,15 +19,40 @@ const links = Object.entries(modules).filter(([path]) => !path.includes('example
 
 });
 
+const categories = [...new Set(links.map(link => link.category).filter(Boolean))];
+
 ---
 
 <MainLayout>
-	<p>homepage</p>
-
 	<!-- dynamically add all links to the glossary-item pages -->
-	{links.map(link => (
-		<a href={link.url} class={link.category}>{link.title}</a>
-	))}
-	
+	<ul class="term-categories">
+		{categories.map(category => (
+			<li class={category}>
+				<label><input type="checkbox">{category}</label>
+			</li>
+		))}
+	</ul>
+
+	<ul class="term-list">
+		{links.map(link => (
+			<li class={link.category}>
+				<a href={link.url}>{link.title}</a>
+			</li>
+		))}
+	</ul>
+
 	<script src="/js/index.js" is:inline></script>
+
+	<!-- Dynamically generate one highlight selector per category -->
+	<script is:inline define:vars={{ categories }}>
+		const style = document.createElement('style');
+		style.textContent = categories.map(cat =>
+			`.term-categories:has(.${cat} :checked) ~ .term-list .${cat}`
+		).join(',\n') + ` {
+			opacity: 1;
+			transition: var(--terms-transition-time);
+			pointer-events: all;
+		}`;
+		document.head.appendChild(style);
+	</script>
 </MainLayout>

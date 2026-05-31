@@ -17,7 +17,17 @@ MARK: Variables
     --white: #ffffff;
     --grey: grey;
 
-    /* ---------- Margin/Padding ---------- */
+    --color-text: var(--black);
+    --color-background: var(--white);
+    --color-border: var(--black);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-text: var(--white);
+        --color-background: var(--black);
+        --color-border: var(--white);
+    }
 }
 
 
@@ -71,15 +81,12 @@ MARK: Light & Dark Mode
 ===================================== */
 
 * {
-    color: var(--black);
-    background: var(--white);
+    color: var(--color-text);
+
 }
 
-@media (prefers-color-scheme: dark) {
-  * {
-        color: var(--white);
-        background: var(--black);
-    }
+body {
+    background-color: var(--color-background);
 }
 
 /* =====================================
