@@ -1,6 +1,7 @@
 ---
 // import the components to reuse
 import DetailLayout from "../../layout/DetailLayout.astro"
+import Animation from "../../components/Animation.astro"
 
 // add the slug of your file here
 export const slug = "threshold";
@@ -14,6 +15,10 @@ export const category = "category2";
 ---
 
 <DetailLayout title={title} slug={slug}>
+    <Animation>
+		<!-- add your animation here -->
+	</Animation>
+    
     <div class="threshold-div">
         <p>detail page</p>
     </div>
