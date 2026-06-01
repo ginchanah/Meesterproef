@@ -17,6 +17,30 @@ export const category = "category1";
 <DetailLayout title={title} slug={slug}>
 	<Animation>
 		<!-- add your animation here -->
+		<section class="set-sibling-index" id="intra-section">
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+			<p class="blend" draggable="true">intra-action</p>
+		</section>
 	</Animation>
 	
     <div class="intra-action-div">
@@ -28,4 +52,67 @@ export const category = "category1";
 
 	<!-- link script -->
 	<script src="/js/index.js" is:inline></script>
+	<script>
+		const section = document.getElementById('intra-section');
+		let draggedEl = null;
+		let offsetX = 0;
+		let offsetY = 0;
+
+		// Make .blend elements draggable
+		document.querySelectorAll('.blend').forEach(el => {
+		el.addEventListener('dragstart', e => {
+			draggedEl = e.target;
+
+			const rect = draggedEl.getBoundingClientRect();
+			offsetX = e.clientX - rect.left;
+			offsetY = e.clientY - rect.top;
+
+			// For some browsers, required to start drag
+			e.dataTransfer.setData('text/plain', '');
+
+			draggedEl.classList.add('dragging');
+		});
+
+		el.addEventListener('dragend', () => {
+			if (draggedEl) {
+			draggedEl.classList.remove('dragging');
+			draggedEl = null;
+			}
+		});
+		});
+
+		// Allow drop inside the section
+		section.addEventListener('dragover', e => {
+		e.preventDefault();
+		});
+
+		section.addEventListener('drop', e => {
+		e.preventDefault();
+		if (!draggedEl) return;
+
+		const sectionRect = section.getBoundingClientRect();
+
+		// Current size of element
+		const elWidth  = draggedEl.offsetWidth;
+		const elHeight = draggedEl.offsetHeight;
+
+		// Position relative to section
+		let x = e.clientX - sectionRect.left - offsetX;
+		let y = e.clientY - sectionRect.top  - offsetY;
+
+		// Keep inside the box
+		const maxX = sectionRect.width  - elWidth;
+		const maxY = sectionRect.height - elHeight;
+		x = Math.max(0, Math.min(x, maxX));
+		y = Math.max(0, Math.min(y, maxY));
+
+		draggedEl.style.position = 'absolute';
+		draggedEl.style.left = x + 'px';
+		draggedEl.style.top  = y + 'px';
+
+		draggedEl.classList.remove('dragging');
+		draggedEl.classList.add('dragged');
+		draggedEl = null;
+		});
+	</script>
 </DetailLayout>
