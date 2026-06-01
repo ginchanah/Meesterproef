@@ -13,7 +13,7 @@ const links = Object.entries(modules).filter(([path]) => !path.includes('example
 
 	const url = path.replace('../pages', '').replace('.astro', '');
 	const title = module.title || path.split('/').pop()?.replace('.astro', '') || 'Untitled';
-	const slug = module.slug || fileSlug;  
+	const slug = module.slug || path.split('/').pop()?.replace('.astro', '') || 'untitled';  
 	// the category is later added as a class so you can filter the item based on it
 	const category = module.category || "";
 	return { url, title, category, slug };
@@ -44,8 +44,9 @@ const categories = [...new Set(links.map(link => link.category).filter(Boolean))
 
 	<script src="/js/index.js" is:inline></script>
 
-	<!-- Dynamically generate one highlight selector per category -->
+	
 	<script is:inline define:vars={{ categories }}>
+	// Dynamically generate one highlight selector per category
 		const style = document.createElement('style');
 		style.textContent = categories.map(cat =>
 			`.term-categories:has(.${cat} :checked) ~ .term-list .${cat}`
