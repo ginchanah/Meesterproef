@@ -74,7 +74,10 @@ MARK: General Styling
     font-family: var(--inter-regular);
 }
 
-
+/* ---------- Styling ---------- */
+body {
+    margin: 0;
+}
 
 /* =====================================
 MARK: Light & Dark Mode
@@ -87,6 +90,22 @@ MARK: Light & Dark Mode
 
 body {
     background-color: var(--color-background);
+}
+
+
+/* =====================================
+MARK: Visually hidden
+===================================== */
+
+.visually-hidden {
+    position: absolute;
+    overflow: hidden;
+
+    width: 1px; 
+    height: 1px; 
+
+    clip: inset(50%); 
+    white-space: nowrap;
 }
 
 /* =====================================
@@ -114,7 +133,10 @@ MARK: Header
 MARK: Animation
 ===================================== */
 /* General animation styling, like scalability */
-/* TODO */
 .animation-section {
-
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    overflow: clip;
 }
