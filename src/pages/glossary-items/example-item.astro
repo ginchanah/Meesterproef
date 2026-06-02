@@ -1,31 +1,35 @@
 ---
 // this is the example code for all glossary item detail pages
 
-
 // import the components to reuse
-import DetailLayout from "../../layout/DetailLayout.astro"
-import Animation from "../../components/Animation.astro"
+import DetailLayout from "../../layout/DetailLayout.astro";
+import Animation from "../../components/Animation.astro";
 
 // add the slug of your file here
 export const slug = "example-item";
 // export the title
-export const title = "Glossary Item";
+export const title = "Intra-action";
 // the category on which you can filter your item
 export const category = "threshold";
-
 ---
 
-
-
 <DetailLayout title={title} slug={slug}>
-
 	<Animation>
 		<!-- add your animation here -->
 	</Animation>
 
 	<!-- detail page content for the glossary item -->
 	<p>detail page</p>
-	
+
+	<div id="box-wrapper">
+		<img id="test" src="/public/assets/images/artwork-img.png" alt="" />
+		<img src="/public/assets/images/artwork.png" alt="" />
+		<img src="/public/assets/images/description.png" alt="" />
+		<img src="/public/assets/images/font-art.png" alt="" />
+		<img src="/public/assets/images/top.png" alt="" />
+		<img src="/public/assets/images/top.png" alt="" />
+	</div>
+
 	<!-- link script -->
 	<script src="/js/index.js" is:inline></script>
 </DetailLayout>

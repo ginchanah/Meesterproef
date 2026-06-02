@@ -1,3 +1,73 @@
 /* =====================================
 MARK: general detail page styling
 ===================================== */
+
+
+
+
+img {
+    width: 200px;
+}
+
+body {
+    perspective: 30rem;
+}
+
+#box-wrapper {
+    transform-style: preserve-3d;
+
+    display: grid;
+    justify-items: center;
+    align-items: center;
+
+    /* Source Nienke: https://codepen.io/Nienke-the-styleful/pen/WbGjKKp 
+    https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/transform-function/rotate3d */
+    transform: rotate3d(5, 10, 0, -30deg);
+
+    &> * {
+        grid-area: 1/1;
+        /* display: block; */
+    }
+
+    & img:nth-child(1) {
+        wid
+    }
+
+}
+
+
+front {
+    background: var(--color-rubiks-front);
+    transform: translateZ(var(--translate-one-side));
+}
+
+back {
+    background: var(--color-rubiks-back);
+    transform: translateZ(calc(var(--translate-one-side) * -1));
+}
+
+top {
+    background: var(--color-rubiks-top);
+    transform: rotateX(90deg) translateZ(var(--translate-one-side));
+}
+
+bottom {
+    background: var(--color-rubiks-bottom);
+    transform: rotateX(90deg) translateZ(calc(var(--translate-one-side) * -1));
+}
+
+
+left {
+    background: var(--color-rubiks-left);
+    transform: rotateY(90deg) translateZ(calc(var(--translate-one-side) * -1));
+}
+
+right {
+    background: var(--color-rubiks-right);
+    transform: rotateY(90deg) translateZ(var(--translate-one-side));
+}
+
+
+
+
+
