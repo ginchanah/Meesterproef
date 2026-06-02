@@ -24,50 +24,55 @@ body {
     https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/transform-function/rotate3d */
     transform: rotate3d(5, 10, 0, -30deg);
 
+    
+
     &> * {
         grid-area: 1/1;
         /* display: block; */
     }
 
-    & img:nth-child(1) {
-        wid
+    &:hover {
+        animation: rotate 10s infinite;
     }
 
+    & img:nth-child(1) {
+        transform: translateZ(100px);
+    }
+
+    & img:nth-child(2) {
+        transform: translateZ(-100px);
+    }
+
+    & img:nth-child(3) {
+        transform: rotateY(90deg) translateZ(-100px);
+    }
+
+    & img:nth-child(4) {
+        transform: rotateY(90deg) translateZ(100px);
+    }
+
+      & img:nth-child(5) {
+        transform: rotateX(90deg) translateZ(129px);
+    }
+
+      & img:nth-child(6) {
+        transform: rotateX(90deg) translateZ(-129px);
+    }
+
+
+
+
+
 }
 
 
-front {
-    background: var(--color-rubiks-front);
-    transform: translateZ(var(--translate-one-side));
+@keyframes rotate {
+    from{
+        transform: rotateX(0deg) rotateZ(0deg);
+    }
+    to {
+        transform: rotateX(360deg) rotateZ(720deg);
+    }
 }
-
-back {
-    background: var(--color-rubiks-back);
-    transform: translateZ(calc(var(--translate-one-side) * -1));
-}
-
-top {
-    background: var(--color-rubiks-top);
-    transform: rotateX(90deg) translateZ(var(--translate-one-side));
-}
-
-bottom {
-    background: var(--color-rubiks-bottom);
-    transform: rotateX(90deg) translateZ(calc(var(--translate-one-side) * -1));
-}
-
-
-left {
-    background: var(--color-rubiks-left);
-    transform: rotateY(90deg) translateZ(calc(var(--translate-one-side) * -1));
-}
-
-right {
-    background: var(--color-rubiks-right);
-    transform: rotateY(90deg) translateZ(var(--translate-one-side));
-}
-
-
-
 
 
