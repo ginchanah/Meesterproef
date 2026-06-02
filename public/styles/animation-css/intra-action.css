@@ -9,8 +9,14 @@ MARK: specific animation styling
     initial-value: 0px;
 }
 
-section {
+.animation-container {
+    display: flex;
+    justify-content: center;
+}
+
+#intra-section-1, #intra-section-2, #intra-section-3 {
     --animation-height: 50vh;
+
 
     display: grid;
     grid-template-rows: 1fr;
@@ -19,7 +25,7 @@ section {
     
     background: #111;
     position: relative;
-    width: 100%;      
+    width: max-content;      
     height: var(--animation-height);
     padding-top: 1.5rem;
     overflow: clip;
@@ -53,6 +59,10 @@ section {
     &:active {
         cursor: grabbing;
     }
+}
+
+#intra-section-2 {
+    color: red;
 }
 
 .backgroundp {
