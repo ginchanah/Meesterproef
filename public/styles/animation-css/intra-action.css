@@ -12,10 +12,12 @@ MARK: specific animation styling
 .animation-container {
     display: flex;
     justify-content: center;
+    width: 100%;
+    overflow: clip;
 }
 
 #intra-section-1, #intra-section-2, #intra-section-3 {
-    --animation-height: 50vh;
+    --animation-height: 160vh;
 
 
     display: grid;
@@ -26,7 +28,7 @@ MARK: specific animation styling
     background: #111;
     position: relative;
     width: max-content;      
-    height: var(--animation-height);
+    height: 100vh;
     padding-top: 1.5rem;
     overflow: clip;
     
@@ -34,7 +36,24 @@ MARK: specific animation styling
         position: relative;
         grid-row: 1/2;
         grid-column: 1/2;
-        font-size: 5rem;
+        font-size: 6.5vw;
+
+        @media (max-width: 1551px) {
+            font-size: 6rem;
+        }
+        @media (max-width: 1432px) {
+            font-size: 5.5rem;
+        }
+        @media (max-width: 1313px) {
+            font-size: 5rem;
+        }
+        @media (max-width: 1193px) {
+            font-size: 10vw;
+        }
+         @media (max-width: 670px) {
+            font-size: 19vw;
+        }
+
         margin: 0;
 
         animation: moveUpDown 4s ease-in-out infinite alternate;
@@ -58,6 +77,17 @@ MARK: specific animation styling
 
     &:active {
         cursor: grabbing;
+    }
+}
+
+@media (max-width: 1193px) {
+    #intra-section-3 {
+        display: none;
+    }
+}
+@media (max-width: 670px) {
+    #intra-section-2 {
+        display: none;
     }
 }
 
