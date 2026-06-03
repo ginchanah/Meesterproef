@@ -29,7 +29,7 @@ const AnimationComponent = animations[animationPath]?.default;
     
 
     {item.content?.map(section => (
-        <section>
+        <section class={section.type}>
             <div set:html={section.intro}></div>
             <h2>{section.title}</h2>
             {section.media.map(media => (
