@@ -5,49 +5,59 @@ import MainLayout from "../layout/MainLayout.astro"
 
 
 // get all files inside the glossaryitems folder
-const modules = import.meta.glob('../pages/glossary-items/*.astro', { eager: true });
+// const modules = import.meta.glob('../pages/glossary-items/*.astro', { eager: true });
 
 
-// get the url and title corresponding to the page, but exclude the example-item.astro page
-const links = Object.entries(modules).filter(([path]) => !path.includes('example-item.astro')).map(([path, module]) => {
+// // get the url and title corresponding to the page, but exclude the example-item.astro page
+// const links = Object.entries(modules).filter(([path]) => !path.includes('example-item.astro')).map(([path, module]) => {
 
-	const url = path.replace('../pages', '').replace('.astro', '');
-	const title = module.title || path.split('/').pop()?.replace('.astro', '') || 'Untitled';
-	const slug = module.slug || path.split('/').pop()?.replace('.astro', '') || 'untitled';  
-	// the category is later added as a class so you can filter the item based on it
-	const category = module.category || "";
-	return { url, title, category, slug };
+// 	const url = path.replace('../pages', '').replace('.astro', '');
+// 	const title = module.title || path.split('/').pop()?.replace('.astro', '') || 'Untitled';
+// 	const slug = module.slug || path.split('/').pop()?.replace('.astro', '') || 'untitled';  
+// 	// the category is later added as a class so you can filter the item based on it
+// 	const category = module.category || "";
+// 	return { url, title, category, slug };
 
-});
+// });
 
-const categories = [...new Set(links.map(link => link.category).filter(Boolean))];
+// const categories = [...new Set(links.map(link => link.category).filter(Boolean))];
+
+
+
+
+// MARK: data.js
+import { data } from "../data/data.js";
+
+const items = data.glossaryItems;
+
+// get all the categories
+const allCategories = items.flatMap(item => item.categories);
+// remove duplicates
+const categories = [...new Set(allCategories)];
 
 ---
 
 <MainLayout>
 	<!-- dynamically add all links to the glossary-item pages -->
 	<ul class="term-categories">
-		{categories.map(category => (
-			<li class={category}>
-				<label><input type="checkbox">{category}</label>
-			</li>
-		))}
+		{categories.map((category) => {
+			return (
+				<li class={category}>
+					<label><input type="checkbox">{category}</label>
+				</li>
+			);
+		})}
 	</ul>
 
 	<ul class="term-list">
-		{links.map(link => (
-			<li class={link.category}>
-				<a href={link.url}>{link.title}</a>
+		{items.map((item) => (
+			<li class={item.categories.join(' ')}>
+				<a href=`glossary-items/${item.slug}`>{item.title}</a>
 			</li>
 		))}
 	</ul>
 
-	// ?
-	// <li>
-	// 	<a href={`/traits/${item.index}`}>
-	// 		{item.name}
-	// 	</a>
-	// </li>
+
 
 
 	<script src="/js/index.js" is:inline></script>
