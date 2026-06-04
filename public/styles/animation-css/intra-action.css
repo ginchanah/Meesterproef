@@ -3,6 +3,124 @@ MARK: specific animation styling
 ===================================== */
 /* give your css file the same slug name as the page you're working on */
 
-.intra-action-div p {
-    background: red;
+@property --animation-height {
+    syntax: "<length> | <percentage>";
+    inherits: true;
+    initial-value: 0px;
 }
+
+.animation-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    overflow: clip;
+}
+
+#intra-section-1, #intra-section-2, #intra-section-3 {
+    --animation-height: 160vh;
+
+
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    align-items: start;
+    
+    background: #111;
+    position: relative;
+    width: max-content;      
+    height: 100vh;
+    padding-top: 1.5rem;
+    overflow: clip;
+    
+    p {
+        position: relative;
+        grid-row: 1/2;
+        grid-column: 1/2;
+        font-size: 6.5vw;
+
+        @media (max-width: 1551px) {
+            font-size: 6rem;
+        }
+        @media (max-width: 1432px) {
+            font-size: 5.5rem;
+        }
+        @media (max-width: 1313px) {
+            font-size: 5rem;
+        }
+        @media (max-width: 1193px) {
+            font-size: 10vw;
+        }
+         @media (max-width: 670px) {
+            font-size: 19vw;
+        }
+
+        margin: 0;
+
+        animation: moveUpDown 4s ease-in-out infinite alternate;
+        animation-delay: calc(var(--index) * 0.3s );
+
+        &.dragging {
+            cursor: grabbing;
+            animation: none;
+            color: var(--grey);
+        }
+
+        &.dragged {
+            animation-delay: 0s;
+        }
+
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+@media (max-width: 1193px) {
+    #intra-section-3 {
+        display: none;
+    }
+}
+@media (max-width: 670px) {
+    #intra-section-2 {
+        display: none;
+    }
+}
+
+#intra-section-2 {
+    color: red;
+}
+
+.backgroundp {
+    color: #111;
+    isolation: isolate;
+}
+
+.blend {
+    color: #111;
+    mix-blend-mode: screen;
+}
+
+.absolute {
+    color: #111;
+    font-size: 3rem;
+    position: absolute;
+    writing-mode: vertical-lr;
+    
+}
+
+@keyframes moveUpDown {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(calc(var(--animation-height)/2));
+    }
+    100% {
+        transform: translateY(0);
+    }
+    }
