@@ -1,0 +1,68 @@
+---
+// link to the footer:
+// src/components/Footer.astro
+
+// define two variants for the footer
+interface Props {
+    variant?: 'index' | 'detail';
+    title?: String
+}
+
+// define props to receive from other components
+const { variant = 'home', title } = Astro.props;
+---
+
+
+
+<!-- here we define two different footers for the homepage and for the detail page -->
+<footer class={`footer footer-${variant}`}>
+    <!-- this is the footer for the homepage -->
+    {variant === 'index' && (
+
+        <div>
+            <!-- banner -->
+            <div class="banner-container">
+                <div class="banner-content" id="bannerContent">
+                <!-- Populated by banner.js -->
+                </div>
+            </div>
+            <!-- haar naam -->
+            <p>MARJOLIJN RUIJG</p>
+            <!--about link -->
+            <a href="/src/pages/sub-pages/about.astro">ABOUT</a>
+            <!-- contact link -->
+            <a href="/src/pages/sub-pages/contact.astro">CONTACT</a>
+            <!-- contact link -->
+            <p>2026 blablabla team font-end hoppa</p>
+        </div>
+
+    )}
+    
+    <!-- this is the footer for the glossary item page -->
+    {variant === 'detail' && (
+
+        // navigation between the glossary items
+        <div>
+            <nav>
+                <a href="/placeholder">PLACEHOLDER</a>
+                <a href="/">BACK TO GLOSSARY</a>
+                <a href="/placeholder">PLACEHOLDER</a>
+            </nav>
+                <!-- banner -->
+                <div class="banner-container">
+                    <div class="banner-content" id="bannerContent">
+                    <!-- Populated by banner.js -->
+                    </div>
+                </div>
+                <!-- haar naam -->
+                <p>MARJOLIJN RUIJG</p>
+                <!--about link -->
+                <a href="/src/pages/sub-pages/about.astro">ABOUT</a>
+                <!-- contact link -->
+                <a href="/src/pages/sub-pages/contact.astro">CONTACT</a>
+                <!-- contact link -->
+                <p>2026 blablabla team font-end hoppa</p>
+        </div>
+
+    )}
+</footer>
