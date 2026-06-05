@@ -20,3 +20,22 @@ spanSplitContainer?.forEach((el) => {
         .map((char) => `<span>${char === " " ? "&nbsp;" : char}</span>`)
         .join("");
 });
+
+
+
+
+// infinite banner in footer
+document.addEventListener("DOMContentLoaded", () => {
+    const bannerContent = document.getElementById("bannerContent");
+    const word = "test";
+    const repetitions = 20; // Ensure enough repetitions to fill wide screens
+    
+    // Create one continuous string of the word
+    let halfContent = "";
+    for (let i = 0; i < repetitions; i++) {
+        halfContent += `<span class="banner-text">${word}</span>`;
+    }
+    
+    // Duplicate the content to allow the seamless infinite CSS translation (-50%)
+    bannerContent.innerHTML = halfContent + halfContent;
+});
