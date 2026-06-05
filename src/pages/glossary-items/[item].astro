@@ -1,6 +1,6 @@
 ---
-import Animation from "../../components/Animation.astro";
 import DetailLayout from "../../layout/DetailLayout.astro"
+import Header from "../../components/Header.astro";
 import { data } from "../../data/data.js";
 
 export function getStaticPaths() {
@@ -11,34 +11,25 @@ export function getStaticPaths() {
 }
 
 const { item } = Astro.props;
-
-
-// Dynamically import the animation file based on slug
-const animations = import.meta.glob('../animations/*.astro', { eager: true });
-const animationPath = `../animations/${item.slug}.astro`;
-const AnimationComponent = animations[animationPath]?.default;
 ---
 
 
 <DetailLayout title={item.title} slug={item.slug}>
-    <section class="animation-section">
-        <h2 class="visually-hidden">Typographic animation of the word {item.title}</h2>
+    <Header variant="two" title={item.title} slug={item.slug}/>
 
-        {AnimationComponent ? <AnimationComponent /> : <p>Animation not found</p>}
-    </section>
-    
+    <main>
+        {item.content?.map(section => (
+            <section class={section.type}>
+                <div set:html={section.intro}></div>
+                <h2>{section.title}</h2>
+                {section.media.map(media => (
+                    <img src={media.src} alt={media.alt} />
+                ))}
+            </section>
+        ))}
+    </main>
 
-    {item.content?.map(section => (
-        <section class={section.type}>
-            <div set:html={section.intro}></div>
-            <h2>{section.title}</h2>
-            {section.media.map(media => (
-                <img src={media.src} alt={media.alt} />
-            ))}
-        </section>
-    ))}
-
-    <script src="/js/index.js" is:inline></script>
+<script src="/js/index.js" is:inline></script>
 </DetailLayout>
 
 
