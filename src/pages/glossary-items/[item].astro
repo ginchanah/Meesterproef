@@ -18,13 +18,38 @@ const { item } = Astro.props;
     <Header variant="two" title={item.title} slug={item.slug}/>
 
     <main>
-        {item.content?.map(section => (
-            <section class={section.type}>
-                <div set:html={section.intro}></div>
-                <h2>{section.title}</h2>
-                {section.media.map(media => (
-                    <img src={media.src} alt={media.alt} />
-                ))}
+        {item.content?.map((section) => (
+            <section class={`${section.type} media-section`}>
+                <div class="section-text">
+                    {section.heading && <h2>{section.heading}</h2>}
+
+                    {section.intro?.type === "quote" && (
+                        <>
+                        <blockquote>{section.intro.text}</blockquote>
+                        <h3>{section.author}</h3>
+                        </>
+                    )}
+
+                    {section.intro?.type === "text" && (
+                        <>
+                        <p>{section.intro.text}</p>
+                        <h3>{section.author}</h3>
+                        </>
+                    )}
+
+                    {section.subtext?.type === "link" && (
+                        <a href={section.subtext.text}>{section.subtext.text}</a>
+                    )}
+                    
+                    {section.subtext?.type === "source" && (
+                        <cite>{section.subtext.text}</cite>
+                    )}
+                </div>
+                <figure class="section-media">
+                    {section.media?.map((media) => (
+                        <img src={media.src} alt={media.alt} />
+                    ))}
+                </figure>
             </section>
         ))}
     </main>
