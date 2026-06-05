@@ -20,6 +20,94 @@ MARK: Variables
     --color-text: var(--black);
     --color-background: var(--white);
     --color-border: var(--black);
+
+
+
+     /* ---------- Text ---------- */
+    /* Title/H1 */
+    --font-title-size: 5rem;
+    --font-title-family: var(--inter-regular);
+    --font-title-weight: bold;
+    --font-title-transform: uppercase;
+
+    /* Heading 2 */
+    --font-heading-2-size: 3.5rem;
+    --font-heading-2-family: var(--inter-regular);
+    --font-heading-2-weight: bold;
+
+    /* Heading 2 in body text */
+    --font-heading-2-text-size: 1.2rem;
+    --font-heading-2-text-family: var(--courier-prime-bold);
+    --font-heading-2-text-weight: bold;
+
+    /* Body Text */
+    --font-body-text-size: 1.2rem;
+    --font-body-text-family: var(--courier-prime-regular);
+    --font-body-text-weight: normal;
+
+    /* Body Text Bold */
+    --font-body-text-bold-size: 1.2rem;
+    --font-body-text-bold-family: var(--courier-prime-bold);
+    --font-body-text-bold-weight: bold;
+
+    /* Body Text Italic */
+    --font-body-text-italic-size: 1.2rem;
+    --font-body-text-italic-family: var(--courier-prime-italic);
+    --font-body-text-italic-weight: normal;
+    --font-body-text-italic-style: italic;
+
+    /* Button Small */
+    --font-button-small-size: 1.2rem;
+    --font-button-small-family: var(--inter-regular);
+    --font-button-small-weight: light;
+    --font-button-small-transform: uppercase;
+
+    /* Button Big */
+    --font-button-big-size: 3.5rem;
+    --font-button-big-family: var(--inter-regular);
+    --font-button-big-weight: light;
+    --font-button-big-transform: uppercase;
+
+
+
+     /* ---------- Margin & Paddings ---------- */
+     /* desktop */
+    --section-padding-large: 0 15rem;
+    --section-margin-large: 4rem 0;
+
+    --nav-padding-large: 4rem 15rem;
+
+    /* tablet */
+    --section-padding-medium: 0 5rem;
+    --section-margin-medium: 4rem 0;
+
+    --nav-padding-medium: 4rem 2rem;
+
+    /* phone */
+    --section-padding-small: 0 1rem;
+    --section-margin-small: 4rem 0;
+
+    --nav-padding-small: 0;
+
+
+
+     /* ---------- Breakpoints ---------- */
+    --breakpoint-phone: 0px;
+    --breakpoint-tablet: 490px;
+    --breakpoint-desktop: 891px;
+}
+
+/* =====================================
+MARK: Light & Dark Mode
+===================================== */
+
+* {
+    color: var(--color-text);
+
+}
+
+body {
+    background-color: var(--color-background);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -74,23 +162,89 @@ MARK: General Styling
     font-family: var(--inter-regular);
 }
 
+h1 {
+    font-size: var(--font-title-size);
+    font-family: var(--font-title-family);
+    font-weight: var(--font-title-weight);
+    text-transform: var(--font-title-transform);
+}
+
+h2 {
+    font-size: var(--font-heading-2-size);
+    font-family: var(--font-heading-2-family);
+    font-weight: var(--font-heading-2-weight);
+}
+
+.heading-2-text {
+    font-size: var(--font-heading-2-text-size);
+    font-family: var(--font-heading-2-text-family);
+    font-weight: var(--font-heading-2-text-weight);
+}
+
+.heading-2-big {
+    font-size: var(--font-heading-2-big-size);
+    font-family: var(--font-heading-2-big-family);
+    font-weight: var(--font-heading-2-big-weight);
+}
+
+body {
+    font-size: var(--font-body-text-size);
+    font-family: var(--font-body-text-family);
+    font-weight: var(--font-body-text-weight);
+}
+
+.button-small {
+    font-size: var(--font-button-small-size);
+    font-family: var(--font-button-small-family);
+    font-weight: var(--font-button-small-weight);
+    text-transform: var(--font-button-small-transform);
+}
+
+.button-big {
+    font-size: var(--font-button-big-size);
+    font-family: var(--font-button-big-family);
+    font-weight: var(--font-button-big-weight);
+    text-transform: var(--font-button-big-transform);
+}
+
 /* ---------- Styling ---------- */
 body {
     margin: 0;
 }
 
-/* =====================================
-MARK: Light & Dark Mode
-===================================== */
+/* ---------- Margins & Paddings ---------- */
 
-* {
-    color: var(--color-text);
-
+h1, h2, h3, h4, h5, p {
+    margin: 0;
 }
 
-body {
-    background-color: var(--color-background);
+figure {
+    margin: 0;
 }
+
+header.header-two nav {
+    padding: var(--nav-padding);
+}
+
+@media (min-width: 0px) {
+    :root {
+        --nav-padding: var(--nav-padding-small);
+    }
+}
+@media (min-width: 490px) {
+    :root {
+        --nav-padding: var(--nav-padding-medium);
+    }
+}
+@media (min-width: 891px) {
+    :root {
+        --nav-padding: var(--nav-padding-large);
+    }
+}
+
+
+
+
 
 
 /* =====================================
@@ -124,19 +278,127 @@ MARK: Header
 }
 
 /* header on the glossary item page */
-/* TODO */
 .header-two {
+    display: grid;
+    
+    nav {
+        width: max-content;
+
+        h2 {
+            text-transform: uppercase;
+            margin-right: 5rem;
+            
+        }
+    
+        .button-big {
+            text-align: right;
+            width: 100%;
+            display: inline-block;
+            
+        }
+
+        h2, .button-big {
+            font-size: clamp(1.8rem, 10vw, 3.5rem)
+        }
+
+    }
+    
+    
+}
+
+
+
+@media (max-width: 675px) {
+    .header-two {
+        justify-items: center;
+    }
 
 }
 
+
 /* =====================================
-MARK: Animation
+MARK: Animation section
 ===================================== */
-/* General animation styling, like scalability */
+/* General animation styling, full screen */
 .animation-section {
     height: 100vh;
     width: 100vw;
     margin: 0;
     padding: 0;
     overflow: clip;
+}
+
+
+
+/* =====================================
+MARK: Section components
+===================================== */
+/* general section styling */
+.media-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7.5rem;
+    padding: var(--section-padding);
+    margin: var(--section-margin);
+
+    
+    figure {
+        width: 100%;
+        margin: 0;
+
+        img {
+            width: 100%;
+        }
+    }
+}
+
+@media (min-width: 1px) {
+    :root {
+        --section-padding: var(--section-padding-small);
+        --section-margin: var(--section-margin-small);
+    }
+}
+@media (min-width: 490px) {
+    :root {
+        --section-padding: var(--section-padding-medium);
+        --section-margin: var(--section-margin-medium);
+    }
+}
+@media (min-width: 891px) {
+    :root {
+        --section-padding: var(--section-padding-large);
+        --section-margin: var(--section-margin-large);
+    }
+}
+
+/* for images on the left */
+.media-right {
+    
+}
+
+
+@media (min-width: 1240px) {
+    .media-section {
+        grid-template-columns: 1fr 1fr;
+
+        div {
+            grid-row: 1/2;
+        }
+
+    }
+
+    .media-left {
+        .section-text {
+            grid-column: 2/3;
+        }
+        .section-media {
+            grid-column: 1/2;
+        }
+    }
+  
+}
+
+
+blockquote {
+
 }
