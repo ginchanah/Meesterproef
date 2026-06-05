@@ -1,6 +1,6 @@
 ---
-import Animation from "../../components/Animation.astro";
 import DetailLayout from "../../layout/DetailLayout.astro"
+import Header from "../../components/Header.astro";
 import { data } from "../../data/data.js";
 
 export function getStaticPaths() {
@@ -11,34 +11,50 @@ export function getStaticPaths() {
 }
 
 const { item } = Astro.props;
-
-
-// Dynamically import the animation file based on slug
-const animations = import.meta.glob('../animations/*.astro', { eager: true });
-const animationPath = `../animations/${item.slug}.astro`;
-const AnimationComponent = animations[animationPath]?.default;
 ---
 
 
 <DetailLayout title={item.title} slug={item.slug}>
-    <section class="animation-section">
-        <h2 class="visually-hidden">Typographic animation of the word {item.title}</h2>
+    <Header variant="two" title={item.title} slug={item.slug}/>
 
-        {AnimationComponent ? <AnimationComponent /> : <p>Animation not found</p>}
-    </section>
-    
+    <main>
+        {item.content?.map((section) => (
+            <section class={`${section.type} media-section`}>
+                <div class="section-text">
+                    {section.heading && <h2>{section.heading}</h2>}
 
-    {item.content?.map(section => (
-        <section class={section.type}>
-            <div set:html={section.intro}></div>
-            <h2>{section.title}</h2>
-            {section.media.map(media => (
-                <img src={media.src} alt={media.alt} />
-            ))}
-        </section>
-    ))}
+                    {section.intro?.type === "quote" && (
+                        <>
+                        <blockquote>{section.intro.text}</blockquote>
+                        <h3>{section.author}</h3>
+                        </>
+                    )}
 
-    <script src="/js/index.js" is:inline></script>
+                    {section.intro?.type === "text" && (
+                        <>
+                        <p>{section.intro.text}</p>
+                        <h3>{section.author}</h3>
+                        </>
+                    )}
+
+                    {section.subtext?.type === "link" && (
+                        <a href={section.subtext.text}>{section.subtext.text}</a>
+                    )}
+                    
+                    {section.subtext?.type === "source" && (
+                        <cite>{section.subtext.text}</cite>
+                    )}
+                </div>
+                <figure class="section-media">
+                    {section.media?.map((media) => (
+                        <img src={media.src} alt={media.alt} />
+                    ))}
+                </figure>
+            </section>
+        ))}
+    </main>
+
+<script src="/js/index.js" is:inline></script>
 </DetailLayout>
 
 

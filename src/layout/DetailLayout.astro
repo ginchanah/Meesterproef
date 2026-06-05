@@ -1,11 +1,11 @@
 ---
 interface Props {
-    title: string;
-    slug: string;
+    title?: string;
+    slug?: string;
+    item?: any;
 }
 
 // import the components to reuse
-import Header from "../components/Header.astro";
 import AnimationHead from "../components/AnimationHead.astro"
 
 const { title, slug } = Astro.props;
@@ -25,16 +25,10 @@ const { title, slug } = Astro.props;
         <AnimationHead slug={slug} />
 
         <meta name="viewport" content="width=device-width" />
-        <title>Glossary Items</title>
+        <title>{title}</title>
 
     </head>
     <body>
-        <!-- ---------- Add header variant two ---------- -->
-        <Header variant="two" title={title} />
-        
-        <!-- ---------- Main Content ---------- -->
-        <main>
             <slot />
-        </main>
     </body>
 </html>
