@@ -142,6 +142,75 @@ export const data = {
       categories: ["example-category2"],
     },
     {
+      title: "Ma (in-between)",
+      slug: "ma",
+      categories: ["category-1"],
+      content: [
+        {
+          type: "media-left",
+          intro: {
+            type: "quote",
+            text: "The Japanese concept of ma (間) assigns subjecthood to the tension between two entities. It suggests that the subject exists not in the human or the external world but in a third dimension - the dialogue between them. The in-between does not distinguish between humans, non-humans, nature, and man-made objects; rather, it represents a new nature of intelligence that emarges in the space between."
+          },
+          author: "",
+          subtext: {
+            type: "source",
+            text: "Venice Biennale Series- Biennale Architettura 2025 Intelligens. Natural. Artificial. Collective. Japanese Pavillion"
+          },
+          media: [
+            {
+              type: "image",
+              src: "/public/assets/images/ma-visualisation.png",
+              alt: "ma written out in a frame. The oudside of part both letters is cut off."
+            },
+          ],
+        },
+        {
+          type: "media-right",
+          heading: "Skyspace",
+          intro: {
+            type: "text",
+            text: "In Skyspace, James Turrell creates an architectural aperture where sky, light, and time merge in a single perceptual experience. A square or circular opening in the ceiling frames the sky, not as an object to observe, but as a presence that continuously shifts. Inside, silence prevails, allowing the viewer’s act of seeing itself to become the focus."
+          },
+          author: "James Turrell, skyspaces (1974 - now)",
+          subtext: {
+            type: "link",
+            text: "https://www.youtube.com/watch?v=_BuJpDXkMz8"
+          },
+          media: [
+            {
+              type: "image",
+              src: "/public/assets/images/ma-artwork.png",
+              alt: "Picture of the ceiling of a white room. The ceiling is square and in the middle there is a square window/hole. Trough it you can view a blue sky. It is the artwork skyspaces from James Turrell. Where he plays with light."
+            },
+          ]
+        },
+        {
+          type: "media-left",
+          heading: "Helvetica",
+          intro: {
+            type: "intro",
+            text: "Massimo Vignelli talking about the space between the characters that makes it, in Helvetica, a documentary about the typeface Helvertica, directed by Gary"
+          },
+          subtext: {
+            type: "link",
+            text: "https://www.youtube.com/watch?v=9g3Ogtgleyg"
+          },
+          media: [
+            {
+              type: "image",
+              src:  "/public/assets/images/ma-title.png",
+              alt:  "ma written out in a frame. The oudside part of both letters is cut off."
+            },
+          ]
+        }
+      ],
+      generalImage: {
+        type: "image",
+        src: "/public/assets/images/ma-title.png"
+      }
+    },
+    {
       title: "example",
       slug: "example",
       categories: ["example-category2"],
