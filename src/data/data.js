@@ -73,7 +73,7 @@ export const data = {
     },
     {
       title: "Adaptation",
-      slug: "example",
+      slug: "adaptation",
       categories: ["example-category3"],
     },
     {
