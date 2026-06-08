@@ -57,9 +57,49 @@ export const data = {
       }
     },
     {
-      title: "example",
+      title: "Inter-action",
       slug: "example",
       categories: ["example-category"],
-    }
+    },
+    {
+      title: "Treshold",
+      slug: "example",
+      categories: ["example-category"],
+    },
+    {
+      title: "System",
+      slug: "example",
+      categories: ["example-category3"],
+    },
+    {
+      title: "Adaptation",
+      slug: "example",
+      categories: ["example-category3"],
+    },
+    {
+      title: "Balancing Feedback",
+      slug: "example",
+      categories: ["example-category3"],
+    },
+    {
+      title: "Reinforcing Feedback",
+      slug: "example",
+      categories: ["example-category3"],
+    },
+    {
+      title: "Invisible",
+      slug: "example",
+      categories: ["example-category"],
+    },
+    {
+      title: "Interface",
+      slug: "example",
+      categories: ["example-category2"],
+    },
+    {
+      title: "example",
+      slug: "example",
+      categories: ["example-category2"],
+    },
   ],
 };

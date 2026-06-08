@@ -1,3 +1,98 @@
 /* =====================================
 MARK: general detail page styling
 ===================================== */
+
+/* =====================================
+MARK: Animation section
+===================================== */
+/* General animation styling, full screen */
+.animation-section {
+    font-family: var(--font-animation-family);
+   
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    overflow: clip;
+}
+
+.banner-text {
+    font-family: var(--font-animation-family);
+   
+}
+
+
+
+
+/* =====================================
+MARK: Section components
+===================================== */
+/* general section styling */
+.media-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7.5rem;
+    padding: var(--section-padding);
+    margin: var(--section-margin);
+
+    
+    figure {
+        width: 100%;
+        margin: 0;
+
+        img {
+            width: 100%;
+        }
+    }
+}
+
+@media (min-width: 1px) {
+    :root {
+        --section-padding: var(--section-padding-small);
+        --section-margin: var(--section-margin-small);
+    }
+}
+@media (min-width: 490px) {
+    :root {
+        --section-padding: var(--section-padding-medium);
+        --section-margin: var(--section-margin-medium);
+    }
+}
+@media (min-width: 891px) {
+    :root {
+        --section-padding: var(--section-padding-large);
+        --section-margin: var(--section-margin-large);
+    }
+}
+
+/* for images on the left */
+.media-right {
+    
+}
+
+
+@media (min-width: 1150px) {
+    .media-section {
+        grid-template-columns: 1fr 1fr;
+
+        div {
+            grid-row: 1/2;
+        }
+
+    }
+
+    .media-left {
+        .section-text {
+            grid-column: 2/3;
+        }
+        .section-media {
+            grid-column: 1/2;
+        }
+    }
+  
+}
+
+
+blockquote {
+
+}

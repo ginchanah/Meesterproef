@@ -43,7 +43,9 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
 
         <div class="animation-section">
             <h1 class="visually-hidden">{title}</h1>
-            {AnimationComponent ? <AnimationComponent /> : <p>Animation not found</p>}
+            <div aria-hidden="true">
+                {AnimationComponent ? <AnimationComponent /> : <p>Animation not found</p>}
+            </div>
         </div>
         <nav>
             <h2>{title}</h2>
