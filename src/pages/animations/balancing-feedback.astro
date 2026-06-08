@@ -1,0 +1,205 @@
+---
+
+---
+
+<main class="balancing-container">
+    <section class="row">
+        <!-- ===================================== -->
+        <!-- MARK: Balancing Word                  -->
+        <!-- ===================================== -->
+
+        <!-- ---------- Letters ---------- -->
+        <div class="block word-balancing">B</div>
+        <div class="block word-balancing">A</div>
+        <div class="block word-balancing">L</div>
+        <div class="block word-balancing">A</div>
+        <div class="block word-balancing">N</div>
+        <div class="block word-balancing">C</div>
+        <div class="block word-balancing">I</div>
+        <div class="block word-balancing">N</div>
+        <div class="block word-balancing">G</div>
+
+        <!-- ===================================== -->
+        <!-- MARK: Feedback Word                   -->
+        <!-- ===================================== -->
+
+        <!-- ---------- Letters ---------- -->
+        <div class="block word-feedback margin-left">F</div>
+        <div class="block word-feedback">E</div>
+        <div class="block word-feedback">E</div>
+        <div class="block word-feedback">D</div>
+        <div class="block word-feedback">B</div>
+        <div class="block word-feedback">A</div>
+        <div class="block word-feedback">C</div>
+        <div class="block word-feedback">K</div>
+    </section>
+</main>
+
+<script>
+    // =====================================
+    // MARK: Variables
+    // =====================================
+
+    // ---------- DOM Elements ----------
+    // Grab all the letter blocks from our HTML page
+    const letters = Array.from(document.querySelectorAll(".block"));
+    // Count how many letters we have in total
+    const totalLetters = letters.length;
+
+    // ---------- State ----------
+    // Create a list to remember exactly where each letter is and how fast it's moving
+    const letterStates = Array.from({ length: totalLetters }, () => ({
+        y: 0, // Vertical position (0 is the middle)
+        speedY: 0, // How fast it's currently moving up or down
+        angle: 0, // How much it's tilted
+    }));
+
+    // Remember where the mouse wants to pull the middle letter
+    let targetY = 0;
+
+    // =====================================
+    // MARK: Initialization
+    // =====================================
+
+    // ---------- Setup ----------
+    // Watch for the mouse moving and update our target position
+    window.addEventListener("mousemove", (e) => updateTargetY(e.clientY));
+    // If the mouse leaves the screen, stop pulling (go back to 0)
+    window.addEventListener("mouseleave", () => {
+        targetY = 0;
+    });
+
+    // Do the exact same thing for touch screens (like phones)
+    window.addEventListener(
+        "touchmove",
+        (e) => {
+            if (e.touches.length > 0) updateTargetY(e.touches[0].clientY);
+        },
+        { passive: true },
+    );
+    window.addEventListener("touchend", () => {
+        targetY = 0;
+    });
+
+    // Add a hover and click effect to every single letter
+    letters.forEach((letterElement, index) => {
+        letterElement.addEventListener("mouseenter", () =>
+            handleLetterHover(index),
+        );
+        letterElement.addEventListener("click", () => handleLetterClick(index));
+    });
+
+    // Start the animation, updating the letters over and over again
+    requestAnimationFrame(() => updatePhysics());
+
+    // =====================================
+    // MARK: Functions
+    // =====================================
+
+    // ---------- Helpers ----------
+    const updateTargetY = (clientY) => {
+        // Turn the mouse position into a number between -1 (top) and 1 (bottom)
+        const normY = (clientY / window.innerHeight) * 2 - 1;
+
+        // Multiply by 50 so it only pulls a maximum of 50 pixels up or down
+        targetY = normY * 50;
+    };
+
+    const handleLetterHover = (index) => {
+        // Random direction: UP (-1) or DOWN (1)
+        const direction = Math.random() < 0.5 ? -1 : 1;
+
+        // Give the hovered letter a little push
+        letterStates[index].speedY += direction * 4;
+
+        // Give the letter to its left a tiny push
+        if (index > 0) letterStates[index - 1].speedY += direction * 1.2;
+        // Give the letter to its right a tiny push
+        if (index < totalLetters - 1)
+            letterStates[index + 1].speedY += direction * 1.2;
+    };
+
+    const handleLetterClick = (index) => {
+        // Same as hovering, but use much bigger numbers so it swings wildly on click
+        const direction = Math.random() < 0.5 ? -1 : 1;
+        letterStates[index].speedY += direction * 35;
+
+        if (index > 0) letterStates[index - 1].speedY += direction * 17.5;
+        if (index < totalLetters - 1)
+            letterStates[index + 1].speedY += direction * 17.5;
+    };
+
+    // ---------- Main Loop ----------
+    const updatePhysics = () => {
+        // Find exactly which letter is in the center
+        const middleIndex = Math.floor(totalLetters / 2);
+
+        for (let i = 0; i < totalLetters; i++) {
+            let letter = letterStates[i];
+
+            // --- Step 1: Who should this letter follow? ---
+            let neighborY = letter.y; // By default, don't follow anyone
+
+            // Letters on the left follow the letter to their right (towards the middle)
+            if (i < middleIndex) {
+                neighborY = letterStates[i + 1].y;
+            }
+            // Letters on the right follow the letter to their left (towards the middle)
+            else if (i > middleIndex) {
+                neighborY = letterStates[i - 1].y;
+            }
+
+            // --- Step 2: Calculate the pushes and pulls ---
+
+            // 1. Pull towards the neighbor letter (move 25% of the distance)
+            let pullToNeighbor = (neighborY - letter.y) * 0.25;
+
+            // 2. Glue the very first and very last letter to the middle line
+            let pullToAnchor = 0;
+            if (i === 0 || i === totalLetters - 1) {
+                pullToAnchor = (0 - letter.y) * 0.3;
+            }
+
+            // 3. Slowly pull EVERY letter back to the middle line
+            let pullToCenter = (0 - letter.y) * 0.07;
+
+            // 4. If this is the middle letter, let the mouse pull it
+            let pullToMouse = 0;
+            if (i === middleIndex) {
+                pullToMouse = (targetY - letter.y) * 0.08;
+            }
+
+            // --- Step 3: Move the letter ---
+
+            // Add all those pushes and pulls together to get the new speed
+            letter.speedY +=
+                pullToNeighbor + pullToAnchor + pullToCenter + pullToMouse;
+
+            // Slow down slightly over time so it stops bouncing eventually
+            letter.speedY *= 0.8; // Keep 80% of the speed
+
+            // Add the speed to the actual position on the screen
+            letter.y += letter.speedY;
+
+            // --- Step 4: Tilt the letter ---
+            // Tilt the letters depending on how far they are from the neighbor
+            if (i < middleIndex) {
+                letter.angle = (letter.y - neighborY) * -0.16; // Tilt left side
+            } else if (i > middleIndex) {
+                letter.angle = (letter.y - neighborY) * 0.16; // Tilt right side
+            } else {
+                letter.angle = 0; // Keep the middle letter perfectly straight
+            }
+        }
+
+        // --- Step 5: Draw the changes ---
+        // Apply the new position and tilt to the actual HTML elements on the screen
+        for (let i = 0; i < totalLetters; i++) {
+            letters[i].style.transform =
+                `translateY(${letterStates[i].y}px) rotate(${letterStates[i].angle}deg)`;
+        }
+
+        // Tell the browser to run this entire function again on the very next frame (for smooth fps)
+        requestAnimationFrame(updatePhysics);
+    };
+</script>
