@@ -68,12 +68,18 @@ MARK: Variables
     --font-button-big-weight: light;
     --font-button-big-transform: uppercase;
 
+     /* Animation */
+    --font-animation-size: 1.2rem;
+    --font-animation-family: var(--inter-regular);
+    --font-animation-weight: light;
+    --font-animation-transform: uppercase;
+
 
 
      /* ---------- Margin & Paddings ---------- */
      /* desktop */
-    --section-padding-large: 0 15rem;
-    --section-margin-large: 4rem 0;
+    --section-padding-large: 4rem 15rem;
+    --section-margin-large: 0rem 0;
 
     --nav-padding-large: 4rem 15rem;
 
@@ -158,7 +164,7 @@ MARK: Fonts
 MARK: General Styling
 ===================================== */
 /* ---------- Fonts ---------- */
-* {
+h1, h2, h3, h4, h5, label {
     font-family: var(--inter-regular);
 }
 
@@ -205,6 +211,10 @@ body {
     font-family: var(--font-button-big-family);
     font-weight: var(--font-button-big-weight);
     text-transform: var(--font-button-big-transform);
+}
+
+footer {
+    font-family: var(--font-animation-family);
 }
 
 /* ---------- Styling ---------- */
@@ -315,90 +325,3 @@ MARK: Header
 
 }
 
-
-/* =====================================
-MARK: Animation section
-===================================== */
-/* General animation styling, full screen */
-.animation-section {
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
-    overflow: clip;
-}
-
-
-
-/* =====================================
-MARK: Section components
-===================================== */
-/* general section styling */
-.media-section {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 7.5rem;
-    padding: var(--section-padding);
-    margin: var(--section-margin);
-
-    
-    figure {
-        width: 100%;
-        margin: 0;
-
-        img {
-            width: 100%;
-        }
-    }
-}
-
-@media (min-width: 1px) {
-    :root {
-        --section-padding: var(--section-padding-small);
-        --section-margin: var(--section-margin-small);
-    }
-}
-@media (min-width: 490px) {
-    :root {
-        --section-padding: var(--section-padding-medium);
-        --section-margin: var(--section-margin-medium);
-    }
-}
-@media (min-width: 891px) {
-    :root {
-        --section-padding: var(--section-padding-large);
-        --section-margin: var(--section-margin-large);
-    }
-}
-
-/* for images on the left */
-.media-right {
-    
-}
-
-
-@media (min-width: 1240px) {
-    .media-section {
-        grid-template-columns: 1fr 1fr;
-
-        div {
-            grid-row: 1/2;
-        }
-
-    }
-
-    .media-left {
-        .section-text {
-            grid-column: 2/3;
-        }
-        .section-media {
-            grid-column: 1/2;
-        }
-    }
-  
-}
-
-
-blockquote {
-
-}
