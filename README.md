@@ -116,6 +116,142 @@ In here you can find all folders with data that still needs to be processed befo
     - `src/pages/sub-pages`  
         The about and contact pages
 
+
+## Structuring the data.js
+**Important**: Data that doesn't exist for a certain glossary item can be removed from the file or left empty 
+
+```
+title: "Example item"
+```
+This is the name of the glossary item
+
+
+```
+slug: "example-item",
+```
+This is the slug, the string of words used to name files and routes to the glossary item. This is the name of the glossary item in a machine readable way, without uppercase letters and spaces.
+
+
+```
+categories: ["category-1", "category-2"]
+```
+These are the categories under which the item can be grouped and filtered. You can add a minimum of one category here. A new category is added by adding another comma within the group.
+
+
+```
+content: []
+```
+Under content, you add all the sections that you want to appear on your detail page.
+A section usually consists of a text and one or more images. The text inside one content block should relate to the image in the same block. So for several texts explaining different artworks, several content sections should be added
+
+
+```
+content: [	
+	{
+		type: "media-left",
+	}
+```
+The type inside the content section is the name of the CSS-class that is added to the section. This is where the different layouts can be defined. You can choose here out of a set of existing CSS classes that we added as presets. But it is possible to add new classes and layouts by adding additional CSS classes in the stylesheet that is linked to the page.
+The current options to choose from are:
+- **"media-left"** -> the image/video on the left, the text on the right
+- **"media-right"** -> the image video on the right, the text on the left
+
+
+```
+content: [	
+	{
+		intro: {
+		
+			type: "quote",
+			
+			text: "Lorem ipsum"
+		
+		}
+	}
+```
+The intro is the text that is being displayed next to the media. 
+Under **type** you can choose what kind of text is being displayed and the layout is changed accordingly.
+The current options to choose from are:
+- **"quote"** -> if the text is a direct quote
+- **"text"** -> if the text is just a general text with no other specifications
+Under **text** you add the actual text that is to be displayed. 
+
+
+```
+content: [	
+	{
+		author: "John Doe"
+	}
+```
+Under **author** you add the name of the source for the artwork and/or text that is being referred to within the section. The author relates to the following field: **subtext**.
+
+
+```
+content: [	
+	{
+		subtext: {
+			
+			type: "link",
+			
+			text: "https://www.example.html"
+		
+		},
+	}
+```
+The **subtext** is where the actual source of the text and/or image in the section is being linked. 
+- Under **type** the type of source is defined. We currently have two options:
+	- **"link"** -> when the source is an actual weblink, leading to a page
+	- **"source"** -> when the source is a literary source, that doesn't link to another page
+- Under **text** the actual source is linked (in case of a link, the whole link, starting with https://). 
+
+
+```
+content: [	
+
+	media: [
+	
+		{
+			type: "image",
+			
+			src: "/public/assets/images/example.png",
+			
+			alt: "This is a nice and descriptive alt-text",
+		
+		},
+		{
+			type: "video",
+			
+			src: "/public/assets/images/example.mp4",
+			
+			alt: "This is a nice and descriptive alt-text",
+		
+		},
+	
+	]
+```
+**Media** is where you add any kind of media you want to appear within the section. You can add several media types, but in the currently defined CSS-classes (under **type = "example-class"**), only two media instances per section are supported. Adding more media requires additional CSS classes to retain a proper layout.
+- Under **type** you define the type of media. Currently supported are:
+	- **"image"** 
+	- **"video"**
+- Under **src** you define the media source, always starting with **/public/assets/images/** and then the name of the file.
+- Under **alt**, the alt text for the image/video is defined. This should be long and descriptive and enough to explain the image to a visually impaired person.
+
+
+```
+generalImage: {
+	
+	type: "image",
+	
+	src: "/public/assets/images/example.png"
+	
+	}
+}
+```
+**generalImage** is where the typographic text example for the current word is defined. This image is not currently used in the layout, but we added it in the data since it was part of the original set of date we received, and might be included in later iterations of the website.
+
+
+
+
 ## Code Conventions
 ### General
 
