@@ -1,10 +1,18 @@
 
 /* =====================================
-MARK: Variables
+MARK: Homepage specific variables
 ===================================== */
 
 :root {
     --terms-transition-time: 0.3s;
+}
+
+/* =====================================
+MARK: General styling
+===================================== */
+
+body {
+    margin: var(--body-padding);
 }
 
 /* =====================================
@@ -13,7 +21,7 @@ MARK: Header
 
 h1 {
         font-family: inter;
-        font-size: 5em;
+        font-size: var(--font-title-size-index);
 
         display: flex;
         flex-direction: column;
@@ -35,20 +43,15 @@ main {
     min-height: 70vh;
 }
 
-
-/* =====================================
-MARK: Term list
-===================================== */
-
-
 .term-list {
     font-family: inter;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     padding: 0;
+    gap: 0.2rem;
 
-    @media (min-width: 1200px) {
-        grid-template-columns: 1fr 1fr 1fr;
+    @media (min-width: 1300px) {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
     }
 
     li {
@@ -69,11 +72,11 @@ MARK: Category filter
 
     .term-categories {
         padding: 0;
-        margin: 2em 0;
+        margin: var(--padding-medium) 0;
 
         display: flex;
         flex-wrap: wrap;
-        gap: 1em;
+        gap: var(--padding-small);
 
         li {
             list-style-type: none;

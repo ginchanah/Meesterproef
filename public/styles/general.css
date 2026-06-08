@@ -26,6 +26,7 @@ MARK: Variables
      /* ---------- Text ---------- */
     /* Title/H1 */
     --font-title-size: 5rem;
+    --font-title-size-index: 5em;
     --font-title-family: var(--inter-regular);
     --font-title-weight: bold;
     --font-title-transform: uppercase;
@@ -77,6 +78,13 @@ MARK: Variables
 
 
      /* ---------- Margin & Paddings ---------- */
+     /* body padding */
+     --body-padding: 2rem;
+     --padding-medium: 2em;
+     --padding-small: 1rem;
+     --padding-extra-small: 0.5rem;
+
+
      /* desktop */
     --section-padding-large: 4rem 15rem;
     --section-margin-large: 0rem 0;
