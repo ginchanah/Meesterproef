@@ -83,8 +83,53 @@ export const data = {
     },
     {
       title: "Reinforcing Feedback",
-      slug: "example",
+      slug: "reinforcing-feedback",
       categories: ["example-category3"],
+      content: [
+        {
+          type: "media-left",
+          intro: {
+            type: "quote",
+            text: "Reinforcing or positive feedback loops are self-enhancing, leading to exponential growth or to runaway collapses over time."
+          },
+          author: "",
+          subtext: {
+            type: "source",
+            text: "Meadows, D. (2008). Thinking in systems: International bestseller. Chelsea green publishing."
+          },
+          media: [
+            {
+              type: "image",
+              src: "/public/assets/images/reinforcing-feedback-visualisation.png",
+              alt: "The story from the artwork repeated multiple times vertically, the further you go down the more it is repeated and overlapped making the sentences in the end impossible to read."
+            }
+          ],
+        },
+        {
+          type: "media-right",
+          heading: "I'm Sitting in a Room by Alvin Lucier",
+          intro: {
+            type: "text",
+            text: "I'm Sitting in a Room by Alvin Lucier is a sound piece where the artist records himself reading a text, then repeatedly replays and re-records it in the same room. Over time, his speech dissolves, from intelligibility, leaving only the resonant frequencies of the space - the room itself becomes the music."
+          },
+          author: "I'm sitting in a room (1969). Alvin Lucier, performance",
+          subtext: {
+            type: "link",
+            text: "https://www.youtube.com/watch?v=bhtO4DsSazc"
+          },
+          media: [
+            {
+              type: "image",
+              src: "/public/assets/images/reinforcing-feedback-artwork.png",
+              alt: "Alvin Lucier sitting on a chair in a room with big white stairs behind him. He is hooked up to a recording device and is wearing a brown suit with a red tie."
+            },
+          ]
+        }
+      ],
+      generalImage: {
+        type: "image",
+        src: "/public/assets/images/reinforcing-feedback-title.png"
+      }
     },
     {
       title: "Invisible",
