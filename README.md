@@ -164,7 +164,7 @@ content: [
 		
 			type: "quote",
 			
-			text: "Lorem ipsum"
+			text: `<b>Lorem</b> ipsum`
 		
 		}
 	}
@@ -174,7 +174,7 @@ Under **type** you can choose what kind of text is being displayed and the layou
 The current options to choose from are:
 - **"quote"** -> if the text is a direct quote
 - **"text"** -> if the text is just a general text with no other specifications
-Under **text** you add the actual text that is to be displayed. 
+Under **text** you add the actual text that is to be displayed. If you want to add a few words to be displayed as bold you can wrap them in the html tag `<b></b>`.
 
 
 ```
