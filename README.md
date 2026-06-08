@@ -1,5 +1,256 @@
 # Minor Web Design & Development Meesterproef
-## Glossary Item Animation
+## Adding new glossary items:
+
+Whenever you want to add a new glossary item, you can do so inside the file **data.js**, which you can find inside the folder **src > data > daja.js**.
+
+In here you find a json file that stores all the data, that will be outputted into HTML.
+
+## Adding an animation for a specific glossary item:
+
+Once you have added all the data for your glossary items into your data.json file, you look for the **"slug"** that you gave the item. 
+
+To add an animation to be loaded into the detailpage of your glossary item, you need to navigate to **src > pages > animations**.   
+
+Inside this folder, you add a new file, with the name of your slug: **example-slug.astro** (add the name of your file here)
+
+This is the file in which you can add the HTML code for your animation. 
+### Adding specific CSS for an animation:
+
+To add specific CSS for your animation component, you can use the ``<style>``tag, to add your CSS inline.
+
+But you also have the option of adding a separate CSS file. 
+
+To do this, you navigate to **public > styles > animation-css**
+Inside this folder you add a new file, using the slug of your glossary item corresponding to the slug in your data.js: **example-slug.css** (add the name of your file here)
+
+This CSS file will automatically be loaded into your detail-page by the AnimationHead.astro components.
+
+### Adding media to be used for the detail page of the glossary item
+
+All media should be added inside **public > assets > media**
+To use that image inside your detail page for the corresponding glossary item, you add the source inside your **data.js** using the path:
+
+**/public/assets/images/example.png** (add the name of your file here)
+
+## General Styling:
+
+Navigate to **public > styles**
+Inside this folder you find all CSS files responsible for the styling.
+
+## Where to link your Javascript:
+
+### For the homepage:
+Add your script link inside **src > index.astro**
+In this file, link your script within the ``<MainLayout> </MainLayout>`` tag.
+
+### For the glossary item detail page:
+For general js applying to all glossary item detail pages, add your script link inside **src >  pages > glossary-items > [item].astro**
+
+In this file, link your script within the ``<DetailLayout> </DetailLayout>`` tag.
+
+Animation-specific JavaScript should be added inline within the ``<script></script>`` tag within your animation file at **src > pages > animations > example-item.astro** (replace with your slug name).
+
+## Explanation of all folders:
+
+```
+public
+├── assets
+│   ├── fonts
+│   └── images
+├── js
+├─── styles
+│    └── animation-css
+src
+├── components
+├── data
+├── layout
+└── pages
+    ├── animations
+    ├── glossary-items
+    └── sub-pages
+
+```
+
+### Public
+In here you can find all folders with data that is directly displayed in the browser as is.
+- `public/assets`  
+    Static assets aren't changed by the browser while running
+    
+    - `public/assets/fonts`  
+        Custom font files used across the website, in our case Inter and Courier Prime.
+        
+    - `public/assets/media`  
+        All images that are used within the homepage and detail pages.
+        
+- `public/js`  
+    Contains all Javascript files that are being loaded in to the page
+    
+- `public/styles`  
+    Global CSS files that are being used in all pages
+    
+    - `public/styles/animation-css`  
+        CSS files for the specific animations used in the glossary item detail pages
+
+
+### Src
+In here you can find all folders with data that still needs to be processed before being displayed in the browser.
+
+- `src/components`  
+    Reusable components that are being used across multiple pages, like the footer and header.
+    
+- `src/data`  
+    The JSON file that contains all the data that is being used to generate the detail pages about each separate glossary item.
+    
+- `src/layout`  
+    Layout components that define the overall structure of the pages (where the header, footer and main components go)
+    
+- `src/pages`  
+    Page components that define the different routes/pages that can be redirected to within the website
+    
+    - `src/pages/animations`  
+        The specific html of the animations used in the detail page corresponding in name to the glossary item they belong to.
+        
+    - `src/pages/glossary-items`  
+        The page layout that generates the pages for the individual glossary terms based on the data.js
+        
+    - `src/pages/sub-pages`  
+        The about and contact pages
+
+
+## Structuring the data.js
+**Important**: Data that doesn't exist for a certain glossary item can be removed from the file or left empty 
+
+```
+title: "Example item"
+```
+This is the name of the glossary item
+
+
+```
+slug: "example-item",
+```
+This is the slug, the string of words used to name files and routes to the glossary item. This is the name of the glossary item in a machine readable way, without uppercase letters and spaces.
+
+
+```
+categories: ["category-1", "category-2"]
+```
+These are the categories under which the item can be grouped and filtered. You can add a minimum of one category here. A new category is added by adding another comma within the group.
+
+
+```
+content: []
+```
+Under content, you add all the sections that you want to appear on your detail page.
+A section usually consists of a text and one or more images. The text inside one content block should relate to the image in the same block. So for several texts explaining different artworks, several content sections should be added
+
+
+```
+content: [	
+	{
+		type: "media-left",
+	}
+```
+The type inside the content section is the name of the CSS-class that is added to the section. This is where the different layouts can be defined. You can choose here out of a set of existing CSS classes that we added as presets. But it is possible to add new classes and layouts by adding additional CSS classes in the stylesheet that is linked to the page.
+The current options to choose from are:
+- **"media-left"** -> the image/video on the left, the text on the right
+- **"media-right"** -> the image video on the right, the text on the left
+
+
+```
+content: [	
+	{
+		intro: {
+		
+			type: "quote",
+			
+			text: "Lorem ipsum"
+		
+		}
+	}
+```
+The intro is the text that is being displayed next to the media. 
+Under **type** you can choose what kind of text is being displayed and the layout is changed accordingly.
+The current options to choose from are:
+- **"quote"** -> if the text is a direct quote
+- **"text"** -> if the text is just a general text with no other specifications
+Under **text** you add the actual text that is to be displayed. 
+
+
+```
+content: [	
+	{
+		author: "John Doe"
+	}
+```
+Under **author** you add the name of the source for the artwork and/or text that is being referred to within the section. The author relates to the following field: **subtext**.
+
+
+```
+content: [	
+	{
+		subtext: {
+			
+			type: "link",
+			
+			text: "https://www.example.html"
+		
+		},
+	}
+```
+The **subtext** is where the actual source of the text and/or image in the section is being linked. 
+- Under **type** the type of source is defined. We currently have two options:
+	- **"link"** -> when the source is an actual weblink, leading to a page
+	- **"source"** -> when the source is a literary source, that doesn't link to another page
+- Under **text** the actual source is linked (in case of a link, the whole link, starting with https://). 
+
+
+```
+content: [	
+
+	media: [
+	
+		{
+			type: "image",
+			
+			src: "/public/assets/images/example.png",
+			
+			alt: "This is a nice and descriptive alt-text",
+		
+		},
+		{
+			type: "video",
+			
+			src: "/public/assets/images/example.mp4",
+			
+			alt: "This is a nice and descriptive alt-text",
+		
+		},
+	
+	]
+```
+**Media** is where you add any kind of media you want to appear within the section. You can add several media types, but in the currently defined CSS-classes (under **type = "example-class"**), only two media instances per section are supported. Adding more media requires additional CSS classes to retain a proper layout.
+- Under **type** you define the type of media. Currently supported are:
+	- **"image"** 
+	- **"video"**
+- Under **src** you define the media source, always starting with **/public/assets/images/** and then the name of the file.
+- Under **alt**, the alt text for the image/video is defined. This should be long and descriptive and enough to explain the image to a visually impaired person.
+
+
+```
+generalImage: {
+	
+	type: "image",
+	
+	src: "/public/assets/images/example.png"
+	
+	}
+}
+```
+**generalImage** is where the typographic text example for the current word is defined. This image is not currently used in the layout, but we added it in the data since it was part of the original set of date we received, and might be included in later iterations of the website.
+
+
+
 
 ## Code Conventions
 ### General
