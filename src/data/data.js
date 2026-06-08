@@ -116,7 +116,7 @@ export const data = {
             {
               type: "image",
               src: "/public/assets/images/ma-visualisation.png",
-              alt: "ma written out in a frame. The oudside part both letters is cut off."
+              alt: "ma written out in a frame. The oudside of part both letters is cut off."
             },
           ],
         },
@@ -137,6 +137,25 @@ export const data = {
               type: "image",
               src: "/public/assets/images/ma-artwork.png",
               alt: "Picture of the ceiling of a white room. The ceiling is square and in the middle there is a square window/hole. Trough it you can view a blue sky. It is the artwork skyspaces from James Turrell. Where he plays with light."
+            },
+          ]
+        },
+        {
+          type: "media-left",
+          heading: "Helvetica",
+          intro: {
+            type: "intro",
+            text: "Massimo Vignelli talking about the space between the characters that makes it, in Helvetica, a documentary about the typeface Helvertica, directed by Gary"
+          },
+          subtext: {
+            type: "link",
+            text: "https://www.youtube.com/watch?v=9g3Ogtgleyg"
+          },
+          media: [
+            {
+              type: "image",
+              src:  "/public/assets/images/ma-title.png",
+              alt:  "ma written out in a frame. The oudside part of both letters is cut off."
             },
           ]
         }
