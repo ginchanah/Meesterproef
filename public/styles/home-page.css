@@ -88,6 +88,7 @@ MARK: Category filter
         padding: 0.5em;
         margin: 0;
         border: 2px var(--color-border) solid;
+        transition: 500ms;
     }
 
     .term-categories input {
