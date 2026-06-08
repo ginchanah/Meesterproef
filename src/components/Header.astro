@@ -15,8 +15,8 @@ interface Props {
 const { variant = 'one', title, slug } = Astro.props;
 
 // Dynamically import the animation file based on slug
-const animations = import.meta.glob('../pages/animations/*.astro', { eager: true });
-const animationPath = `../pages/animations/${slug}.astro`;
+const animations = import.meta.glob('../animations/*.astro', { eager: true });
+const animationPath = `../animations/${slug}.astro`;
 console.log(animationPath)
 const AnimationComponent = (animations[animationPath] as { default: any } | undefined)?.default;
 
