@@ -39,18 +39,85 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
     
     <!-- this is the header for the glossary item pagina -->
     {variant === 'two' && (
-
-
+        <nav class="header2-nav">
+            <div>
+                <a class="button-big" href="/"><span aria-hidden="true">←</span> Glossary</a>
+                <p>(Inter)facing the Hybrid City</p>
+            </div>
+            <div>
+                <a href="/sub-pages/contact">contact</a>
+                <a href="/sub-pages/about">about</a>
+            </div>
+        </nav>
         <div class="animation-section">
             <h1 class="visually-hidden">{title}</h1>
             <div aria-hidden="true">
                 {AnimationComponent ? <AnimationComponent /> : <p>Animation not found</p>}
             </div>
         </div>
-        <nav>
-            <h2>{title}</h2>
-            <a class="button-big" href="/"><span aria-hidden="true">←</span> Glossary</a>
-        </nav>
 
     )}
 </header>
+<style>
+    .header2-nav {
+        background-color: var(--color-background);
+        width: 100%;
+        box-sizing: border-box;
+        padding: 1em;
+        font-family: inter;
+
+        display: flex;
+        justify-content: center;
+        justify-content: space-between;
+        }
+    .header2-nav a {
+        width: auto;
+        text-decoration: none;
+        text-wrap: nowrap;
+        &:hover{
+            text-decoration: underline;
+        }
+    }
+    .header2-nav p {
+        height: var(--font-button-big-size);
+        padding: 0 1em;
+        margin-right: 1em;
+        display: flex;
+        align-items: center;
+        &::before {
+            content: "";
+            display: inline-block;
+            background-color: var(--color-text);
+            height: 90%;
+            margin-right: 1em;
+            border-right: solid 2px var(--color-text);
+        }
+    }
+    .header2-nav div:nth-child(1){
+        display: flex;
+        align-items: center;
+    }
+    .header2-nav div:nth-child(2){
+        display: flex;
+        align-items: center;
+        gap: 2em;
+    }
+    @media (max-width: 800px) {
+        .header2-nav {
+            flex-direction: column;
+            gap: 1em;
+            div:nth-child(2){
+                width: auto;
+                border-top: solid 2px var(--color-text);
+                border-bottom: solid 2px var(--color-text);
+                padding: 0.5em 0;
+            }
+            
+        }
+        @media (max-width: 600px) {
+            p {
+                font-size: 0.75em;
+            }
+        }
+    }
+</style>
