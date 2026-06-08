@@ -42,7 +42,7 @@
 
     // ---------- DOM Elements ----------
     // Grab all the letter blocks from our HTML page
-    const letters = Array.from(document.querySelectorAll(".block"));
+    const letters = Array.from(document.querySelectorAll<HTMLElement>(".block"));
     // Count how many letters we have in total
     const totalLetters = letters.length;
 
@@ -97,7 +97,7 @@
     // =====================================
 
     // ---------- Helpers ----------
-    const updateTargetY = (clientY) => {
+    const updateTargetY = (clientY: number) => {
         // Turn the mouse position into a number between -1 (top) and 1 (bottom)
         const normY = (clientY / window.innerHeight) * 2 - 1;
 
@@ -105,7 +105,7 @@
         targetY = normY * 50;
     };
 
-    const handleLetterHover = (index) => {
+    const handleLetterHover = (index: number) => {
         // Random direction: UP (-1) or DOWN (1)
         const direction = Math.random() < 0.5 ? -1 : 1;
 
@@ -119,7 +119,7 @@
             letterStates[index + 1].speedY += direction * 1.2;
     };
 
-    const handleLetterClick = (index) => {
+    const handleLetterClick = (index: number) => {
         // Same as hovering, but use much bigger numbers so it swings wildly on click
         const direction = Math.random() < 0.5 ? -1 : 1;
         letterStates[index].speedY += direction * 35;
