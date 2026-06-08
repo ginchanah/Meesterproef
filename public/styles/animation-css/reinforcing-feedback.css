@@ -1,10 +1,12 @@
-*{
+#animation-wrapper *{
     margin:0;
     padding:0;
     box-sizing:border-box;
+
+       color: black;
 }
 
-body{
+#animation-wrapper{
     width:100vw;
     height:100vh;
     display:flex;
@@ -23,13 +25,13 @@ body{
         color 1.2s ease;
 }
 
-.word{
+#animation-wrapper .word{
     display:flex;
     align-items:center;
     cursor:default;
 }
 
-.word span{
+#animation-wrapper .word span{
 
     font-size:8vw;
 
@@ -44,6 +46,6 @@ body{
         transform .15s linear;
 }
 
-.space{
+#animation-wrapper .space{
     width:.4em;
 }
