@@ -1,7 +1,7 @@
 # Minor Web Design & Development Meesterproef
 ## Adding new glossary items:
 
-Whenever you want to add a new glossary item, you can do so inside the file **data.js**, which you can find inside the folder **src > data > daja.js**.
+Whenever you want to add a new glossary item, you can do so inside the file **data.js**, which you can find inside the folder **src > data > data.js**.
 
 In here you find a json file that stores all the data, that will be outputted into HTML.
 
@@ -30,7 +30,7 @@ This CSS file will automatically be loaded into your detail-page by the Animatio
 All media should be added inside **public > assets > media**
 To use that image inside your detail page for the corresponding glossary item, you add the source inside your **data.js** using the path:
 
-**/public/assets/images/example.png** (add the name of your file here)
+**/public/assets/media/example.png** (add the name of your file here)
 
 ## General Styling:
 
@@ -56,7 +56,7 @@ Animation-specific JavaScript should be added inline within the ``<script></scri
 public
 ├── assets
 │   ├── fonts
-│   └── images
+│   └── media
 ├── js
 ├─── styles
 │    └── animation-css
@@ -154,7 +154,7 @@ content: [
 The type inside the content section is the name of the CSS-class that is added to the section. This is where the different layouts can be defined. You can choose here out of a set of existing CSS classes that we added as presets. But it is possible to add new classes and layouts by adding additional CSS classes in the stylesheet that is linked to the page.
 The current options to choose from are:
 - **"media-left"** -> the image/video on the left, the text on the right
-- **"media-right"** -> the image video on the right, the text on the left
+- **"media-right"** -> the image/video on the right, the text on the left
 
 
 ```
@@ -213,7 +213,7 @@ content: [
 		{
 			type: "image",
 			
-			src: "/public/assets/images/example.png",
+			src: "/public/assets/media/example.png",
 			
 			alt: "This is a nice and descriptive alt-text",
 		
@@ -221,7 +221,7 @@ content: [
 		{
 			type: "video",
 			
-			src: "/public/assets/images/example.mp4",
+			src: "/public/assets/media/example.mp4",
 			
 			alt: "This is a nice and descriptive alt-text",
 		
@@ -233,7 +233,7 @@ content: [
 - Under **type** you define the type of media. Currently supported are:
 	- **"image"** 
 	- **"video"**
-- Under **src** you define the media source, always starting with **/public/assets/images/** and then the name of the file.
+- Under **src** you define the media source, always starting with **/public/assets/media/** and then the name of the file.
 - Under **alt**, the alt text for the image/video is defined. This should be long and descriptive and enough to explain the image to a visually impaired person.
 
 
@@ -242,7 +242,7 @@ generalImage: {
 	
 	type: "image",
 	
-	src: "/public/assets/images/example.png"
+	src: "/public/assets/media/example.png"
 	
 	}
 }
