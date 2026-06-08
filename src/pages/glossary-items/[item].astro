@@ -26,14 +26,14 @@ const { item } = Astro.props;
                     {section.intro?.type === "quote" && (
                         <>
                         <blockquote>{section.intro.text}</blockquote>
-                        <h3>{section.author}</h3>
+                        {section.author && <h3>{section.author}</h3>}
                         </>
                     )}
 
                     {section.intro?.type === "text" && (
                         <>
                         <p>{section.intro.text}</p>
-                        <h3>{section.author}</h3>
+                        {section.author && <h3>{section.author}</h3>}
                         </>
                     )}
 
