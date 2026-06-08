@@ -47,7 +47,17 @@ const { item } = Astro.props;
                 </div>
                 <figure class="section-media">
                     {section.media?.map((media) => (
-                        <img src={media.src} alt={media.alt} />
+                        <>
+                        {media.type === "image" && (
+                            <img src={media.src} alt={media.alt} />
+                        )}
+
+                        {media.type === "video" && (
+                            <video src={media.src} aria-label={media.alt} controls>
+                                <source src={media.src} />
+                            </video>
+                        )}
+                        </>
                     ))}
                 </figure>
             </section>
