@@ -83,7 +83,7 @@ export const data = {
     },
     {
       title: "Reinforcing Feedback",
-      slug: "example",
+      slug: "reinforcing-feedback",
       categories: ["example-category3"],
       content: [
         {
