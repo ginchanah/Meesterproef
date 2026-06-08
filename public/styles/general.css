@@ -23,7 +23,7 @@ MARK: Variables
 
 
 
-     /* ---------- Text ---------- */
+    /* ---------- Text ---------- */
     /* Title/H1 */
     --font-title-size: 5rem;
     --font-title-family: var(--inter-regular);
@@ -70,8 +70,8 @@ MARK: Variables
 
 
 
-     /* ---------- Margin & Paddings ---------- */
-     /* desktop */
+    /* ---------- Margin & Paddings ---------- */
+    /* desktop */
     --section-padding-large: 0 15rem;
     --section-margin-large: 4rem 0;
 
@@ -91,7 +91,7 @@ MARK: Variables
 
 
 
-     /* ---------- Breakpoints ---------- */
+    /* ---------- Breakpoints ---------- */
     --breakpoint-phone: 0px;
     --breakpoint-tablet: 490px;
     --breakpoint-desktop: 891px;
@@ -214,7 +214,12 @@ body {
 
 /* ---------- Margins & Paddings ---------- */
 
-h1, h2, h3, h4, h5, p {
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
     margin: 0;
 }
 
@@ -231,11 +236,13 @@ header.header-two nav {
         --nav-padding: var(--nav-padding-small);
     }
 }
+
 @media (min-width: 490px) {
     :root {
         --nav-padding: var(--nav-padding-medium);
     }
 }
+
 @media (min-width: 891px) {
     :root {
         --nav-padding: var(--nav-padding-large);
@@ -255,10 +262,10 @@ MARK: Visually hidden
     position: absolute;
     overflow: hidden;
 
-    width: 1px; 
-    height: 1px; 
+    width: 1px;
+    height: 1px;
 
-    clip: inset(50%); 
+    clip: inset(50%);
     white-space: nowrap;
 }
 
@@ -267,43 +274,40 @@ MARK: Header
 ===================================== */
 /* general header styling */
 /* TODO */
-.header {
-
-}
+.header {}
 
 /* header on the homepage */
 /* TODO */
-.header-one {
-
-}
+.header-one {}
 
 /* header on the glossary item page */
 .header-two {
     display: grid;
-    
+
     nav {
         width: max-content;
 
         h2 {
             text-transform: uppercase;
             margin-right: 5rem;
-            
+
         }
-    
+
         .button-big {
             text-align: right;
             width: 100%;
             display: inline-block;
-            
+
         }
 
-        h2, .button-big {
+        h2,
+        .button-big {
             font-size: clamp(1.8rem, 10vw, 3.5rem)
         }
 
     }
-    
-    
+
+
 }
 
 
@@ -341,7 +345,7 @@ MARK: Section components
     padding: var(--section-padding);
     margin: var(--section-margin);
 
-    
+
     figure {
         width: 100%;
         margin: 0;
@@ -358,12 +362,14 @@ MARK: Section components
         --section-margin: var(--section-margin-small);
     }
 }
+
 @media (min-width: 490px) {
     :root {
         --section-padding: var(--section-padding-medium);
         --section-margin: var(--section-margin-medium);
     }
 }
+
 @media (min-width: 891px) {
     :root {
         --section-padding: var(--section-padding-large);
@@ -372,9 +378,7 @@ MARK: Section components
 }
 
 /* for images on the left */
-.media-right {
-    
-}
+.media-right {}
 
 
 @media (min-width: 1240px) {
@@ -391,14 +395,153 @@ MARK: Section components
         .section-text {
             grid-column: 2/3;
         }
+
         .section-media {
             grid-column: 1/2;
         }
     }
-  
+
 }
 
 
-blockquote {
+blockquote {}
 
+
+
+/* =====================================
+MARK: Footer
+===================================== */
+
+/* ---------- Rotating Banner ---------- */
+.banner-container {
+    width: 100%;
+    overflow: hidden;
+    background: #fff;
+    padding: clamp(10px, 2vw, 20px) 0;
+    display: flex;
+}
+
+.banner-content {
+    display: inline-flex;
+    animation: scroll-banner 15s linear infinite;
+}
+
+.banner-text {
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    font-weight: 100;
+    text-transform: uppercase;
+    margin: 0;
+    color: #000;
+    text-wrap: nowrap;
+}
+
+.banner-text:nth-child(5n) {
+    font-weight: 800;
+}
+
+@keyframes scroll-banner {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* ---------- Navigation ---------- */
+.footer-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--section-padding);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.footer-nav a {
+    text-decoration: none;
+    text-transform: uppercase;
+    color: var(--color-text);
+    font-weight: 300;
+    font-size: clamp(0.7rem, 2vw, 1rem);
+    transition: opacity 0.2s;
+}
+
+.footer-nav a:hover {
+    opacity: 0.6;
+}
+
+/* ---------- Links ---------- */
+.footer-links {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    padding: var(--section-padding);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.footer-buttons {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.footer-links a.button-small {
+    border: 1px solid var(--color-border);
+    padding: 1em 1.5em;
+    text-decoration: none;
+    font-size: clamp(0.8rem, 2vw, 1.2rem);
+    font-weight: 300;
+    text-transform: uppercase;
+    color: var(--color-text);
+    background-color: transparent;
+    transition: background-color 0.2s, color 0.2s;
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.footer-links a.button-small:hover {
+    background-color: var(--color-text);
+    color: var(--color-background);
+}
+
+/* ---------- Footer text ---------- */
+.footer-links p {
+    margin: 0;
+    padding: 0;
+    font-size: clamp(1rem, 4vw, 2rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+@media (max-width: 890px) {
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .footer-buttons {
+        width: auto;
+        gap: 0.5rem;
+    }
+}
+
+/* ---------- Copyright ---------- */
+.footer-copyright {
+    padding: var(--section-padding);
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    margin: 0;
+    text-align: center;
+    font-size: 0.6rem;
+    font-weight: 200;
+    text-transform: uppercase;
+    color: var(--color-text);
 }

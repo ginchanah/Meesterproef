@@ -14,54 +14,55 @@ const { variant = 'home', title } = Astro.props;
 
 
 
-<!-- here we define two different footers for the homepage and for the detail page -->
+<!-- ===================================== -->
+<!-- MARK: Footer                          -->
+<!-- ===================================== -->
 <footer class={`footer footer-${variant}`}>
-    <!-- this is the footer for the homepage -->
+    <!-- ---------- Homepage Footer ---------- -->
     {variant === 'index' && (
 
         <div>
-            <!-- banner -->
+            <!-- Banner -->
             <div class="banner-container">
-                <div class="banner-content" id="bannerContent">
-                <!-- Populated by banner.js -->
+                <div class="banner-content" id="bannerContent" data-word="glossary">
+                <!-- Populated by index.js -->
                 </div>
             </div>
-            <!-- haar naam -->
-            <p>MARJOLIJN RUIJG</p>
-            <!--about link -->
-            <a href="/src/pages/sub-pages/about.astro">ABOUT</a>
-            <!-- contact link -->
-            <a href="/src/pages/sub-pages/contact.astro">CONTACT</a>
-            <!-- contact link -->
-            <p>2026 blablabla team font-end hoppa</p>
+            <div class="footer-links">
+                <p>MARJOLIJN RUIJG</p>
+                <div class="footer-buttons">
+                    <a href="/sub-pages/about" class="button-small">ABOUT</a>
+                    <a href="/sub-pages/contact" class="button-small">CONTACT</a>
+                </div>
+            </div>
+            <p class="footer-copyright">&copy; 2026 BUILT BY TEAM FONT-END.</p>
         </div>
 
     )}
     
-    <!-- this is the footer for the glossary item page -->
+    <!-- ---------- Detail Page Footer ---------- -->
     {variant === 'detail' && (
 
-        // navigation between the glossary items
+        <!-- Navigation between glossary items -->
         <div>
-            <nav>
-                <a href="/placeholder">PLACEHOLDER</a>
+            <nav class="footer-nav">
+                <a href="/placeholder">&larr; PLACEHOLDER</a>
                 <a href="/">BACK TO GLOSSARY</a>
-                <a href="/placeholder">PLACEHOLDER</a>
+                <a href="/placeholder">PLACEHOLDER &rarr;</a>
             </nav>
-                <!-- banner -->
                 <div class="banner-container">
                     <div class="banner-content" id="bannerContent">
-                    <!-- Populated by banner.js -->
+                    <!-- Populated by index.js -->
                     </div>
                 </div>
-                <!-- haar naam -->
-                <p>MARJOLIJN RUIJG</p>
-                <!--about link -->
-                <a href="/src/pages/sub-pages/about.astro">ABOUT</a>
-                <!-- contact link -->
-                <a href="/src/pages/sub-pages/contact.astro">CONTACT</a>
-                <!-- contact link -->
-                <p>2026 blablabla team font-end hoppa</p>
+                <div class="footer-links">
+                    <p>MARJOLIJN RUIJG</p>
+                    <div class="footer-buttons">
+                        <a href="/sub-pages/about" class="button-small">ABOUT</a>
+                        <a href="/sub-pages/contact" class="button-small">CONTACT</a>
+                    </div>
+                </div>
+                <p class="footer-copyright">&copy; 2026 BUILT BY TEAM FONT-END.</p>
         </div>
 
     )}

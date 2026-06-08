@@ -7,7 +7,7 @@ siblingIndexContainer?.forEach(container => {
         let selfIndex = Array.from(directChildren).indexOf(item)
         item.setAttribute("style", `--index:${selfIndex}`)
     })
-  container.setAttribute("style", `--count:${directChildren.length}`)
+    container.setAttribute("style", `--count:${directChildren.length}`)
 })
 
 
@@ -27,15 +27,21 @@ spanSplitContainer?.forEach((el) => {
 // infinite banner in footer
 document.addEventListener("DOMContentLoaded", () => {
     const bannerContent = document.getElementById("bannerContent");
-    const word = "test";
-    const repetitions = 20; // Ensure enough repetitions to fill wide screens
-    
+    if (!bannerContent) return;
+
+    let word = bannerContent.dataset.word;
+    if (!word) {
+        const h1Element = document.querySelector("h1");
+        word = h1Element ? h1Element.textContent.trim() : "glossary";
+    }
+    const repetitions = 10; // Ensure enough repetitions to fill wide screens
+
     // Create one continuous string of the word
     let halfContent = "";
     for (let i = 0; i < repetitions; i++) {
         halfContent += `<span class="banner-text">${word}</span>`;
     }
-    
+
     // Duplicate the content to allow the seamless infinite CSS translation (-50%)
     bannerContent.innerHTML = halfContent + halfContent;
 });
