@@ -1,0 +1,60 @@
+---
+import DetailLayout from "../../layout/DetailLayout.astro"
+import Header from "../../components/Header.astro";
+import { data } from "../../data/data.js";
+
+export function getStaticPaths() {
+    return data.glossaryItems.map(item => ({
+        params: { item: item.slug },
+        props: { item }
+    }));
+}
+
+const { item } = Astro.props;
+---
+
+
+<DetailLayout title={item.title} slug={item.slug}>
+    <Header variant="two" title={item.title} slug={item.slug}/>
+
+    <main>
+        {item.content?.map((section) => (
+            <section class={`${section.type} media-section`}>
+                <div class="section-text">
+                    {section.heading && <h2>{section.heading}</h2>}
+
+                    {section.intro?.type === "quote" && (
+                        <>
+                        <blockquote>{section.intro.text}</blockquote>
+                        <h3>{section.author}</h3>
+                        </>
+                    )}
+
+                    {section.intro?.type === "text" && (
+                        <>
+                        <p>{section.intro.text}</p>
+                        <h3>{section.author}</h3>
+                        </>
+                    )}
+
+                    {section.subtext?.type === "link" && (
+                        <a href={section.subtext.text}>{section.subtext.text}</a>
+                    )}
+                    
+                    {section.subtext?.type === "source" && (
+                        <cite>{section.subtext.text}</cite>
+                    )}
+                </div>
+                <figure class="section-media">
+                    {section.media?.map((media) => (
+                        <img src={media.src} alt={media.alt} />
+                    ))}
+                </figure>
+            </section>
+        ))}
+    </main>
+
+<script src="/js/index.js" is:inline></script>
+</DetailLayout>
+
+

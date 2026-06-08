@@ -1,12 +1,13 @@
 ---
 interface Props {
-    title: string;
-    slug: string;
+    title?: string;
+    slug?: string;
+    item?: any;
 }
 
 // import the components to reuse
-import Header from "../components/Header.astro";
 import AnimationHead from "../components/AnimationHead.astro"
+import Footer from "../components/Footer.astro";
 
 const { title, slug } = Astro.props;
 ---
@@ -21,20 +22,18 @@ const { title, slug } = Astro.props;
         <!-- link all stylesheets here -->
         <link rel="stylesheet" href="/styles/general.css">
         <link rel="stylesheet" href="/styles/detail-page.css">
+        <link rel="stylesheet" href="/styles/footer.css">
         <!-- adds a stylesheet for the specific animation you're working on-->
         <AnimationHead slug={slug} />
 
         <meta name="viewport" content="width=device-width" />
-        <title>Glossary Items</title>
+        <title>{title}</title>
 
     </head>
     <body>
-        <!-- ---------- Add header variant two ---------- -->
-        <Header variant="two" title={title} />
-        
-        <!-- ---------- Main Content ---------- -->
-        <main>
             <slot />
-        </main>
+
+        <Footer variant="detail" />
+
     </body>
 </html>
