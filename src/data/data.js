@@ -78,7 +78,7 @@ export const data = {
     },
     {
       title: "Balancing Feedback",
-      slug: "example",
+      slug: "balancing-feedback",
       categories: ["example-category3"],
     },
     {
