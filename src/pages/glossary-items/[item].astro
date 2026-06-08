@@ -32,7 +32,7 @@ const { item } = Astro.props;
 
                     {section.intro?.type === "text" && (
                         <>
-                        <p ></p>
+                        <p set:html={section.intro.text}></p>
                         {section.author && <h3>{section.author}</h3>}
                         </>
                     )}
