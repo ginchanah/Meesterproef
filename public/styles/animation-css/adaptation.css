@@ -1,0 +1,52 @@
+@layer components, utilities;
+
+/* =====================================
+MARK: Layout Components
+===================================== */
+@layer components {
+
+    /* ---------- Layout ---------- */
+    .container {
+        height: 100vh;
+        position: relative;
+    }
+
+    .animation-section {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* ---------- Adaptation Animation ---------- */
+    .assimilation-background {
+        position: absolute;
+        inset: 0;
+        display: flex;
+    }
+
+    .assimilation-pane {
+        flex: 1;
+    }
+
+    .pane-black {
+        background-color: var(--color-background);
+    }
+
+    .pane-white {
+        background-color: var(--color-text);
+    }
+
+    .assimilation-word {
+        position: relative;
+        z-index: 10;
+        font-size: 10rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        mix-blend-mode: difference;
+        /* https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/mix-blend-mode */
+        color: var(--color-text);
+        pointer-events: none;
+        letter-spacing: 0.02em;
+    }
+}
