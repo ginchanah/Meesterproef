@@ -11,7 +11,7 @@ MARK: Homepage specific variables
 MARK: General styling
 ===================================== */
 
-body {
+header, main {
     margin: var(--body-padding);
 }
 
@@ -89,6 +89,12 @@ MARK: Category filter
         margin: 0;
         border: 2px var(--color-border) solid;
         transition: 500ms;
+        
+
+
+        &:hover {
+            opacity: 0.65;
+        }
     }
 
     .term-categories input {
