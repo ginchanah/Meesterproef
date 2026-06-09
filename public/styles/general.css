@@ -131,6 +131,7 @@ body {
         --color-border: var(--white);
     }
 }
+
 @media (prefers-color-scheme: light) {
     :root {
         --color-text: var(--white);
@@ -147,33 +148,35 @@ MARK: Fonts
 /* Inter */
 @font-face {
     font-family: "Inter";
-    src: url(/public/assets/fonts/Inter/Inter-VariableFont_opsz\,wght.ttf);
+    src: url(/assets/fonts/Inter/Inter-VariableFont_opsz\,wght.ttf);
+    font-weight: 100 900;
 }
 
 @font-face {
     font-family: "Inter Italic";
-    src: url(/public/assets/fonts/Inter/Inter-Italic-VariableFont_opsz\,wght.ttf);
+    src: url(/assets/fonts/Inter/Inter-Italic-VariableFont_opsz\,wght.ttf);
+    font-weight: 100 900;
 }
 
 /* Courier */
 @font-face {
     font-family: "Courier Prime Regular";
-    src: url(/public/assets/fonts/Courier_Prime/CourierPrime-Regular.ttf);
+    src: url(/assets/fonts/Courier_Prime/CourierPrime-Regular.ttf);
 }
 
 @font-face {
     font-family: "Courier Prime Italic";
-    src: url(/public/assets/fonts/Courier_Prime/CourierPrime-Italic.ttf);
+    src: url(/assets/fonts/Courier_Prime/CourierPrime-Italic.ttf);
 }
 
 @font-face {
     font-family: "Courier Prime Bold";
-    src: url(/public/assets/fonts/Courier_Prime/CourierPrime-Bold.ttf);
+    src: url(/assets/fonts/Courier_Prime/CourierPrime-Bold.ttf);
 }
 
 @font-face {
     font-family: "Courier Prime Bold Italic";
-    src: url(/public/assets/fonts/Courier_Prime/CourierPrime-BoldItalic.ttf);
+    src: url(/assets/fonts/Courier_Prime/CourierPrime-BoldItalic.ttf);
 }
 
 /* =====================================
