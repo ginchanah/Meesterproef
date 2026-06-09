@@ -370,3 +370,230 @@ MARK: Header
     }
 
 }
+
+
+/* =====================================
+MARK: Animation section
+===================================== */
+/* General animation styling, full screen */
+.animation-section {
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    overflow: clip;
+}
+
+
+
+/* =====================================
+MARK: Section components
+===================================== */
+/* general section styling */
+.media-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7.5rem;
+    padding: var(--section-padding);
+    margin: var(--section-margin);
+
+
+    figure {
+        width: 100%;
+        margin: 0;
+
+        img {
+            width: 100%;
+        }
+    }
+}
+
+@media (min-width: 1px) {
+    :root {
+        --section-padding: var(--section-padding-small);
+        --section-margin: var(--section-margin-small);
+    }
+}
+
+@media (min-width: 490px) {
+    :root {
+        --section-padding: var(--section-padding-medium);
+        --section-margin: var(--section-margin-medium);
+    }
+}
+
+@media (min-width: 891px) {
+    :root {
+        --section-padding: var(--section-padding-large);
+        --section-margin: var(--section-margin-large);
+    }
+}
+
+/* for images on the left */
+.media-right {}
+
+
+@media (min-width: 1240px) {
+    .media-section {
+        grid-template-columns: 1fr 1fr;
+
+        div {
+            grid-row: 1/2;
+        }
+
+    }
+
+    .media-left {
+        .section-text {
+            grid-column: 2/3;
+        }
+
+        .section-media {
+            grid-column: 1/2;
+        }
+    }
+
+}
+
+
+blockquote {}
+
+
+
+/* =====================================
+MARK: Footer
+===================================== */
+
+/* ---------- Rotating Banner ---------- */
+.banner-container {
+    width: 100%;
+    overflow: hidden;
+    background: #fff;
+    padding: clamp(10px, 2vw, 20px) 0;
+    display: flex;
+}
+
+.banner-content {
+    display: inline-flex;
+    animation: scroll-banner 15s linear infinite;
+}
+
+.banner-text {
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    font-weight: 100;
+    text-transform: uppercase;
+    margin: 0;
+    color: #000;
+    text-wrap: nowrap;
+}
+
+.banner-text:nth-child(5n) {
+    font-weight: 800;
+}
+
+@keyframes scroll-banner {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* ---------- Navigation ---------- */
+.footer-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--section-padding);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.footer-nav a {
+    text-decoration: none;
+    text-transform: uppercase;
+    color: var(--color-text);
+    font-weight: 300;
+    font-size: clamp(0.7rem, 2vw, 1rem);
+    transition: opacity 0.2s;
+}
+
+.footer-nav a:hover {
+    opacity: 0.6;
+}
+
+/* ---------- Links ---------- */
+.footer-links {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    padding: var(--section-padding);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.footer-buttons {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.footer-links a.button-small {
+    border: 1px solid var(--color-border);
+    padding: 1em 1.5em;
+    text-decoration: none;
+    font-size: clamp(0.8rem, 2vw, 1.2rem);
+    font-weight: 300;
+    text-transform: uppercase;
+    color: var(--color-text);
+    background-color: transparent;
+    transition: background-color 0.2s, color 0.2s;
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.footer-links a.button-small:hover {
+    background-color: var(--color-text);
+    color: var(--color-background);
+}
+
+/* ---------- Footer text ---------- */
+.footer-links p {
+    margin: 0;
+    padding: 0;
+    font-size: clamp(1rem, 4vw, 2rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+@media (max-width: 890px) {
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .footer-buttons {
+        width: auto;
+        gap: 0.5rem;
+    }
+}
+
+/* ---------- Copyright ---------- */
+.footer-copyright {
+    padding: var(--section-padding);
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    margin: 0;
+    text-align: center;
+    font-size: 0.6rem;
+    font-weight: 200;
+    text-transform: uppercase;
+    color: var(--color-text);
+}
