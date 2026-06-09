@@ -110,16 +110,7 @@
         });
     };
 
-    // ---------- Sibling Index ----------
-    const applySiblingIndex = () => {
-        const containers = document.querySelectorAll(".set-sibling-index");
-        containers.forEach(container => {
-            const directChildren = container.querySelectorAll<HTMLElement>(":scope > *");
-            directChildren.forEach((item, index) => {
-                item.style.setProperty("--sibling-index", String(index));
-            });
-        });
-    };
+
 
     // ---------- Animation Loop ----------
     // This runs ~60 times per second and moves everything
@@ -174,6 +165,5 @@
 
     // ---------- Start ----------
     fillRows();
-    applySiblingIndex();
     requestAnimationFrame(animate);
 </script>
