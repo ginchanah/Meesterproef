@@ -1,0 +1,182 @@
+---
+
+---
+
+<div class="container">
+    <!-- ===================================== -->
+    <!-- MARK: Adaptation Animation            -->
+    <!-- ===================================== -->
+    <div class="animation-section active" id="anim-5">
+        <!-- ---------- Animation Container ---------- -->
+        <div class="assimilation-background">
+            <div class="assimilation-pane pane-black"></div>
+            <div class="assimilation-pane pane-white"></div>
+            <div class="assimilation-pane pane-black"></div>
+        </div>
+        <div class="assimilation-word">ADAPTATION</div>
+    </div>
+</div>
+
+<script>
+    // =====================================
+    // MARK: Adaptation Animation
+    // =====================================
+
+    // ---------- Variables ----------
+
+    // get the elements from the page
+    const background = document.querySelector(
+        ".assimilation-background",
+    ) as HTMLElement;
+    const panes = document.querySelectorAll<HTMLElement>(".assimilation-pane");
+    const leftPane = panes[0];
+    const middlePane = panes[1];
+    const rightPane = panes[2];
+
+    let draggingSide: string | null = null; // tracks which boundary is being dragged ('left' or 'right')
+    let idleTimer: ReturnType<typeof setTimeout> | null = null; // timer to wait before playing the animation
+    let animationTimer: ReturnType<typeof setTimeout> | null = null; // timer that loops the animation
+
+    // ---------- Initialization ----------
+
+    // prevent page scrolling when touching the animation on mobile
+    background.style.touchAction = "none";
+
+    // start the animation after 1 second
+    resetIdleTimer();
+
+    // =====================================
+    // MARK: Dragging Logic
+    // =====================================
+
+    // when the user clicks or touches the background
+    background.addEventListener("pointerdown", (event: PointerEvent) => {
+        // stop the automatic animation
+        stopAnimation();
+
+        // check which divider is closer to the click
+        const leftEdge = leftPane.getBoundingClientRect().right;
+        const rightEdge = rightPane.getBoundingClientRect().left;
+
+        // start dragging the closer side
+        if (
+            Math.abs(event.clientX - leftEdge) <
+            Math.abs(event.clientX - rightEdge)
+        ) {
+            draggingSide = "left";
+        } else {
+            draggingSide = "right";
+        }
+
+        // show a drag cursor
+        background.style.cursor = "ew-resize";
+
+        // keep tracking the mouse even if it leaves the element
+        background.setPointerCapture(event.pointerId);
+    });
+
+    // when the user moves the mouse or drags
+    background.addEventListener("pointermove", (event: PointerEvent) => {
+        // if not dragging, just show a drag cursor near the dividers
+        if (draggingSide === null) {
+            const leftEdge = leftPane.getBoundingClientRect().right;
+            const rightEdge = rightPane.getBoundingClientRect().left;
+            const nearLeft = Math.abs(event.clientX - leftEdge) < 40;
+            const nearRight = Math.abs(event.clientX - rightEdge) < 40;
+
+            background.style.cursor =
+                nearLeft || nearRight ? "ew-resize" : "default";
+            return;
+        }
+
+        // reset the idle timer while dragging
+        resetIdleTimer();
+
+        // turn mouse position into a percentage (0 to 100)
+        const width = window.innerWidth;
+        let mouse = Math.max(0, Math.min(100, (event.clientX / width) * 100));
+
+        // get current sizes as percentages
+        let left = (leftPane.getBoundingClientRect().width / width) * 100;
+        let right = (rightPane.getBoundingClientRect().width / width) * 100;
+
+        // move the divider the user is dragging
+        if (draggingSide === "left") {
+            left = Math.min(mouse, 100 - right);
+        } else {
+            right = Math.min(100 - mouse, 100 - left);
+        }
+
+        // the middle pane fills whatever is left
+        const middle = 100 - left - right;
+
+        // apply the new sizes
+        leftPane.style.flex = String(left);
+        middlePane.style.flex = String(middle);
+        rightPane.style.flex = String(right);
+    });
+
+    // when the user lets go
+    background.addEventListener("pointerup", stopDragging);
+    background.addEventListener("pointercancel", stopDragging);
+
+    function stopDragging() {
+        draggingSide = null;
+        background.style.cursor = "default";
+        resetIdleTimer();
+    }
+
+    // =====================================
+    // MARK: Animation Logic
+    // =====================================
+
+    // automatically move the panes to random sizes
+    function playAnimation() {
+        // turn on smooth sliding
+        panes.forEach(
+            (pane) => (pane.style.transition = "flex 1s ease-in-out"),
+        );
+
+        // pick random sizes (each between 10% and 43%)
+        const left = Math.random() * 33 + 10;
+        const middle = Math.random() * 33 + 10;
+        const right = 100 - left - middle;
+
+        // apply the sizes
+        leftPane.style.flex = String(left);
+        middlePane.style.flex = String(middle);
+        rightPane.style.flex = String(right);
+
+        // do it again in 1.5 seconds
+        animationTimer = setTimeout(playAnimation, 1500);
+    }
+
+    // stop the automatic animation and freeze the panes where they are
+    function stopAnimation() {
+        if (animationTimer) clearTimeout(animationTimer);
+
+        // save the current sizes so they don't jump
+        const width = window.innerWidth;
+        leftPane.style.flex = String(
+            (leftPane.getBoundingClientRect().width / width) * 100,
+        );
+        middlePane.style.flex = String(
+            (middlePane.getBoundingClientRect().width / width) * 100,
+        );
+        rightPane.style.flex = String(
+            (rightPane.getBoundingClientRect().width / width) * 100,
+        );
+
+        // turn off smooth sliding so dragging feels instant
+        panes.forEach((pane) => (pane.style.transition = "none"));
+    }
+
+    // wait 1 second, then start the animation (resets if called again)
+    function resetIdleTimer() {
+        if (idleTimer) clearTimeout(idleTimer);
+
+        if (draggingSide === null) {
+            idleTimer = setTimeout(playAnimation, 1000);
+        }
+    }
+</script>

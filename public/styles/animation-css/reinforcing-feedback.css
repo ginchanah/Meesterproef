@@ -1,0 +1,51 @@
+#animation-wrapper *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+       color: black;
+}
+
+#animation-wrapper{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:white;
+    color:black;
+
+    overflow:hidden;
+
+    font-family:"Inter",sans-serif;
+
+    transition:
+        background-color 1.2s ease,
+        color 1.2s ease;
+}
+
+#animation-wrapper .word{
+    display:flex;
+    align-items:center;
+    cursor:default;
+}
+
+#animation-wrapper .word span{
+
+    font-size:8vw;
+
+    font-variation-settings:"wght" 100;
+
+    display:inline-block;
+
+    transform-origin:center center;
+
+    transition:
+        font-variation-settings .15s linear,
+        transform .15s linear;
+}
+
+#animation-wrapper .space{
+    width:.4em;
+}

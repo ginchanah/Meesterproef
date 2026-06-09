@@ -1,0 +1,60 @@
+@layer base, components, utilities;
+
+/* =====================================
+MARK: Variables
+===================================== */
+:root {
+    --spacing-large: clamp(16px, 2.5vw, 32px);
+    --block-size-w: clamp(40px, 4.8vw, 60px);
+    --block-size-h: clamp(40px, 4.8vh, 60px);
+    --block-font-size: clamp(1.8rem, 3.8vh, 3.2rem);
+}
+
+
+
+@layer components {
+    /* ---------- Layout Containers ---------- */
+    .balancing-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+        background-color: var(--color-background);
+        color: var(--color-text);
+        font-family: var(--inter-regular);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        position: relative;
+    }
+
+    /* ---------- Blocks ---------- */
+    .block {
+        width: var(--block-size-w);
+        height: var(--block-size-h);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 2px;
+        font-family: var(--inter-regular);
+        font-weight: 900;
+        font-size: var(--block-font-size);
+        color: var(--color-text);
+        user-select: none;
+        will-change: transform;
+        cursor: pointer;
+    }
+}
+
+@layer utilities {
+    /* ---------- Spacing ---------- */
+    .margin-left {
+        margin-left: var(--spacing-large);
+    }
+}
