@@ -56,12 +56,26 @@ main {
 
     li {
         transition: var(--terms-transition-time);
-        list-style-type: none;          
+        list-style-type: none;
+        position: relative;
+        
+        & p {
+            position: absolute;
+            top: 0%;
+            left: 25%;
+
+            display: block;
+            background: var(--black-transparent);
+            backdrop-filter: blur(2px);
+            /* display: none; */
+
+            
+        }
     }
 }
 
 /* =====================================
-MARK: Category filter
+MARK: Category filter 
 ===================================== */
 
 .term-categories {

@@ -16,6 +16,7 @@ MARK: Variables
     --black: #000;
     --white: #ffffff;
     --grey: grey;
+    --black-transparent: #212121e5;
 
     --color-text: var(--black);
     --color-background: var(--white);
@@ -246,7 +247,7 @@ body {
         height: 2px;
         bottom: 0;
         left: 0;
-        background-color: var(--white);
+        background-color: var(--color-text);
         transform: scaleX(0);
         transition: transform 0.3s ease;
     }
