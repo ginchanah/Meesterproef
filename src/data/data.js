@@ -133,7 +133,7 @@ export const data = {
     },
     {
       title: "Invisible",
-      slug: "example",
+      slug: "invisible",
       categories: ["example-category"],
     },
     {

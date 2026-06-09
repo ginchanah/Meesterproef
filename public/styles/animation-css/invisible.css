@@ -1,0 +1,40 @@
+.invisible-container{
+    width: 100dvw;
+    height: 100dvh;
+    position: relative;
+
+    .invisible-title {
+        font-family: Inter;
+        font-weight: bold;
+        text-transform: uppercase;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        translate: -50% -50%;
+        color: var(--color-background);
+        font-size: 10em;
+        text-wrap: nowrap;
+    }
+    span {
+        margin: 1em;
+    }
+
+    div {
+        width: 101%;
+        height: 101%;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+    }
+    p{
+        font-family: 'Courier Prime', monospace;
+        font-size: 1.75em;
+        line-height: 0.75;
+        /* overflow: hidden; */
+        text-wrap: wrap;
+        margin: 0;
+        word-break: break-all;
+        width: 100%;
+        text-align: center;
+    }
+}

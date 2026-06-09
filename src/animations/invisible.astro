@@ -1,0 +1,50 @@
+<section class="invisible-container">
+  <p class="invisible-title">INVISIBLE</p>
+  <div class="mouse-tracker-container">
+    <p class="word invisible-background-text">invisible</p>
+  </div>
+</section>
+
+<script>
+// Fill the paragraph with enough repeated text to cover the whole container
+const backgroundText = document.querySelector(".invisible-background-text")
+if (backgroundText) {
+  backgroundText.textContent = "invisible".repeat(255)
+}
+
+const word = document.querySelector<HTMLElement>(".word")
+const container = document.querySelector<HTMLElement>(".mouse-tracker-container")
+
+if (word && container) {
+    // Prevents queuing more than one rAF at a time — keeps animation in sync with the cursor
+    let rafPending = false
+
+    const mouseFollower = (e: MouseEvent) => {
+        if (rafPending) return
+        rafPending = true
+
+        requestAnimationFrame(() => {
+            // Read layout inside rAF so it reflects the previous frame's settled state —
+            // avoids forced reflow and keeps the center accurate as spacing changes
+            const rect = container.getBoundingClientRect()
+            const centerX = rect.left + rect.width / 2
+            const centerY = rect.top + rect.height / 2
+
+            // Normalize mouse distance from center to 0 (center) → 1 (edge) per axis
+            const percentageX = Math.abs(e.clientX - centerX) / (rect.width / 2)
+            const percentageY = Math.abs(e.clientY - centerY) / (rect.height / 2)
+
+            // 1 at center (max spread), 0 at edge (min spread); larger axis drives the effect
+            const biggest = 1 - Math.max(percentageX, percentageY)
+            const min_spacing = 0.05 // minimum letter/line gap when mouse is at the edge
+            const spacing = (2 * biggest) + min_spacing
+
+            word.style.letterSpacing = spacing + "em"             // horizontal expansion
+            word.style.lineHeight = (0.75 + 2 * spacing) + "em"  // vertical expansion (base 0.75 + top & bottom spacing)
+            rafPending = false
+        })
+    }
+
+    container.addEventListener("mousemove", mouseFollower)
+}
+</script>
