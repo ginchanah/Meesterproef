@@ -15,8 +15,8 @@ interface Props {
 const { variant = 'one', title, slug } = Astro.props;
 
 // Dynamically import the animation file based on slug
-const animations = import.meta.glob('../pages/animations/*.astro', { eager: true });
-const animationPath = `../pages/animations/${slug}.astro`;
+const animations = import.meta.glob('../animations/*.astro', { eager: true });
+const animationPath = `../animations/${slug}.astro`;
 console.log(animationPath)
 const AnimationComponent = (animations[animationPath] as { default: any } | undefined)?.default;
 
@@ -39,23 +39,27 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
     
     <!-- this is the header for the glossary item pagina -->
     {variant === 'two' && (
+        <>
         <nav class="header2-nav">
             <div>
-                <a class="button-big" href="/"><span aria-hidden="true">←</span> Glossary</a>
+                <a class="button-big hover-underline" href="/"><span aria-hidden="true">←</span> Glossary</a>
                 <p>(Inter)facing the Hybrid City</p>
             </div>
             <div>
-                <a href="/sub-pages/contact">contact</a>
-                <a href="/sub-pages/about">about</a>
+                <a href="/sub-pages/contact" class="hover-underline" >contact</a>
+                <a href="/sub-pages/about" class="hover-underline" >about</a>
             </div>
         </nav>
-        <div class="animation-section">
-            <h1 class="visually-hidden">{title}</h1>
-            <div aria-hidden="true">
-                {AnimationComponent ? <AnimationComponent /> : <p>Animation not found</p>}
-            </div>
-        </div>
 
+        {AnimationComponent ? (
+            <div class="animation-section">
+                <h1 class="visually-hidden">{title}</h1>
+                <div aria-hidden="true">
+                    <AnimationComponent />
+                </div>
+            </div>
+        ) : null}
+        </>
     )}
 </header>
 <style>
@@ -64,19 +68,16 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
         width: 100%;
         box-sizing: border-box;
         padding: 1em;
-        font-family: inter;
+        font-family: var(--inter-regular);
 
         display: flex;
         justify-content: center;
         justify-content: space-between;
-        }
+    }
     .header2-nav a {
         width: auto;
-        text-decoration: none;
+        /* text-decoration: none; */
         text-wrap: nowrap;
-        &:hover{
-            text-decoration: underline;
-        }
     }
     .header2-nav p {
         height: var(--font-button-big-size);
