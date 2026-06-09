@@ -39,6 +39,7 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
     
     <!-- this is the header for the glossary item pagina -->
     {variant === 'two' && (
+        <>
         <nav class="header2-nav">
             <div>
                 <a class="button-big hover-underline" href="/"><span aria-hidden="true">←</span> Glossary</a>
@@ -49,13 +50,16 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
                 <a href="/sub-pages/about" class="hover-underline" >about</a>
             </div>
         </nav>
-        <div class="animation-section">
-            <h1 class="visually-hidden">{title}</h1>
-            <div aria-hidden="true">
-                {AnimationComponent ? <AnimationComponent /> : <p>Animation not found</p>}
-            </div>
-        </div>
 
+        {AnimationComponent ? (
+            <div class="animation-section">
+                <h1 class="visually-hidden">{title}</h1>
+                <div aria-hidden="true">
+                    <AnimationComponent />
+                </div>
+            </div>
+        ) : null}
+        </>
     )}
 </header>
 <style>
