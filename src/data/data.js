@@ -189,7 +189,7 @@ export const data = {
           type: "media-left",
           heading: "Helvetica",
           intro: {
-            type: "intro",
+            type: "text",
             text: `Massimo Vignelli talking about the space between the characters that makes it, in Helvetica, a documentary about the typeface Helvertica, directed by Gary`
           },
           subtext: {
