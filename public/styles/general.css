@@ -24,7 +24,6 @@ MARK: Variables
 
 
     /* ---------- Text ---------- */
-    /* ---------- Text ---------- */
     /* Title/H1 */
     --font-title-size: 5rem;
     --font-title-size-index: 5em;
@@ -106,7 +105,6 @@ MARK: Variables
 
 
 
-    /* ---------- Breakpoints ---------- */
     /* ---------- Breakpoints ---------- */
     --breakpoint-phone: 0px;
     --breakpoint-tablet: 490px;
@@ -277,7 +275,6 @@ h3,
 h4,
 h5,
 p {
-
     margin: 0;
 }
 
@@ -295,13 +292,11 @@ header.header-two nav {
     }
 }
 
-
 @media (min-width: 490px) {
     :root {
         --nav-padding: var(--nav-padding-medium);
     }
 }
-
 
 @media (min-width: 891px) {
     :root {
@@ -324,10 +319,7 @@ MARK: Visually hidden
 
     width: 1px;
     height: 1px;
-    width: 1px;
-    height: 1px;
 
-    clip: inset(50%);
     clip: inset(50%);
     white-space: nowrap;
 }
@@ -338,17 +330,14 @@ MARK: Header
 /* general header styling */
 /* TODO */
 .header {}
-.header {}
 
 /* header on the homepage */
 /* TODO */
-.header-one {}
 .header-one {}
 
 /* header on the glossary item page */
 .header-two {
     display: grid;
-
 
     nav {
         width: max-content;
@@ -356,7 +345,6 @@ MARK: Header
         h2 {
             text-transform: uppercase;
             margin-right: 5rem;
-
 
         }
 
@@ -371,11 +359,8 @@ MARK: Header
             display: inline-block;
             position: relative;
 
-
         }
     }
-
-
 }
 
 
