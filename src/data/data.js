@@ -174,8 +174,8 @@ export const data = {
           media: [
             {
               type: "image",
-              src:  "/public/assets/media/ma-title.png",
-              alt:  "ma written out in a frame. The oudside part of both letters is cut off."
+              src: "/public/assets/media/ma-title.png",
+              alt: "ma written out in a frame. The oudside part of both letters is cut off."
             },
           ]
         }
