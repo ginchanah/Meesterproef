@@ -57,21 +57,6 @@ export const data = {
       }
     },
     {
-      title: "Inter-action",
-      slug: "example",
-      categories: ["example-category"],
-    },
-    {
-      title: "Treshold",
-      slug: "example",
-      categories: ["example-category"],
-    },
-    {
-      title: "System",
-      slug: "example",
-      categories: ["example-category3"],
-    },
-    {
       title: "Adaptation",
       slug: "adaptation",
       categories: ["example-category3"],
@@ -135,11 +120,6 @@ export const data = {
       title: "Invisible",
       slug: "example",
       categories: ["example-category"],
-    },
-    {
-      title: "Interface",
-      slug: "example",
-      categories: ["example-category2"],
     },
     {
       title: "Ma (in-between)",
@@ -209,11 +189,6 @@ export const data = {
         type: "image",
         src: "/public/assets/media/ma-title.png"
       }
-    },
-    {
-      title: "example",
-      slug: "example",
-      categories: ["example-category2"],
     },
     {
       title: "Lines of Flight",
