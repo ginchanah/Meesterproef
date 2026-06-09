@@ -215,5 +215,10 @@ export const data = {
       slug: "example",
       categories: ["example-category2"],
     },
+    {
+      title: "Lines of Flight",
+      slug: "lines-of-flight",
+      categories: ["example-category2"],
+    },
   ],
 };

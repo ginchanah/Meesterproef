@@ -1,0 +1,169 @@
+---
+
+---
+
+<!-- ===================================== -->
+<!-- MARK: Lines of Flight                 -->
+<!-- ===================================== -->
+
+<div class="main-frame">
+    <div class="text-plane set-sibling-index">
+        <!-- ---------- Rows ---------- -->
+        <div class="row">
+            <div class="scrolling-text"></div>
+        </div>
+        <div class="row">
+            <div class="scrolling-text"></div>
+        </div>
+        <div class="row">
+            <div class="scrolling-text"></div>
+        </div>
+        <div class="row">
+            <div class="scrolling-text"></div>
+        </div>
+        <div class="row">
+            <div class="scrolling-text"></div>
+        </div>
+        <div class="row">
+            <div class="scrolling-text"></div>
+        </div>
+        <div class="row">
+            <div class="scrolling-text"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // =====================================
+    // MARK: Variables
+    // =====================================
+
+    // ---------- DOM Elements ----------
+    const repeatedText = " LINES OF FLIGHT ".repeat(10);
+    const rows = document.querySelectorAll<HTMLElement>(".scrolling-text");
+    const rowContainers = document.querySelectorAll<HTMLElement>(".row");
+    const textPlane = document.querySelector<HTMLElement>(".text-plane");
+
+    // ---------- State ----------
+    // We store position, speed, and direction for each row
+    const positions: number[] = [];
+    const speeds = [1.2, 0.9, 1.4, 0.8, 1.5, 1.0, 1.3];
+    const directions: number[] = []; // -1 = scrolling left, 1 = scrolling right
+
+    // Where the mouse is on screen (0 to 1)
+    let mouseX = 0.5;
+    let mouseY = 0.5;
+    let mouseOnScreen = false;
+
+    // Current and target rotation for the 3D perspective
+    let rotationY = 30;
+    let rotationX = 0;
+
+    // =====================================
+    // MARK: Initialization
+    // =====================================
+
+    // ---------- Event Listeners ----------
+    // Track the mouse position
+    window.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX / window.innerWidth;
+        mouseY = e.clientY / window.innerHeight;
+        mouseOnScreen = true;
+    });
+
+    window.addEventListener("mouseleave", () => {
+        mouseOnScreen = false;
+    });
+
+    // Track touch position (same idea as mouse)
+    window.addEventListener("touchmove", (e) => {
+        if (e.touches.length > 0) {
+            mouseX = e.touches[0].clientX / window.innerWidth;
+            mouseY = e.touches[0].clientY / window.innerHeight;
+            mouseOnScreen = true;
+        }
+    }, { passive: true });
+
+    window.addEventListener("touchend", () => {
+        mouseOnScreen = false;
+    });
+
+    // Clicking a row flips its scroll direction
+    rowContainers.forEach((row, i) => {
+        row.addEventListener("click", () => {
+            directions[i] *= -1;
+        });
+    });
+
+
+    // =====================================
+    // MARK: Functions
+    // =====================================
+
+    // ---------- Population ----------
+    // Fill each row with two copies of the text so we can loop seamlessly
+    const fillRows = () => {
+        rows.forEach((row, i) => {
+            row.innerHTML = `<span>${repeatedText}</span><span>${repeatedText}</span>`;
+            positions.push(-i * 100); // stagger starting positions
+            directions.push(-1);      // all start scrolling left
+        });
+    };
+
+
+
+    // ---------- Animation Loop ----------
+    // This runs ~60 times per second and moves everything
+    const animate = () => {
+        // 1. Update the 3D perspective to follow the mouse
+        let targetY = 30;
+        let targetX = 0;
+
+        if (mouseOnScreen) {
+            targetY = 20 + mouseX * 20;       // rotate between 20° and 40°
+            targetX = (mouseY - 0.5) * -8;    // tilt between -4° and 4°
+        }
+
+        // Smoothly move towards the target (lerp)
+        rotationY += (targetY - rotationY) * 0.04;
+        rotationX += (targetX - rotationX) * 0.04;
+
+        if (textPlane) {
+            textPlane.style.transform = `rotateY(${rotationY}deg) rotateX(${rotationX}deg)`;
+        }
+
+        // 2. Move each row of text
+        rows.forEach((row, i) => {
+            // Figure out how fast this row should go right now
+            let speed = speeds[i];
+
+            // If the mouse is on screen, speed up rows that are close to the cursor
+            if (mouseOnScreen) {
+                const rect = rowContainers[i].getBoundingClientRect();
+                const rowMiddle = (rect.top + rect.bottom) / 2;
+                const mousePixelY = mouseY * window.innerHeight;
+                const distance = Math.abs(mousePixelY - rowMiddle);
+                const closeness = Math.max(0, 1 - distance / (window.innerHeight / 2));
+
+                speed += closeness * 3; // up to 3x faster when the mouse is right on it
+            }
+
+            // Move the row in its current direction
+            positions[i] += speed * directions[i];
+
+            // Loop seamlessly: when text scrolls too far, jump back
+            const halfWidth = row.scrollWidth / 2;
+            if (positions[i] <= -halfWidth) positions[i] += halfWidth;
+            if (positions[i] >= 0) positions[i] -= halfWidth;
+
+            // Apply the new position
+            row.style.transform = `translateX(${positions[i]}px)`;
+        });
+
+        requestAnimationFrame(animate);
+    };
+
+    // ---------- Start ----------
+    fillRows();
+    requestAnimationFrame(animate);
+</script>
