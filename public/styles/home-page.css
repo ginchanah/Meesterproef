@@ -20,7 +20,7 @@ MARK: Header
 ===================================== */
 
 h1 {
-    font-family: inter;
+    font-family: var(--inter-regular);
     font-size: var(--font-title-size-index);
 
     display: flex;
@@ -44,7 +44,7 @@ main {
 }
 
 .term-list {
-    font-family: inter;
+    font-family: var(--inter-regular);
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     padding: 0;

@@ -131,6 +131,14 @@ body {
         --color-border: var(--white);
     }
 }
+@media (prefers-color-scheme: light) {
+    :root {
+        --color-text: var(--white);
+        --color-background: var(--black);
+        --color-border: var(--white);
+    }
+}
+
 
 
 /* =====================================
