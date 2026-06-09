@@ -117,11 +117,6 @@ export const data = {
       }
     },
     {
-      title: "Invisible",
-      slug: "example",
-      categories: ["example-category"],
-    },
-    {
       title: "Ma (in-between)",
       slug: "ma",
       categories: ["category-1"],
