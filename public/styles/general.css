@@ -23,9 +23,10 @@ MARK: Variables
 
 
 
-     /* ---------- Text ---------- */
+    /* ---------- Text ---------- */
     /* Title/H1 */
     --font-title-size: 5rem;
+    --font-title-size-index: 5em;
     --font-title-family: var(--inter-regular);
     --font-title-weight: bold;
     --font-title-transform: uppercase;
@@ -68,7 +69,7 @@ MARK: Variables
     --font-button-big-weight: light;
     --font-button-big-transform: uppercase;
 
-     /* Animation */
+    /* Animation */
     --font-animation-size: 1.2rem;
     --font-animation-family: var(--inter-regular);
     --font-animation-weight: light;
@@ -76,8 +77,15 @@ MARK: Variables
 
 
 
-     /* ---------- Margin & Paddings ---------- */
-     /* desktop */
+    /* ---------- Margin & Paddings ---------- */
+    /* body padding */
+    --body-padding: 2rem;
+    --padding-medium: 2em;
+    --padding-small: 1rem;
+    --padding-extra-small: 0.5rem;
+
+
+    /* desktop */
     --section-padding-large: 4rem 15rem;
     --section-margin-large: 0rem 0;
 
@@ -97,7 +105,7 @@ MARK: Variables
 
 
 
-     /* ---------- Breakpoints ---------- */
+    /* ---------- Breakpoints ---------- */
     --breakpoint-phone: 0px;
     --breakpoint-tablet: 490px;
     --breakpoint-desktop: 891px;
@@ -164,7 +172,12 @@ MARK: Fonts
 MARK: General Styling
 ===================================== */
 /* ---------- Fonts ---------- */
-h1, h2, h3, h4, h5, label {
+h1,
+h2,
+h3,
+h4,
+h5,
+label {
     font-family: var(--inter-regular);
 }
 
@@ -213,6 +226,38 @@ body {
     text-transform: var(--font-button-big-transform);
 }
 
+/* to do! */
+/* source: https://tobiasahlin.com/blog/css-trick-animating-link-underlines/ */
+.hover-underline {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+
+    &:active {
+        opacity: 0.8;
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        display: block;
+        width: 100%;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background-color: var(--white);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    &:hover::before {
+        transform: scaleX(1);
+    }
+
+}
+
+
 footer {
     font-family: var(--font-animation-family);
 }
@@ -224,7 +269,12 @@ body {
 
 /* ---------- Margins & Paddings ---------- */
 
-h1, h2, h3, h4, h5, p {
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
     margin: 0;
 }
 
@@ -241,11 +291,13 @@ header.header-two nav {
         --nav-padding: var(--nav-padding-small);
     }
 }
+
 @media (min-width: 490px) {
     :root {
         --nav-padding: var(--nav-padding-medium);
     }
 }
+
 @media (min-width: 891px) {
     :root {
         --nav-padding: var(--nav-padding-large);
@@ -265,10 +317,10 @@ MARK: Visually hidden
     position: absolute;
     overflow: hidden;
 
-    width: 1px; 
-    height: 1px; 
+    width: 1px;
+    height: 1px;
 
-    clip: inset(50%); 
+    clip: inset(50%);
     white-space: nowrap;
 }
 
@@ -277,45 +329,39 @@ MARK: Header
 ===================================== */
 /* general header styling */
 /* TODO */
-.header {
-
-}
+.header {}
 
 /* header on the homepage */
 /* TODO */
-.header-one {
-
-}
+.header-one {}
 
 /* header on the glossary item page */
 .header-two {
     display: grid;
-    
+
     nav {
         width: max-content;
 
         h2 {
             text-transform: uppercase;
             margin-right: 5rem;
-            
+
         }
-    
+
+        h2,
+        .button-big {
+            font-size: clamp(1.8rem, 10vw, 3.5rem);
+        }
+
         .button-big {
             text-align: right;
             width: 100%;
             display: inline-block;
-            
-        }
+            position: relative;
 
-        h2, .button-big {
-            font-size: clamp(1.8rem, 10vw, 3.5rem)
         }
-
     }
-    
-    
 }
-
 
 
 @media (max-width: 675px) {
@@ -324,4 +370,3 @@ MARK: Header
     }
 
 }
-
