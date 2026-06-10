@@ -1,15 +1,15 @@
-<section class="invisible-container">
+<div class="invisible-container">
   <p class="invisible-title">INVISIBLE</p>
   <div class="mouse-tracker-container">
     <p class="word invisible-background-text">invisible</p>
   </div>
-</section>
+</div>
 
 <script>
 // Fill the paragraph with enough repeated text to cover the whole container
 const backgroundText = document.querySelector(".invisible-background-text")
 if (backgroundText) {
-  backgroundText.textContent = "invisible".repeat(255)
+  backgroundText.textContent = "invisible".repeat(450)
 }
 
 const word = document.querySelector<HTMLElement>(".word")
@@ -36,7 +36,7 @@ if (word && container) {
 
             // 1 at center (max spread), 0 at edge (min spread); larger axis drives the effect
             const biggest = 1 - Math.max(percentageX, percentageY)
-            const min_spacing = 0.05 // minimum letter/line gap when mouse is at the edge
+            const min_spacing = 0.02 // minimum letter/line gap when mouse is at the edge
             const spacing = (2 * biggest) + min_spacing
 
             word.style.letterSpacing = spacing + "em"             // horizontal expansion
