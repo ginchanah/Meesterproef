@@ -117,6 +117,16 @@ export const data = {
       }
     },
     {
+      title: "Invisible",
+      slug: "invisible",
+      categories: ["example-category"],
+    },
+    {
+      title: "Interface",
+      slug: "example",
+      categories: ["example-category2"],
+    },
+    {
       title: "Ma (in-between)",
       slug: "ma",
       categories: ["category-1"],
