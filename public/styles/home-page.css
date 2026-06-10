@@ -58,18 +58,31 @@ main {
         transition: var(--terms-transition-time);
         list-style-type: none;
         position: relative;
-        
-        & p {
+
+        & .glossary-term-feedforward {
             position: absolute;
             top: 0%;
             left: 25%;
+            font-size: 1rem;
 
-            display: block;
+            /* display: block; */
             background: var(--black-transparent);
+            /* background: hotpink; */
             backdrop-filter: blur(2px);
-            /* display: none; */
-
-            
+            display: none;
+            border: 2px solid rgba(255, 255, 255, 0.50);
+            padding: var(--padding-extra-small);
+            width: 150%;
+            z-index: -1;
+            transition: var(--terms-transition-time);
+            opacity: 0%;
+            display: block;
+        }
+        
+        &:hover .glossary-term-feedforward {
+            transition-delay:1s;
+            z-index: 1;
+            opacity: 100%;
         }
     }
 }
