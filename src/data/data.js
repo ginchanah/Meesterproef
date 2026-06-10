@@ -25,7 +25,7 @@ export const data = {
           media: [
             {
               type: "image",
-              src: "/public/assets/media/intra-action-2.png",
+              src: "/assets/media/intra-action-2.png",
               alt: "The word intra-action written several times, overlapping in a way that makes it almost unreadable.",
             },
           ],
@@ -45,7 +45,7 @@ export const data = {
           media: [
             {
               type: "image",
-              src: "/public/assets/media/intra-action-1.png",
+              src: "/assets/media/intra-action-1.png",
               alt: "Wifi portrayed as light point on a wall that together form a landscape like shape."
             },
           ]
@@ -53,7 +53,7 @@ export const data = {
       ],
       generalImage: {
         type: "image",
-        src: "/public/assets/media/intra-action-3.png"
+        src: "/assets/media/intra-action-3.png"
       }
     },
     {
@@ -85,7 +85,7 @@ export const data = {
           media: [
             {
               type: "image",
-              src: "/public/assets/media/reinforcing-feedback-visualisation.png",
+              src: "/assets/media/reinforcing-feedback-visualisation.png",
               alt: "The story from the artwork repeated multiple times vertically, the further you go down the more it is repeated and overlapped making the sentences in the end impossible to read."
             }
           ],
@@ -105,7 +105,7 @@ export const data = {
           media: [
             {
               type: "image",
-              src: "/public/assets/media/reinforcing-feedback-artwork.png",
+              src: "/assets/media/reinforcing-feedback-artwork.png",
               alt: "Alvin Lucier sitting on a chair in a room with big white stairs behind him. He is hooked up to a recording device and is wearing a brown suit with a red tie."
             },
           ]
@@ -113,7 +113,7 @@ export const data = {
       ],
       generalImage: {
         type: "image",
-        src: "/public/assets/media/reinforcing-feedback-title.png"
+        src: "/assets/media/reinforcing-feedback-title.png"
       }
     },
     {
@@ -135,7 +135,7 @@ export const data = {
           media: [
             {
               type: "image",
-              src: "/public/assets/media/ma-visualisation.png",
+              src: "/assets/media/ma-visualisation.png",
               alt: "ma written out in a frame. The oudside of part both letters is cut off."
             },
           ],
@@ -155,7 +155,7 @@ export const data = {
           media: [
             {
               type: "image",
-              src: "/public/assets/media/ma-artwork.png",
+              src: "/assets/media/ma-artwork.png",
               alt: "Picture of the ceiling of a white room. The ceiling is square and in the middle there is a square window/hole. Trough it you can view a blue sky. It is the artwork skyspaces from James Turrell. Where he plays with light."
             },
           ]
@@ -174,15 +174,15 @@ export const data = {
           media: [
             {
               type: "image",
-              src:  "/public/assets/media/ma-title.png",
-              alt:  "ma written out in a frame. The oudside part of both letters is cut off."
+              src: "/assets/media/ma-title.png",
+              alt: "ma written out in a frame. The oudside part of both letters is cut off."
             },
           ]
         }
       ],
       generalImage: {
         type: "image",
-        src: "/public/assets/media/ma-title.png"
+        src: "/assets/media/ma-title.png"
       }
     },
     {
