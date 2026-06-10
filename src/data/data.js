@@ -57,23 +57,8 @@ export const data = {
       }
     },
     {
-      title: "Inter-action",
-      slug: "example",
-      categories: ["example-category"],
-    },
-    {
-      title: "Treshold",
-      slug: "example",
-      categories: ["example-category"],
-    },
-    {
-      title: "System",
-      slug: "example",
-      categories: ["example-category3"],
-    },
-    {
       title: "Adaptation",
-      slug: "example",
+      slug: "adaptation",
       categories: ["example-category3"],
     },
     {
@@ -189,7 +174,7 @@ export const data = {
           type: "media-left",
           heading: "Helvetica",
           intro: {
-            type: "intro",
+            type: "text",
             text: `Massimo Vignelli talking about the space between the characters that makes it, in Helvetica, a documentary about the typeface Helvertica, directed by Gary`
           },
           subtext: {
@@ -211,8 +196,8 @@ export const data = {
       }
     },
     {
-      title: "example",
-      slug: "example",
+      title: "Lines of Flight",
+      slug: "lines-of-flight",
       categories: ["example-category2"],
     },
   ],
