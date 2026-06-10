@@ -2,9 +2,9 @@
 MARK: Homepage specific variables
 ===================================== */
 
-:root {
+/* :root {
     --terms-transition-time: 0.3s;
-}
+} */
 
 /* =====================================
 MARK: General styling
@@ -55,7 +55,7 @@ main {
     }
 
     li {
-        transition: var(--terms-transition-time);
+        transition: var(--transition-time);
         list-style-type: none;          
     }
 }
@@ -81,11 +81,11 @@ MARK: Category filter
     position: relative;
     padding: 0.5em;
     margin: 0;
-    border: 2px var(--color-border) solid;
-    transition: var(--terms-transition-time);
+    border: var(--thin-border) var(--color-border) solid;
+    transition: var(--transition-time);
 
     &:hover {
-        opacity: 0.65;
+        opacity: var(--hover-opacity);
     }
 }
 
@@ -111,6 +111,6 @@ MARK: Category filter
 /* When ANY category is checked, dim all terms */
 .term-categories:has(:checked)~.term-list li {
     opacity: 0.2;
-    transition: var(--terms-transition-time);
+    transition: var(--transition-time);
     pointer-events: none;
 }

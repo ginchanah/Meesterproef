@@ -76,6 +76,11 @@ MARK: Variables
     --font-animation-transform: uppercase;
 
 
+    /* ---------- Sizes & Styles ---------- */
+    --thin-border: 1px;
+    --transition-time: 0.3s;
+    --hover-opacity: 65%;
+
 
     /* ---------- Margin & Paddings ---------- */
     /* body padding */
@@ -244,6 +249,7 @@ body {
     text-decoration: none;
     cursor: pointer;
     position: relative;
+    transition: var(--transition-time);
 
     &:active {
         opacity: 0.8;
@@ -532,7 +538,7 @@ MARK: Footer
 }
 
 .footer-nav a:hover {
-    opacity: 0.6;
+    opacity: var(--hover-opacity);
 }
 
 /* ---------- Links ---------- */
@@ -544,7 +550,7 @@ MARK: Footer
     padding: var(--section-padding);
     padding-top: 2rem;
     padding-bottom: 2rem;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: var(--thin-border) solid var(--color-border);
 }
 
 .footer-buttons {
@@ -562,16 +568,26 @@ MARK: Footer
     text-transform: uppercase;
     color: var(--color-text);
     background-color: transparent;
-    transition: background-color 0.2s, color 0.2s;
+    /* transition: background-color 0.2s, color 0.2s; */
     flex: 1;
     text-align: center;
     white-space: nowrap;
+    transition: var(--transition-time);
+
+    &:hover {
+        opacity: var(--hover-opacity);
+    }
+
+    &:active {
+        background-color: var(--color-text);
+        color: var(--color-background);
+    }
 }
 
-.footer-links a.button-small:hover {
+/* .footer-links a.button-small:hover {
     background-color: var(--color-text);
-    color: var(--color-background);
-}
+    color: var(--color-background); 
+} */
 
 /* ---------- Footer text ---------- */
 .footer-links p {
