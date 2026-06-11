@@ -2,10 +2,7 @@
 
 ---
 
-<!-- ===================================== -->
-<!-- MARK: Lines of Flight                 -->
-<!-- ===================================== -->
-
+<!-- ===================================== --><!-- MARK: Lines of Flight                 --><!-- ===================================== -->
 <div class="main-frame">
     <div class="text-plane set-sibling-index">
         <!-- ---------- Rows ---------- -->
@@ -76,13 +73,17 @@
     });
 
     // Track touch position (same idea as mouse)
-    window.addEventListener("touchmove", (e) => {
-        if (e.touches.length > 0) {
-            mouseX = e.touches[0].clientX / window.innerWidth;
-            mouseY = e.touches[0].clientY / window.innerHeight;
-            mouseOnScreen = true;
-        }
-    }, { passive: true });
+    window.addEventListener(
+        "touchmove",
+        (e) => {
+            if (e.touches.length > 0) {
+                mouseX = e.touches[0].clientX / window.innerWidth;
+                mouseY = e.touches[0].clientY / window.innerHeight;
+                mouseOnScreen = true;
+            }
+        },
+        { passive: true },
+    );
 
     window.addEventListener("touchend", () => {
         mouseOnScreen = false;
@@ -95,7 +96,6 @@
         });
     });
 
-
     // =====================================
     // MARK: Functions
     // =====================================
@@ -106,11 +106,9 @@
         rows.forEach((row, i) => {
             row.innerHTML = `<span>${repeatedText}</span><span>${repeatedText}</span>`;
             positions.push(-i * 100); // stagger starting positions
-            directions.push(-1);      // all start scrolling left
+            directions.push(-1); // all start scrolling left
         });
     };
-
-
 
     // ---------- Animation Loop ----------
     // This runs ~60 times per second and moves everything
@@ -120,8 +118,8 @@
         let targetX = 0;
 
         if (mouseOnScreen) {
-            targetY = 20 + mouseX * 20;       // rotate between 20° and 40°
-            targetX = (mouseY - 0.5) * -8;    // tilt between -4° and 4°
+            targetY = 20 + mouseX * 25; // rotate between 20° and 45°
+            targetX = (mouseY - 0.5) * -8; // tilt between -4° and 4°
         }
 
         // Smoothly move towards the target (lerp)
@@ -143,7 +141,10 @@
                 const rowMiddle = (rect.top + rect.bottom) / 2;
                 const mousePixelY = mouseY * window.innerHeight;
                 const distance = Math.abs(mousePixelY - rowMiddle);
-                const closeness = Math.max(0, 1 - distance / (window.innerHeight / 2));
+                const closeness = Math.max(
+                    0,
+                    1 - distance / (window.innerHeight / 2),
+                );
 
                 speed += closeness * 3; // up to 3x faster when the mouse is right on it
             }
