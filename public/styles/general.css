@@ -26,7 +26,8 @@ MARK: Variables
     /* ---------- Text ---------- */
     /* Title/H1 */
     --font-title-size: 5rem;
-    --font-title-size-index: 5em;
+    --font-title-size-index: clamp(3.5rem, 2rem + 5vw, 5rem);
+
     --font-title-family: var(--inter-regular);
     --font-title-weight: bold;
     --font-title-transform: uppercase;
@@ -42,7 +43,7 @@ MARK: Variables
     --font-heading-2-text-weight: bold;
 
     /* Body Text */
-    --font-body-text-size: 1.2rem;
+    --font-body-text-size: clamp(1rem, 1rem + 0.1vw, 1.2rem);
     --font-body-text-family: var(--courier-prime-regular);
     --font-body-text-weight: normal;
 
@@ -84,10 +85,11 @@ MARK: Variables
 
     /* ---------- Margin & Paddings ---------- */
     /* body padding */
-    --body-padding: 2rem;
+    --body-padding: clamp(1.3rem, 1rem + 1vw, 2rem);
     --padding-medium: 2em;
     --padding-small: 1rem;
     --padding-extra-small: 0.5rem;
+    --padding-buttons-standard: 1em 1.5em;
 
 
     /* desktop */
@@ -561,7 +563,7 @@ MARK: Footer
 
 .footer-links a.button-small {
     border: 1px solid var(--color-border);
-    padding: 1em 1.5em;
+    padding: var(--padding-buttons-standard);
     text-decoration: none;
     font-size: clamp(0.8rem, 2vw, 1.2rem);
     font-weight: 300;
