@@ -44,4 +44,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Duplicate the content to allow the seamless infinite CSS translation (-50%)
     bannerContent.innerHTML = halfContent + halfContent;
+
+    // Adjust animation duration to ensure a consistent slow speed
+    // Calculate distance traveled (50% of the total width)
+    const distance = bannerContent.offsetWidth / 2;
+    // Set a constant speed: pixels per second (adjust if needed to make it slower or faster)
+    const pixelsPerSecond = 40;
+    const duration = distance / pixelsPerSecond;
+    
+    bannerContent.style.animationDuration = `${duration}s`;
 });
