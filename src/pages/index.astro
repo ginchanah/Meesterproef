@@ -31,8 +31,8 @@ const categories = [...new Set(allCategories)];
 			<li class={item.categories.join(' ')}>
 				<a href=`glossary-items/${item.slug}` class="hover-underline">{item.title}</a>
 				<div class="glossary-term-feedforward">
-					<h4>Adaptation</h4>
-					<p>Dit is een testzin omdat ik te lui ben om eerst alles in json te zetten, dat is een probleem voor straks hihi.</p>
+					<h4>{item.title}</h4>
+					<p>Reinforcing or positive feedback loops are self-enhancing, leading to exponential growth or to runaway collapses over time.</p>
 				</div>
 			</li>
 		))}
