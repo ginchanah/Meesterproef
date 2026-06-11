@@ -3,7 +3,9 @@ MARK: Homepage specific variables
 ===================================== */
 
 :root {
-    --terms-transition-time: 0.3s;
+    --term-list-font-size: var(--font-body-text-size);
+    --term-list-gap: 0.2rem;
+    --term-category-gap: 1rem;
 }
 
 /* =====================================
@@ -19,7 +21,7 @@ main {
 MARK: Header
 ===================================== */
 
-h1 {
+#index-h1 {
     font-family: var(--inter-regular);
     font-size: var(--font-title-size-index);
 
@@ -45,19 +47,22 @@ main {
 
 .term-list {
     font-family: var(--inter-regular);
+    font-size: var(--term-list-font-size);
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     padding: 0;
-    gap: 0.2rem;
+    /* margin-bottom: 5rem; */
+    gap: var(--term-list-gap);
 
     @media (min-width: 1300px) {
         grid-template-columns: 1fr 1fr 1fr 1fr;
     }
 
     li {
-        transition: var(--terms-transition-time);
-        list-style-type: none;          
+        transition: var(--transition-time);
+        list-style-type: none;
     }
+
 }
 
 /* =====================================
@@ -70,7 +75,7 @@ MARK: Category filter
 
     display: flex;
     flex-wrap: wrap;
-    gap: var(--padding-small);
+    gap: var(--term-category-gap);
 
     li {
         list-style-type: none;
@@ -79,13 +84,14 @@ MARK: Category filter
 
 .term-categories li {
     position: relative;
-    padding: 0.5em;
+    padding: 0.6rem 1.2rem;
     margin: 0;
-    border: 2px var(--color-border) solid;
-    transition: var(--terms-transition-time);
+    border: var(--thin-border) var(--color-border) solid;
+    transition: var(--transition-time);
+    font-weight: 300;
 
     &:hover {
-        opacity: 0.65;
+        opacity: var(--hover-opacity);
     }
 }
 
@@ -111,6 +117,14 @@ MARK: Category filter
 /* When ANY category is checked, dim all terms */
 .term-categories:has(:checked)~.term-list li {
     opacity: 0.2;
-    transition: var(--terms-transition-time);
+    transition: var(--transition-time);
     pointer-events: none;
+}
+
+@media (max-width: 800px) {
+    :root {
+        --term-list-font-size: 1.2rem;
+        --term-list-gap: 0.8rem;
+        --term-category-gap: 0.5rem;
+    }
 }
