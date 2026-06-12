@@ -1,15 +1,39 @@
 ---
 // link to the footer:
 // src/components/Footer.astro
+import { data } from "../data/data.js";
 
 // define two variants for the footer
 interface Props {
     variant?: 'index' | 'detail';
-    title?: String
+    title?: String;
+    item?: any;
 }
 
 // define props to receive from other components
-const { variant = 'home', title } = Astro.props;
+const { variant = 'home', title, item } = Astro.props;
+
+let prevItem = null;
+let nextItem = null;
+
+if (variant === 'detail' && item) {
+    const items = data.glossaryItems;
+    // use the first category to find siblings
+    const category = item.categories && item.categories.length > 0 ? item.categories[0] : null;
+    
+    if (category) {
+        const categoryItems = items.filter(i => i.categories && i.categories.includes(category));
+        const currentIndex = categoryItems.findIndex(i => i.slug === item.slug);
+        
+        if (currentIndex !== -1 && categoryItems.length > 1) {
+            const prevIndex = (currentIndex - 1 + categoryItems.length) % categoryItems.length;
+            const nextIndex = (currentIndex + 1) % categoryItems.length;
+            
+            prevItem = categoryItems[prevIndex];
+            nextItem = categoryItems[nextIndex];
+        }
+    }
+}
 ---
 
 
@@ -46,9 +70,17 @@ const { variant = 'home', title } = Astro.props;
         <!-- Navigation between glossary items -->
         <div>
             <nav class="footer-nav">
-                <a href="/placeholder" class="hover-underline">&larr; PLACEHOLDER</a>
+                {prevItem ? (
+                    <a href={`/glossary-items/${prevItem.slug}`} class="hover-underline">&larr; {prevItem.title}</a>
+                ) : (
+                    <a href="#" class="hover-underline">&larr; PLACEHOLDER</a>
+                )}
                 <a href="/" class="hover-underline">BACK TO GLOSSARY</a>
-                <a href="/placeholder" class="hover-underline">PLACEHOLDER &rarr;</a>
+                {nextItem ? (
+                    <a href={`/glossary-items/${nextItem.slug}`} class="hover-underline">{nextItem.title} &rarr;</a>
+                ) : (
+                    <a href="#" class="hover-underline">PLACEHOLDER &rarr;</a>
+                )}
             </nav>
                 <div class="banner-container">
                     <div class="banner-content" id="bannerContent">
