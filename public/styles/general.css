@@ -501,7 +501,7 @@ MARK: Footer
     font-size: clamp(1.5rem, 5vw, 3rem);
     font-weight: 100;
     text-transform: uppercase;
-    margin: 0;
+    margin: 0 0.3em;
     color: #000;
     text-wrap: nowrap;
 }
