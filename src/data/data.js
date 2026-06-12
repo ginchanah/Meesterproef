@@ -60,6 +60,58 @@ export const data = {
       title: "Adaptation",
       slug: "adaptation",
       categories: ["example-category3"],
+      content: [
+        {
+          type: "media-left",
+          intro: {
+            type: "quote",
+            text: `“A system can adapt if it can learn a new pattern of behaviour after recognising that the environment has changed and that the old pattern of behaviour is not working.”`,
+          },
+          author: "W. Ross Ashby’s theory of adaptation",
+          subtext: {
+            type: "source",
+            text: `https://www.zorofeigl.nl/detour-a-long-and-winding-road-to-nowhere-in-particular/`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/adaptation-visualisation.png",
+              alt: "The word adaptation styled as a long string knotting and wrapping around itself."
+            }
+          ],
+        },
+        {
+          type: "text-full",
+          intro: {
+            type: "text",
+            text: `According to Ashby, adaptation is the process by which a system subjected to environmental disturbances alters its internal organization so as to maintain its essential variables within viable limits. When ordinary regulatory behavior fails, the system undergoes structural change through a process of feedback and selection, which Ashby termed ultrastability. This adaptive capacity does not require intelligent design or foresight, but emerges from trial-and-error regulation.`
+          },
+        },
+        {
+          type: "media-right",
+          heading: "Detour. A long and winding road to nowhere in particular",
+          intro: {
+            type: "text",
+            text: `A machine constantly sweeps a green ribbon across the fl oor, creating malleable patterns as the green material itself moves the machine. An endless dance between machine and material emerges.`
+          },
+          author: "Detour. A long and winding road to nowhere in particular, 2012 by Zoro Feigl",
+          subtext: {
+            type: "link",
+            text: `https://ia601606.us.archive.org/32/items/designforbrainor00ashb/designforbrainor00ashb.pdf`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/adaptation-artwork.png",
+              alt: "The machine at work with the green ribbon. The ribbon is formed in repeating loops."
+            },
+          ]
+        }
+      ],
+      generalImage: {
+        type: "image",
+        src: "/assets/media/adaptation-title.png"
+      }
     },
     {
       title: "Balancing Feedback",
@@ -199,6 +251,134 @@ export const data = {
       title: "Lines of Flight",
       slug: "lines-of-flight",
       categories: ["example-category2"],
+    },
+    {
+      title: "Layout Demo",
+      slug: "layout-demo",
+      categories: ["example-category"],
+      content: [
+        {
+          type: "media-right",
+          heading: "Media-Right Layout",
+          intro: {
+            type: "text",
+            text: `This is the <b>media-right</b> layout. Text on the left, image on the right. Two equal columns. The text block sits above a smaller subtext block, while the image fills the right column.`
+          },
+          author: "Layout System",
+          subtext: {
+            type: "source",
+            text: `type: "media-right" — default two-column layout`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/intra-action-1.png",
+              alt: "Demo image for media-right layout"
+            }
+          ]
+        },
+        {
+          type: "media-left",
+          heading: "Media-Left Layout",
+          intro: {
+            type: "text",
+            text: `This is the <b>media-left</b> layout. Image on the left, text on the right. The row is visually reversed compared to media-right. The heading above also switches to right-aligned.`
+          },
+          author: "Layout System",
+          subtext: {
+            type: "source",
+            text: `type: "media-left" — reversed two-column layout`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/ma-artwork.png",
+              alt: "Demo image for media-left layout"
+            }
+          ]
+        },
+        {
+          type: "media-full",
+          heading: "Media-Full Layout",
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/reinforcing-feedback-visualisation.png",
+              alt: "Demo image for media-full layout"
+            }
+          ]
+        },
+        {
+          type: "text-full",
+          heading: "Text-Full Layout",
+          intro: {
+            type: "text",
+            text: `This is the <b>text-full</b> layout. A single full-width text block with no media. Useful for longer passages, standalone quotes, or transitional paragraphs that don't need an accompanying image or video.`
+          },
+          author: "Layout System",
+          subtext: {
+            type: "source",
+            text: `type: "text-full" — full-width text, no media`
+          }
+        },
+        {
+          type: "media-top",
+          heading: "Media-Top Layout",
+          intro: {
+            type: "text",
+            text: `This is the <b>media-top</b> layout. The media sits on top at full width, with the text block below it. Good for when you want the image to lead and the text to follow as context or explanation.`
+          },
+          author: "Layout System",
+          subtext: {
+            type: "source",
+            text: `type: "media-top" — stacked: media above, text below`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/intra-action-2.png",
+              alt: "Demo image for media-top layout"
+            }
+          ]
+        },
+        {
+          type: "media-bottom",
+          heading: "Media-Bottom Layout",
+          intro: {
+            type: "text",
+            text: `This is the <b>media-bottom</b> layout. The inverse of media-top: text sits on top at full width, with the media below it. Good for when you want the text to introduce the image or video.`
+          },
+          author: "Layout System",
+          subtext: {
+            type: "source",
+            text: `type: "media-bottom" — stacked: text above, media below`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/reinforcing-feedback-artwork.png",
+              alt: "Demo image for media-bottom layout"
+            }
+          ]
+        },
+        {
+          type: "text-columns",
+          heading: "Text-Columns Layout",
+          intro: {
+            type: "text",
+            text: `This is the <b>left column</b> of the text-columns layout. Two text blocks sit side by side with no media. Useful for comparing ideas, bilingual text, or placing a quote beside its analysis.`
+          },
+          author: "Layout System",
+          subtext: {
+            type: "text",
+            text: `This is the <b>right column</b>. It uses the subtext field to populate the second block. Both columns share the same styling and stack vertically on mobile.`
+          }
+        }
+      ],
+      generalImage: {
+        type: "image",
+        src: "/assets/media/intra-action-3.png"
+      }
     },
   ],
 };

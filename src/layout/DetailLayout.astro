@@ -9,10 +9,10 @@ interface Props {
 import AnimationHead from "../components/AnimationHead.astro"
 import Footer from "../components/Footer.astro";
 
-const { title, slug } = Astro.props;
+const { title, slug, item } = Astro.props;
 ---
 <!-- ===================================== -->
-<!-- MARK: Layout for the detailpage                                                                                   -->
+<!-- MARK: Layout for the detailpage -->
 <!-- ===================================== -->
 <html lang="en">
     <head>
@@ -32,7 +32,7 @@ const { title, slug } = Astro.props;
     <body>
             <slot />
 
-        <Footer variant="detail" />
+        <Footer variant="detail" item={item} />
 
     </body>
 </html>

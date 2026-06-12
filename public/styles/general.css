@@ -26,7 +26,8 @@ MARK: Variables
     /* ---------- Text ---------- */
     /* Title/H1 */
     --font-title-size: 5rem;
-    --font-title-size-index: 5em;
+    --font-title-size-index: clamp(3.5rem, 2rem + 5vw, 5rem);
+
     --font-title-family: var(--inter-regular);
     --font-title-weight: bold;
     --font-title-transform: uppercase;
@@ -42,7 +43,7 @@ MARK: Variables
     --font-heading-2-text-weight: bold;
 
     /* Body Text */
-    --font-body-text-size: 1.2rem;
+    --font-body-text-size: clamp(1rem, 1rem + 0.1vw, 1.2rem);
     --font-body-text-family: var(--courier-prime-regular);
     --font-body-text-weight: normal;
 
@@ -76,13 +77,19 @@ MARK: Variables
     --font-animation-transform: uppercase;
 
 
+    /* ---------- Sizes & Styles ---------- */
+    --thin-border: 1px;
+    --transition-time: 0.3s;
+    --hover-opacity: 65%;
+
 
     /* ---------- Margin & Paddings ---------- */
     /* body padding */
-    --body-padding: 2rem;
+    --body-padding: clamp(1.3rem, 1rem + 1vw, 2rem);
     --padding-medium: 2em;
     --padding-small: 1rem;
     --padding-extra-small: 0.5rem;
+    --padding-buttons-standard: 1em 1.5em;
 
 
     /* desktop */
@@ -244,6 +251,7 @@ body {
     text-decoration: none;
     cursor: pointer;
     position: relative;
+    transition: var(--transition-time);
 
     &:active {
         opacity: 0.8;
@@ -493,7 +501,7 @@ MARK: Footer
     font-size: clamp(1.5rem, 5vw, 3rem);
     font-weight: 100;
     text-transform: uppercase;
-    margin: 0;
+    margin: 0 0.3em;
     color: #000;
     text-wrap: nowrap;
 }
@@ -517,9 +525,8 @@ MARK: Footer
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--section-padding);
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    box-sizing: border-box;
+    padding: 2rem calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
 }
 
 .footer-nav a {
@@ -528,11 +535,6 @@ MARK: Footer
     color: var(--color-text);
     font-weight: 300;
     font-size: clamp(0.7rem, 2vw, 1rem);
-    transition: opacity 0.2s;
-}
-
-.footer-nav a:hover {
-    opacity: 0.6;
 }
 
 /* ---------- Links ---------- */
@@ -541,10 +543,9 @@ MARK: Footer
     grid-template-columns: 2fr 1fr;
     gap: 2rem;
     align-items: center;
-    padding: var(--section-padding);
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--color-border);
+    box-sizing: border-box;
+    padding: 2rem calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
+    border-bottom: var(--thin-border) solid var(--color-border);
 }
 
 .footer-buttons {
@@ -555,23 +556,33 @@ MARK: Footer
 
 .footer-links a.button-small {
     border: 1px solid var(--color-border);
-    padding: 1em 1.5em;
+    padding: var(--padding-buttons-standard);
     text-decoration: none;
     font-size: clamp(0.8rem, 2vw, 1.2rem);
     font-weight: 300;
     text-transform: uppercase;
     color: var(--color-text);
     background-color: transparent;
-    transition: background-color 0.2s, color 0.2s;
+    /* transition: background-color 0.2s, color 0.2s; */
     flex: 1;
     text-align: center;
     white-space: nowrap;
+    transition: var(--transition-time);
+
+    &:hover {
+        opacity: var(--hover-opacity);
+    }
+
+    &:active {
+        background-color: var(--color-text);
+        color: var(--color-background);
+    }
 }
 
-.footer-links a.button-small:hover {
+/* .footer-links a.button-small:hover {
     background-color: var(--color-text);
-    color: var(--color-background);
-}
+    color: var(--color-background); 
+} */
 
 /* ---------- Footer text ---------- */
 .footer-links p {
@@ -598,10 +609,8 @@ MARK: Footer
 
 /* ---------- Copyright ---------- */
 .footer-copyright {
-    padding: var(--section-padding);
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
-    margin: 0;
+    box-sizing: border-box;
+    padding: 1.5rem calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
     text-align: center;
     font-size: 0.6rem;
     font-weight: 200;
