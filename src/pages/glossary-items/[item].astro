@@ -13,7 +13,7 @@ export function getStaticPaths() {
 const { item } = Astro.props;
 ---
 
-<DetailLayout title={item.title} slug={item.slug}>
+<DetailLayout title={item.title} slug={item.slug} item={item}>
     <Header variant="two" title={item.title} slug={item.slug} />
 
     <main class="page">
