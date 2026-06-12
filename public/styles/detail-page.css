@@ -1,14 +1,8 @@
 /* =====================================
-MARK: general detail page styling
+MARK: General detail page styling
 ===================================== */
-
-/* =====================================
-MARK: Animation section
-===================================== */
-/* General animation styling, full screen */
 .animation-section {
     font-family: var(--font-animation-family);
-   
     height: 100vh;
     width: 100vw;
     margin: 0;
@@ -18,81 +12,168 @@ MARK: Animation section
 
 .banner-text {
     font-family: var(--font-animation-family);
-   
 }
-
-
-
 
 /* =====================================
 MARK: Section components
 ===================================== */
-/* general section styling */
-.media-section {
+
+/* ---------- Layout Container ---------- */
+.page {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-top: 2rem;
+}
+
+.page .block {
+    border: 1px solid var(--color-border);
+}
+
+/* Base grid layout applied to all rows and headers */
+.page > .row, .block--header {
+    margin-top: -1px;
+    margin-inline: clamp(1rem, 1rem + 3vw, 4rem);
+}
+
+.page > .row {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 7.5rem;
-    padding: var(--section-padding);
-    margin: var(--section-margin);
+    grid-template-columns: 1fr 1fr;
+}
 
+/* Layout overrides */
+.page > .row--full { display: block; }
+.page > .row--stacked { display: flex; flex-direction: column; }
+.row--text-columns .block--text-large:last-child { margin-left: -1px; }
+.row--stacked .block--text-large { margin-top: -1px; }
+
+/* ---------- Header ---------- */
+.block--header { padding: 1rem 1.2rem; }
+.block--header h2 {
+    font-size: clamp(1.3rem, 1rem + 1.5vw, 1.8rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    font-family: var(--inter-regular);
+    text-transform: uppercase;
+}
+.block--header--right { text-align: right; }
+
+/* ---------- Text Blocks ---------- */
+.row__text-side { display: flex; flex-direction: column; }
+
+.block--text-large { flex: 1; padding: 1.5rem; }
+.block--text-full { padding: 2rem 1.5rem; }
+.block--text-small { padding: 0.8rem 1.5rem; margin-top: -1px; }
+
+.block--text-large p,
+.block--text-large blockquote {
+    font-size: var(--font-body-text-size);
+    line-height: 1.65;
+    font-family: var(--font-body-text-family);
+    text-align: justify;
+    hyphens: auto;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.block-author {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-family: var(--inter-regular);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+}
+
+/* Combine small text elements */
+.block--text-small p, .block--text-small cite, .block--text-small a, .block-cite {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    font-family: var(--font-body-text-family);
+    opacity: 0.65;
+}
+.block--text-small cite, .block-cite { font-style: normal; display: block; }
+.block--text-small a, .block-cite a { word-break: break-all; }
+.block-cite { margin-top: 1rem; }
+
+/* ---------- Image Blocks ---------- */
+.block--image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    margin-left: -1px; /* collapse border with text neighbour */
+}
+.block--image-full { margin-left: 0; padding: 1rem; }
+
+.block--image img, .block--image video,
+.block--image-full img, .block--image-full video { width: 100%; }
+
+.block--image img, .block--image video { height: 100%; object-fit: contain; }
+.block--image-full img, .block--image-full video { max-height: 500px; object-fit: cover; }
+
+/* Reversed row */
+.page .row--reversed .block--image {
+    order: -1;
+    margin-inline: 0 -1px;
+}
+
+/* =====================================
+MARK: Scroll Animations
+===================================== */
+/* The grid borders remain static. Only the content inside animates. */
+.animate-on-scroll > * {
+    opacity: 0;
+    transform: translateY(40px); /* Default slide up */
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.is-visible > * { opacity: 1; transform: translate(0, 0) !important; }
+
+/* Staggered delay for multiple elements */
+.animate-on-scroll > *:nth-child(2) { transition-delay: 0.1s; }
+.animate-on-scroll > *:nth-child(3) { transition-delay: 0.2s; }
+.animate-on-scroll > *:nth-child(4) { transition-delay: 0.3s; }
+
+/* Side slides for columns */
+.page > .row > :first-child .animate-on-scroll > *, 
+.page > .row > .animate-on-scroll:first-child > * { transform: translateX(-60px); }
+
+.page > .row > :last-child .animate-on-scroll > *, 
+.page > .row > .animate-on-scroll:last-child > * { transform: translateX(60px); }
+
+/* Reversed row logic */
+.page > .row--reversed > :first-child .animate-on-scroll > *, 
+.page > .row--reversed > .animate-on-scroll:first-child > * { transform: translateX(60px); }
+
+.page > .row--reversed > :last-child .animate-on-scroll > *, 
+.page > .row--reversed > .animate-on-scroll:last-child > * { transform: translateX(-60px); }
+
+/* =====================================
+MARK: Responsive
+===================================== */
+@media (max-width: 768px) {
+    .page > .row { grid-template-columns: 1fr; }
     
-    figure {
-        width: 100%;
-        margin: 0;
+    .page .block--image { margin-left: 0; margin-top: -1px; }
 
-        img {
-            width: 100%;
-        }
-    }
-}
-
-@media (min-width: 1px) {
-    :root {
-        --section-padding: var(--section-padding-small);
-        --section-margin: var(--section-margin-small);
-    }
-}
-@media (min-width: 490px) {
-    :root {
-        --section-padding: var(--section-padding-medium);
-        --section-margin: var(--section-margin-medium);
-    }
-}
-@media (min-width: 891px) {
-    :root {
-        --section-padding: var(--section-padding-large);
-        --section-margin: var(--section-margin-large);
-    }
-}
-
-/* for images on the left */
-.media-right {
-    
-}
-
-
-@media (min-width: 1150px) {
-    .media-section {
-        grid-template-columns: 1fr 1fr;
-
-        div {
-            grid-row: 1/2;
-        }
-
+    .page .row--reversed .block--image {
+        margin-right: 0;
+        margin-top: 0;
+        order: -1;
     }
 
-    .media-left {
-        .section-text {
-            grid-column: 2/3;
-        }
-        .section-media {
-            grid-column: 1/2;
-        }
+    .page .row--reversed .row__text-side, 
+    .row--text-columns .block--text-large:last-child {
+        margin-top: -1px;
+        margin-left: 0;
     }
-  
+
+    .block--header h2 { font-size: 1.3rem; }
 }
 
 
-blockquote {
-
-}
+blockquote {}

@@ -1,70 +1,402 @@
 ---
-import DetailLayout from "../../layout/DetailLayout.astro"
+import DetailLayout from "../../layout/DetailLayout.astro";
 import Header from "../../components/Header.astro";
 import { data } from "../../data/data.js";
 
 export function getStaticPaths() {
-    return data.glossaryItems.map(item => ({
+    return data.glossaryItems.map((item) => ({
         params: { item: item.slug },
-        props: { item }
+        props: { item },
     }));
 }
 
 const { item } = Astro.props;
 ---
 
-
 <DetailLayout title={item.title} slug={item.slug}>
-    <Header variant="two" title={item.title} slug={item.slug}/>
+    <Header variant="two" title={item.title} slug={item.slug} />
 
-    <main>
-        {item.content?.map((section) => (
-            <section class={`${section.type} media-section`}>
-                <div class="section-text">
-                    {section.heading && <h2>{section.heading}</h2>}
-
-                    {section.intro?.type === "quote" && (
-                        <>
-                        <blockquote set:html={section.intro.text}></blockquote>
-                        {section.author && <h3>{section.author}</h3>}
-                        </>
+    <main class="page">
+        {
+            item.content?.map((section) => (
+                <>
+                    {/* Full-width heading block for sections with a heading */}
+                    {section.heading && (
+                        <section
+                            class={`block block--header ${section.type === "media-left" ? "block--header--right" : ""}`}
+                        >
+                            <h2>{section.heading}</h2>
+                        </section>
                     )}
 
-                    {section.intro?.type === "text" && (
-                        <>
-                        <p set:html={section.intro.text}></p>
-                        {section.author && <h3>{section.author}</h3>}
-                        </>
+                    {/* ===== Layout: media-left / media-right (two-column) ===== */}
+                    {(section.type === "media-left" ||
+                        section.type === "media-right") && (
+                        <section
+                            class={`row ${section.type === "media-left" ? "row--reversed" : ""}`}
+                        >
+                            <div class="row__text-side">
+                                <div class="block block--text-large">
+                                    {section.intro?.type === "quote" && (
+                                        <>
+                                            <blockquote
+                                                set:html={section.intro.text}
+                                            />
+                                            {section.author && (
+                                                <h3 class="block-author">
+                                                    {section.author}
+                                                </h3>
+                                            )}
+                                        </>
+                                    )}
+                                    {section.intro?.type === "text" && (
+                                        <>
+                                            <p set:html={section.intro.text} />
+                                            {section.author && (
+                                                <h3 class="block-author">
+                                                    {section.author}
+                                                </h3>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                                <div class="block block--text-small">
+                                    {section.subtext?.type === "link" && (
+                                        <p>
+                                            <a
+                                                href={section.subtext.text}
+                                                class="hover-underline"
+                                            >
+                                                {section.subtext.text}
+                                            </a>
+                                        </p>
+                                    )}
+                                    {section.subtext?.type === "source" && (
+                                        <cite>{section.subtext.text}</cite>
+                                    )}
+                                </div>
+                            </div>
+                            <div class="block block--image">
+                                {section.media?.map((media) => (
+                                    <>
+                                        {media.type === "image" && (
+                                            <img
+                                                src={media.src}
+                                                alt={media.alt}
+                                            />
+                                        )}
+                                        {media.type === "video" && (
+                                            <video
+                                                src={media.src}
+                                                aria-label={media.alt}
+                                                controls
+                                            >
+                                                <source src={media.src} />
+                                            </video>
+                                        )}
+                                    </>
+                                ))}
+                            </div>
+                        </section>
                     )}
 
-                    {section.subtext?.type === "link" && (
-                        <a href={section.subtext.text}>{section.subtext.text}</a>
+                    {/* ===== Layout: media-full (full-width media block) ===== */}
+                    {section.type === "media-full" && (
+                        <section class="row row--full">
+                            <div class="block block--image block--image-full">
+                                {section.media?.map((media) => (
+                                    <>
+                                        {media.type === "image" && (
+                                            <img
+                                                src={media.src}
+                                                alt={media.alt}
+                                            />
+                                        )}
+                                        {media.type === "video" && (
+                                            <video
+                                                src={media.src}
+                                                aria-label={media.alt}
+                                                controls
+                                            >
+                                                <source src={media.src} />
+                                            </video>
+                                        )}
+                                    </>
+                                ))}
+                            </div>
+                        </section>
                     )}
-                    
-                    {section.subtext?.type === "source" && (
-                        <cite>{section.subtext.text}</cite>
-                    )}
-                </div>
-                <figure class="section-media">
-                    {section.media?.map((media) => (
-                        <>
-                        {media.type === "image" && (
-                            <img src={media.src} alt={media.alt} />
-                        )}
 
-                        {media.type === "video" && (
-                            <video src={media.src} aria-label={media.alt} controls>
-                                <source src={media.src} />
-                            </video>
-                        )}
-                        </>
-                    ))}
-                </figure>
-            </section>
-        ))}
+                    {/* ===== Layout: text-full (full-width text, no media) ===== */}
+                    {section.type === "text-full" && (
+                        <section class="row row--full">
+                            <div class="block block--text-large block--text-full">
+                                {section.intro?.type === "quote" && (
+                                    <>
+                                        <blockquote
+                                            set:html={section.intro.text}
+                                        />
+                                        {section.author && (
+                                            <h3 class="block-author">
+                                                {section.author}
+                                            </h3>
+                                        )}
+                                    </>
+                                )}
+                                {section.intro?.type === "text" && (
+                                    <>
+                                        <p set:html={section.intro.text} />
+                                        {section.author && (
+                                            <h3 class="block-author">
+                                                {section.author}
+                                            </h3>
+                                        )}
+                                    </>
+                                )}
+                                {section.subtext?.type === "source" && (
+                                    <cite class="block-cite">
+                                        {section.subtext.text}
+                                    </cite>
+                                )}
+                                {section.subtext?.type === "link" && (
+                                    <p class="block-cite">
+                                        <a
+                                            href={section.subtext.text}
+                                            class="hover-underline"
+                                        >
+                                            {section.subtext.text}
+                                        </a>
+                                    </p>
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* ===== Layout: media-top (media above, text below — both full width) ===== */}
+                    {section.type === "media-top" && (
+                        <section class="row row--stacked">
+                            <div class="block block--image block--image-full">
+                                {section.media?.map((media) => (
+                                    <>
+                                        {media.type === "image" && (
+                                            <img
+                                                src={media.src}
+                                                alt={media.alt}
+                                            />
+                                        )}
+                                        {media.type === "video" && (
+                                            <video
+                                                src={media.src}
+                                                aria-label={media.alt}
+                                                controls
+                                            >
+                                                <source src={media.src} />
+                                            </video>
+                                        )}
+                                    </>
+                                ))}
+                            </div>
+                            <div class="block block--text-large block--text-full">
+                                {section.intro?.type === "quote" && (
+                                    <>
+                                        <blockquote
+                                            set:html={section.intro.text}
+                                        />
+                                        {section.author && (
+                                            <h3 class="block-author">
+                                                {section.author}
+                                            </h3>
+                                        )}
+                                    </>
+                                )}
+                                {section.intro?.type === "text" && (
+                                    <>
+                                        <p set:html={section.intro.text} />
+                                        {section.author && (
+                                            <h3 class="block-author">
+                                                {section.author}
+                                            </h3>
+                                        )}
+                                    </>
+                                )}
+                                {section.subtext?.type === "source" && (
+                                    <cite class="block-cite">
+                                        {section.subtext.text}
+                                    </cite>
+                                )}
+                                {section.subtext?.type === "link" && (
+                                    <p class="block-cite">
+                                        <a
+                                            href={section.subtext.text}
+                                            class="hover-underline"
+                                        >
+                                            {section.subtext.text}
+                                        </a>
+                                    </p>
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* ===== Layout: media-bottom (text above, media below — both full width) ===== */}
+                    {section.type === "media-bottom" && (
+                        <section class="row row--stacked">
+                            <div class="block block--text-large block--text-full">
+                                {section.intro?.type === "quote" && (
+                                    <>
+                                        <blockquote
+                                            set:html={section.intro.text}
+                                        />
+                                        {section.author && (
+                                            <h3 class="block-author">
+                                                {section.author}
+                                            </h3>
+                                        )}
+                                    </>
+                                )}
+                                {section.intro?.type === "text" && (
+                                    <>
+                                        <p set:html={section.intro.text} />
+                                        {section.author && (
+                                            <h3 class="block-author">
+                                                {section.author}
+                                            </h3>
+                                        )}
+                                    </>
+                                )}
+                                {section.subtext?.type === "source" && (
+                                    <cite class="block-cite">
+                                        {section.subtext.text}
+                                    </cite>
+                                )}
+                                {section.subtext?.type === "link" && (
+                                    <p class="block-cite">
+                                        <a
+                                            href={section.subtext.text}
+                                            class="hover-underline"
+                                        >
+                                            {section.subtext.text}
+                                        </a>
+                                    </p>
+                                )}
+                            </div>
+                            <div class="block block--image block--image-full">
+                                {section.media?.map((media) => (
+                                    <>
+                                        {media.type === "image" && (
+                                            <img
+                                                src={media.src}
+                                                alt={media.alt}
+                                            />
+                                        )}
+                                        {media.type === "video" && (
+                                            <video
+                                                src={media.src}
+                                                aria-label={media.alt}
+                                                controls
+                                            >
+                                                <source src={media.src} />
+                                            </video>
+                                        )}
+                                    </>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* ===== Layout: text-columns (two text blocks side by side, no media) ===== */}
+                    {section.type === "text-columns" && (
+                        <section class="row row--text-columns">
+                            <div class="block block--text-large">
+                                {section.intro?.type === "quote" && (
+                                    <>
+                                        <blockquote
+                                            set:html={section.intro.text}
+                                        />
+                                        {section.author && (
+                                            <h3 class="block-author">
+                                                {section.author}
+                                            </h3>
+                                        )}
+                                    </>
+                                )}
+                                {section.intro?.type === "text" && (
+                                    <>
+                                        <p set:html={section.intro.text} />
+                                        {section.author && (
+                                            <h3 class="block-author">
+                                                {section.author}
+                                            </h3>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                            <div class="block block--text-large">
+                                {section.subtext?.type === "source" && (
+                                    <p>{section.subtext.text}</p>
+                                )}
+                                {section.subtext?.type === "link" && (
+                                    <p>
+                                        <a
+                                            href={section.subtext.text}
+                                            class="hover-underline"
+                                        >
+                                            {section.subtext.text}
+                                        </a>
+                                    </p>
+                                )}
+                                {section.subtext?.type === "text" && (
+                                    <p set:html={section.subtext.text} />
+                                )}
+                            </div>
+                        </section>
+                    )}
+                </>
+            ))
+        }
     </main>
 
-<script src="/js/index.js" is:inline></script>
+    <script src="/js/index.js" is:inline></script>
+
+    <script>
+        // =====================================
+        // MARK: Scroll Animations
+        // =====================================
+
+        // ---------- Variables ----------
+        const observerOptions = {
+            root: null,
+            rootMargin: "0px 0px -50px 0px",
+            threshold: 0.1,
+        };
+
+        // ---------- Setup & Initialization ----------
+        const initScrollAnimations = () => {
+            const blocks = document.querySelectorAll(".page .block");
+            const observer = new IntersectionObserver(
+                handleIntersection,
+                observerOptions,
+            );
+
+            blocks.forEach((block) => {
+                block.classList.add("animate-on-scroll");
+                observer.observe(block);
+            });
+        };
+
+        document.addEventListener("DOMContentLoaded", initScrollAnimations);
+
+        // ---------- Functions ----------
+        const handleIntersection = (
+            entries: IntersectionObserverEntry[],
+            observer: IntersectionObserver,
+        ) => {
+            entries.forEach((entry: IntersectionObserverEntry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("is-visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        };
+    </script>
 </DetailLayout>
-
-
