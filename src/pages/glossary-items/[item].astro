@@ -23,19 +23,16 @@ const { item } = Astro.props;
                 <div class="section-text">
                     {section.heading && <h2>{section.heading}</h2>}
 
-                    {section.intro?.type === "quote" && (
-                        <>
-                        <blockquote set:html={section.intro.text}></blockquote>
-                        {section.author && <h3>{section.author}</h3>}
-                        </>
+                   {section.intro?.map((block) =>
+                        block.type === "quote" ? (
+                            <blockquote set:html={block.text} />
+                        ) : block.type === "text" ? (
+                            <p set:html={block.text} />
+                        ) : null
                     )}
 
-                    {section.intro?.type === "text" && (
-                        <>
-                        <p set:html={section.intro.text}></p>
-                        {section.author && <h3>{section.author}</h3>}
-                        </>
-                    )}
+                    {section.author && <h3>{section.author}</h3>}
+
 
                     {section.subtext?.type === "link" && (
                         <a href={section.subtext.text}>{section.subtext.text}</a>
