@@ -7,8 +7,8 @@ import { createConsoleLogger } from 'astro/app';
 // define two variants for the header
 interface Props {
     variant?: 'one' | 'two';
-    title?: String;
-    slug?: String;
+    title?: string;
+    slug?: string;
 }
 
 // define props to receive from other components
@@ -29,11 +29,46 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
     {variant === 'one' && (
 
         <h1 id="index-h1">
-            <span>(Inter)facing the Hybrid City</span>
-            <span>Glossary</span>
+            <span id="type-line-1">(Inter)facing the Hybrid City</span>
+            <span id="type-line-2">Glossary</span>
         </h1>
 
+        <script>
+            // A simple helper function to wait for a given number of milliseconds
+            const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+            async function typeHeader() {
+                const line1 = document.getElementById('type-line-1');
+                const line2 = document.getElementById('type-line-2');
+                
+                if (!line1 || !line2) return;
+
+                const text1 = "(Inter)facing the Hybrid City";
+                const text2 = "Glossary";
+                
+                // Clear the text but leave an invisible space so the height doesn't collapse
+                line1.textContent = "\u200B";
+                line2.textContent = "\u200B";
+                
+                // Wait 200 milliseconds before starting, so the header has time to fade in
+                await wait(200);
+
+                // Type the first line, letter by letter
+                for (let letter of text1) {
+                    line1.textContent += letter;
+                    await wait(15);
+                }
+
+                // Type the second line, letter by letter
+                for (let letter of text2) {
+                    line2.textContent += letter;
+                    await wait(35);
+                }
+            }
+
+            // Start the typing animation
+            typeHeader();
+        </script>
 
     )}
     
