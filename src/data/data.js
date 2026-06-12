@@ -60,6 +60,58 @@ export const data = {
       title: "Adaptation",
       slug: "adaptation",
       categories: ["example-category3"],
+      content: [
+        {
+          type: "media-left",
+          intro: {
+            type: "quote",
+            text: `“A system can adapt if it can learn a new pattern of behaviour after recognising that the environment has changed and that the old pattern of behaviour is not working.”`,
+          },
+          author: "W. Ross Ashby’s theory of adaptation",
+          subtext: {
+            type: "source",
+            text: `https://www.zorofeigl.nl/detour-a-long-and-winding-road-to-nowhere-in-particular/`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/adaptation-visualisation.png",
+              alt: "The word adaptation styled as a long string knotting and wrapping around itself."
+            }
+          ],
+        },
+        {
+          type: "text-full",
+          intro: {
+            type: "text",
+            text: `According to Ashby, adaptation is the process by which a system subjected to environmental disturbances alters its internal organization so as to maintain its essential variables within viable limits. When ordinary regulatory behavior fails, the system undergoes structural change through a process of feedback and selection, which Ashby termed ultrastability. This adaptive capacity does not require intelligent design or foresight, but emerges from trial-and-error regulation.`
+          },
+        },
+        {
+          type: "media-right",
+          heading: "Detour. A long and winding road to nowhere in particular",
+          intro: {
+            type: "text",
+            text: `A machine constantly sweeps a green ribbon across the fl oor, creating malleable patterns as the green material itself moves the machine. An endless dance between machine and material emerges.`
+          },
+          author: "Detour. A long and winding road to nowhere in particular, 2012 by Zoro Feigl",
+          subtext: {
+            type: "link",
+            text: `https://ia601606.us.archive.org/32/items/designforbrainor00ashb/designforbrainor00ashb.pdf`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/adaptation-artwork.png",
+              alt: "The machine at work with the green ribbon. The ribbon is formed in repeating loops."
+            },
+          ]
+        }
+      ],
+      generalImage: {
+        type: "image",
+        src: "/assets/media/adaptation-title.png"
+      }
     },
     {
       title: "Balancing Feedback",
