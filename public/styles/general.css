@@ -525,9 +525,8 @@ MARK: Footer
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--section-padding);
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    box-sizing: border-box;
+    padding: 2rem calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
 }
 
 .footer-nav a {
@@ -536,11 +535,6 @@ MARK: Footer
     color: var(--color-text);
     font-weight: 300;
     font-size: clamp(0.7rem, 2vw, 1rem);
-    transition: opacity 0.2s;
-}
-
-.footer-nav a:hover {
-    opacity: var(--hover-opacity);
 }
 
 /* ---------- Links ---------- */
@@ -549,9 +543,8 @@ MARK: Footer
     grid-template-columns: 2fr 1fr;
     gap: 2rem;
     align-items: center;
-    padding: var(--section-padding);
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    box-sizing: border-box;
+    padding: 2rem calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
     border-bottom: var(--thin-border) solid var(--color-border);
 }
 
@@ -616,10 +609,8 @@ MARK: Footer
 
 /* ---------- Copyright ---------- */
 .footer-copyright {
-    padding: var(--section-padding);
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
-    margin: 0;
+    box-sizing: border-box;
+    padding: 1.5rem calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
     text-align: center;
     font-size: 0.6rem;
     font-weight: 200;
