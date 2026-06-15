@@ -227,8 +227,10 @@ MARK: Animation button
 /* pause/start animation */
 .animation-section:has(.stop-animation) * {
     animation-play-state: paused !important;
+    transform: none;
 }
 
 .animation-section:has(.play-animation) * {
     animation-play-state: running !important;
+    transform: none;
 }
