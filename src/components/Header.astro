@@ -18,7 +18,8 @@ const animations = import.meta.glob("../animations/*.astro", { eager: true });
 const animationPath = `../animations/${slug}.astro`;
 const AnimationComponent = (animations[animationPath] as { default: any } | undefined)?.default;
 
-
+// get nav path
+const pathname = Astro.url.pathname;
 
 ---
 <!-- here we define two different headers for the homepage and for the detail page -->
@@ -31,8 +32,6 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
             <span>Glossary</span>
         </h1>
 
-
-
     )}
     
     <!-- this is the header for the glossary item page -->
@@ -40,12 +39,13 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
         <>
         <nav class="header2-nav">
             <div>
-                <a class="button-big hover-underline" href="/"><span aria-hidden="true">←</span> Glossary</a>
+                <a href="/" class="button-big hover-underline"><span aria-hidden="true">←</span> Glossary</a>
+                
                 <p>(Inter)facing the Hybrid City</p>
             </div>
             <div>
-                <a href="/sub-pages/contact" class="hover-underline" >contact</a>
-                <a href="/sub-pages/about" class="hover-underline" >about</a>
+                <a href="/sub-pages/contact" class={`hover-underline ${pathname === "/sub-pages/contact" ? "active" : ""}`}>contact</a>
+                <a href="/sub-pages/about" class={`hover-underline ${pathname === "/sub-pages/about" ? "active" : ""}`} >about</a>
             </div>
         </nav>
 

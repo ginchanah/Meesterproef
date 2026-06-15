@@ -258,7 +258,7 @@ body {
     transition: var(--transition-time);
 
     &:active {
-        opacity: 0.8;
+        opacity: 0.6;
     }
 
     &::before {
@@ -278,6 +278,14 @@ body {
         transform: scaleX(1);
     }
 
+}
+
+.active {
+    cursor: default;
+
+    &::before {
+         transform: scaleX(1);
+    }
 }
 
 
