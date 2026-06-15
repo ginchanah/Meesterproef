@@ -56,7 +56,9 @@ MARK: specific animation styling
 
         margin: 0;
 
-        animation: moveUpDown 4s ease-in-out infinite alternate;
+        @media (prefers-reduced-motion: no-preference) {
+            animation: moveUpDown 4s ease-in-out infinite alternate;
+        }
         animation-delay: calc(var(--index) * 0.3s );
 
         &.dragging {

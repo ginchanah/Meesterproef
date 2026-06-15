@@ -494,7 +494,9 @@ MARK: Footer
 
 .banner-content {
     display: inline-flex;
-    animation: scroll-banner 15s linear infinite;
+    @media (prefers-reduced-motion: no-preference) {
+        animation: scroll-banner 15s linear infinite;
+    }
 }
 
 .banner-text {
