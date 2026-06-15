@@ -4,10 +4,10 @@
 MARK: Variables
 ===================================== */
 :root {
-    --spacing-large: clamp(16px, 2.5vw, 32px);
-    --block-size-w: clamp(40px, 4.8vw, 60px);
-    --block-size-h: clamp(40px, 4.8vh, 60px);
-    --block-font-size: clamp(1.8rem, 3.8vh, 3.2rem);
+    --spacing-large: clamp(8px, 2vw, 32px);
+    --block-size-w: clamp(14px, 4.5vw, 60px);
+    --block-size-h: clamp(24px, 6vh, 60px);
+    --block-font-size: clamp(12px, 4vw, 3.2rem);
 }
 
 
@@ -18,13 +18,27 @@ MARK: Variables
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        height: 80vh;
         width: 100%;
         background-color: var(--color-background);
         color: var(--color-text);
         font-family: var(--inter-regular);
         overflow: hidden;
         position: relative;
+    }
+
+    .animation-section {
+        height: 80vh !important;
+    }
+
+    @media (min-width: 1024px) {
+        .balancing-container {
+            height: 100vh;
+        }
+        
+        .animation-section {
+            height: 100vh !important;
+        }
     }
 
     .row {
@@ -41,7 +55,7 @@ MARK: Variables
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0 2px;
+        margin: 0 clamp(1px, 0.3vw, 2px);
         font-family: var(--inter-regular);
         font-weight: 900;
         font-size: var(--block-font-size);
