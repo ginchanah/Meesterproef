@@ -305,10 +305,6 @@ figure {
     margin: 0;
 }
 
-header.header-two nav {
-    padding: var(--nav-padding);
-}
-
 @media (min-width: 0px) {
     :root {
         --nav-padding: var(--nav-padding-small);
@@ -347,52 +343,6 @@ MARK: Visually hidden
     white-space: nowrap;
 }
 
-/* =====================================
-MARK: Header
-===================================== */
-/* general header styling */
-/* TODO */
-.header {}
-
-/* header on the homepage */
-/* TODO */
-.header-one {}
-
-/* header on the glossary item page */
-.header-two {
-    display: grid;
-
-    nav {
-        width: max-content;
-
-        h2 {
-            text-transform: uppercase;
-            margin-right: 5rem;
-
-        }
-
-        h2,
-        .button-big {
-            font-size: clamp(1.8rem, 10vw, 3.5rem);
-        }
-
-        .button-big {
-            text-align: right;
-            width: 100%;
-            display: inline-block;
-            position: relative;
-
-        }
-    }
-}
-
-
-@media (max-width: 675px) {
-    .header-two {
-        justify-items: center;
-    }
-
-}
 
 
 /* =====================================
