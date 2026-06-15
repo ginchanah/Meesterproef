@@ -125,32 +125,34 @@ MARK: Section components
 MARK: Scroll Animations
 ===================================== */
 /* The grid borders remain static. Only the content inside animates. */
-.animate-on-scroll > * {
-    opacity: 0;
-    transform: translateY(40px); /* Default slide up */
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+@media (prefers-reduced-motion: no-preference) {
+    .animate-on-scroll > * {
+        opacity: 0;
+        transform: translateY(40px); /* Default slide up */
+        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .animate-on-scroll.is-visible > * { opacity: 1; transform: translate(0, 0) !important; }
+    
+    /* Staggered delay for multiple elements */
+    .animate-on-scroll > *:nth-child(2) { transition-delay: 0.1s; }
+    .animate-on-scroll > *:nth-child(3) { transition-delay: 0.2s; }
+    .animate-on-scroll > *:nth-child(4) { transition-delay: 0.3s; }
+    
+    /* Side slides for columns */
+    .page .row > :first-child .animate-on-scroll > *, 
+    .page .row > .animate-on-scroll:first-child > * { transform: translateX(-60px); }
+    
+    .page .row > :last-child .animate-on-scroll > *, 
+    .page .row > .animate-on-scroll:last-child > * { transform: translateX(60px); }
+    
+    /* Reversed row logic */
+    .page .row-reversed > :first-child .animate-on-scroll > *, 
+    .page .row-reversed > .animate-on-scroll:first-child > * { transform: translateX(60px); }
+    
+    .page .row-reversed > :last-child .animate-on-scroll > *, 
+    .page .row-reversed > .animate-on-scroll:last-child > * { transform: translateX(-60px); }
 }
 
-.animate-on-scroll.is-visible > * { opacity: 1; transform: translate(0, 0) !important; }
-
-/* Staggered delay for multiple elements */
-.animate-on-scroll > *:nth-child(2) { transition-delay: 0.1s; }
-.animate-on-scroll > *:nth-child(3) { transition-delay: 0.2s; }
-.animate-on-scroll > *:nth-child(4) { transition-delay: 0.3s; }
-
-/* Side slides for columns */
-.page .row > :first-child .animate-on-scroll > *, 
-.page .row > .animate-on-scroll:first-child > * { transform: translateX(-60px); }
-
-.page .row > :last-child .animate-on-scroll > *, 
-.page .row > .animate-on-scroll:last-child > * { transform: translateX(60px); }
-
-/* Reversed row logic */
-.page .row-reversed > :first-child .animate-on-scroll > *, 
-.page .row-reversed > .animate-on-scroll:first-child > * { transform: translateX(60px); }
-
-.page .row-reversed > :last-child .animate-on-scroll > *, 
-.page .row-reversed > .animate-on-scroll:last-child > * { transform: translateX(-60px); }
 
 /* =====================================
 MARK: Responsive
@@ -176,4 +178,57 @@ MARK: Responsive
 }
 
 
-blockquote {}
+/* =====================================
+MARK: Animation button
+===================================== */
+.hidden-section {
+    position: relative;
+
+    .animation-button {
+        background: var(--black);
+        position: absolute;
+        z-index: 10000;
+        appearance: none;
+        border: none;
+        right: 20px;
+        top: 20px;
+        border-radius: 50%;
+        width: 3.5rem;
+        height: 3.5rem;
+        display: grid;
+        place-items: center;
+
+        cursor: pointer;
+
+        span {
+            display: inline-block;
+            width: 80%;
+            height: 80%;
+            
+            background-position: center;
+            
+            background-repeat: no-repeat;
+
+            
+        }
+
+        &.stop-animation span {
+            background-image: url("/assets/media/start.svg");
+            background-size: 80%;
+        }
+
+        &.play-animation span {
+            background-image: url("/assets/media/stop.svg");
+            background-size: 100%;
+        }
+    }
+}
+
+/* pause/start animation */
+.animation-section:has(.stop-animation) * {
+    animation-play-state: paused !important;
+}
+
+.animation-section:has(.play-animation) * {
+    animation-play-state: running !important;
+}

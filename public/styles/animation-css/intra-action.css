@@ -56,9 +56,9 @@ MARK: specific animation styling
 
         margin: 0;
 
-        @media (prefers-reduced-motion: no-preference) {
-            animation: moveUpDown 4s ease-in-out infinite alternate;
-        }
+    
+        animation: moveUpDown 4s ease-in-out infinite alternate;
+
         animation-delay: calc(var(--index) * 0.3s );
 
         &.dragging {
@@ -81,6 +81,18 @@ MARK: specific animation styling
         cursor: grabbing;
     }
 }
+
+.animation-section:has(.stop-animation) * {
+    animation-play-state: paused !important;
+}
+
+.animation-section:has(.play-animation) * {
+    animation-play-state: running !important;
+}
+
+
+
+
 
 @media (max-width: 1193px) {
     #intra-section-3 {

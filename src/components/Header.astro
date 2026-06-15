@@ -52,7 +52,9 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
         {AnimationComponent ? (
             <div class="animation-section">
                 <h1 class="visually-hidden">{title}</h1>
-                <div aria-hidden="true">
+                <p class="visually-hidden">Inside this section, there is an interactive typographic animation of the word {title}.</p>
+                <div class="hidden-section" aria-hidden="true">
+                    <button class="animation-button"><span></span></button>
                     <AnimationComponent />
                 </div>
             </div>

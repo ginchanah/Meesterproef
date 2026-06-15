@@ -66,3 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     bannerContent.style.animationDuration = `${duration}s`;
 });
+
+
+
+
