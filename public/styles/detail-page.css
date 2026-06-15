@@ -69,7 +69,6 @@ MARK: Section components
 .block--text-large p,
 .block--text-large blockquote {
     font-size: var(--font-body-text-size);
-    line-height: 1.65;
     font-family: var(--font-body-text-family);
     text-align: justify;
     hyphens: auto;
