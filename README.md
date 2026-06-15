@@ -1,4 +1,60 @@
 # Minor Web Design & Development Meesterproef
+## Setting up the project
+
+#### Prerequisites
+
+To run the website, you need to have **npm** installed on your computer.
+
+To do this, you can follow the instructions on https://nodejs.org/en/download/https://nodejs.org/en/download/.
+Only go further once this step is completed.
+
+#### Code editor
+
+For a code editor, we recommend **Visual Studio Code (VS Code)**, which is what we recommend.
+
+Once you receive the zip-file, you can unpack it and then open the folder inside VS Code.
+
+Once you have the folder open in VS Code, you should see the folder Meesterproef and inside the folders **.astro**, **.vscode**, **node_modules**, **public**, **src** and a few other files.
+
+The only folders you have to worry about are **src** and **public**.
+
+#### Starting up the site locally on your computer
+
+To start up the website, we have to get a little technical. 
+First you open the folder of the project inside **VS Code**.
+Then, in the navigation bar at the top of the program, you look for **Terminal**.
+
+Then you click on **Terminal > New Terminal**.
+
+Inside **VS Code** on the bottom right, underneath the code, a window should open up, that also reads *Terminal*.
+
+#### If you want to run the website for the first time ever
+
+Inside the Terminal window, you run the command:
+
+**npm install**
+
+This will take a little bit, so wait until this process has finished before you go further.
+Once this step is completed, you run another command inside the terminal.
+
+**npm run dev**
+
+This will also start up in a few seconds, and somewhere inside the text in the terminal you will read something along the lines of this:
+
+**Local    http://localhost:4321/ 
+
+This is a link you can copy and paste inside your browser to open up the website. You should now be able to see the website!
+
+#### If you have opened up the website before
+
+If you have already followed the all the steps above, but it is now a new day and you have restarted your computer and want to open up the website again, it's less difficult.
+
+You do *not* need to run the **npm install** command again.
+
+The only thing you need to do to open up the website is to open up the folder inside VS Code, open up the terminal and the run the command
+
+**npm run dev**
+
 ## Adding new glossary items:
 
 Whenever you want to add a new glossary item, you can do so inside the file **data.js**, which you can find inside the folder **src > data > data.js**.
@@ -27,7 +83,7 @@ This CSS file will automatically be loaded into your detail-page by the Animatio
 
 ### Adding media to be used for the detail page of the glossary item
 
-All media should be added inside **public > assets > media**
+All media (images, videos, ...) should be added from your computer inside the folder **public > assets > media**
 To use that image inside your detail page for the corresponding glossary item, you add the source inside your **data.js** using the path:
 
 **/public/assets/media/example.png** (add the name of your file here)
@@ -160,21 +216,35 @@ The current options to choose from are:
 ```
 content: [	
 	{
-		intro: {
+		intro: [
+			{
 		
-			type: "quote",
+				type: "quote",
+				
+				text: `<b>Lorem</b> ipsum`
 			
-			text: `<b>Lorem</b> ipsum`
+			},
+			{
 		
-		}
+				type: "text",
+				
+				text: `<i>Lorem</i> ipsum`
+			
+			}
+		
+		] 
 	}
 ```
 The intro is the text that is being displayed next to the media. 
+It is an array, in which you can add one or more items that will be displayed as the text in your section. We chose to make it an array so that one section could contain both a quote and more general text.
+
 Under **type** you can choose what kind of text is being displayed and the layout is changed accordingly.
 The current options to choose from are:
 - **"quote"** -> if the text is a direct quote
 - **"text"** -> if the text is just a general text with no other specifications
-Under **text** you add the actual text that is to be displayed. If you want to add a few words to be displayed as bold you can wrap them in the html tag `<b></b>`.
+Under **text** you add the actual text that is to be displayed. 
+- If you want to add a few words to be displayed as bold you can wrap them in the html tag `<b></b>`.
+- If you want to add words to be displayed in italic font you can wrap them in the html tag ``<i></i>``. 
 
 
 ```
