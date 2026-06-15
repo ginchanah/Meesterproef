@@ -400,7 +400,7 @@ MARK: Animation section
 ===================================== */
 /* General animation styling, full screen */
 .animation-section {
-    height: 100vh;
+    height: var(--animation-height, 100vh);
     width: 100vw;
     margin: 0;
     padding: 0;

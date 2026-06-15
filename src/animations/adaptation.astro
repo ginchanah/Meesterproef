@@ -146,8 +146,9 @@
         resetIdleTimer();
 
         // turn mouse position into a percentage (0 to 100)
-        const width = window.innerWidth;
-        let mouse = Math.max(0, Math.min(100, (event.clientX / width) * 100));
+        const rect = background.getBoundingClientRect();
+        const width = rect.width;
+        let mouse = Math.max(0, Math.min(100, ((event.clientX - rect.left) / width) * 100));
 
         // get current sizes as percentages
         let left = (leftPane.getBoundingClientRect().width / width) * 100;
