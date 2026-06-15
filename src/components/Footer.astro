@@ -5,18 +5,18 @@ import { data } from "../data/data.js";
 
 // define two variants for the footer
 interface Props {
-    variant?: 'index' | 'detail';
+    variant?: "index" | "detail";
     title?: String;
     item?: any;
 }
 
 // define props to receive from other components
-const { variant = 'home', title, item } = Astro.props;
+const { variant = "home", title, item } = Astro.props;
 
 let prevItem = null;
 let nextItem = null;
 
-if (variant === 'detail' && item) {
+if (variant === "detail" && item) {
     const items = data.glossaryItems;
     // use the first category to find siblings
     const category = item.categories && item.categories.length > 0 ? item.categories[0] : null;
@@ -43,7 +43,7 @@ if (variant === 'detail' && item) {
 <!-- ===================================== -->
 <footer class={`footer footer-${variant}`}>
     <!-- ---------- Homepage Footer ---------- -->
-    {variant === 'index' && (
+    {variant === "index" && (
 
         <div>
             <!-- Banner -->
@@ -65,7 +65,7 @@ if (variant === 'detail' && item) {
     )}
     
     <!-- ---------- Detail Page Footer ---------- -->
-    {variant === 'detail' && (
+    {variant === "detail" && (
 
         <!-- Navigation between glossary items -->
         <div>

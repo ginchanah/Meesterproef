@@ -53,7 +53,8 @@ export const data = {
       ],
       generalImage: {
         type: "image",
-        src: "/assets/media/intra-action-3.png"
+        src: "/assets/media/intra-action-3.png",
+        alt: "The word intra-action rendered in an overlapping glitch effect"
       }
     },
     {
@@ -110,7 +111,8 @@ export const data = {
       ],
       generalImage: {
         type: "image",
-        src: "/assets/media/adaptation-title.png"
+        src: "/assets/media/adaptation-title.png",
+        alt: "The word adaptation written in a continuous flowing line"
       }
     },
     {
@@ -165,7 +167,8 @@ export const data = {
       ],
       generalImage: {
         type: "image",
-        src: "/assets/media/reinforcing-feedback-title.png"
+        src: "/assets/media/reinforcing-feedback-title.png",
+        alt: "A visual representation of an escalating feedback loop"
       }
     },
     {
@@ -244,7 +247,8 @@ export const data = {
       ],
       generalImage: {
         type: "image",
-        src: "/assets/media/ma-title.png"
+        src: "/assets/media/ma-title.png",
+        alt: "The word ma enclosed in a cropped rectangular frame"
       }
     },
     {
@@ -377,7 +381,8 @@ export const data = {
       ],
       generalImage: {
         type: "image",
-        src: "/assets/media/intra-action-3.png"
+        src: "/assets/media/intra-action-3.png",
+        alt: "The word intra-action rendered in an overlapping glitch effect"
       }
     },
   ],
