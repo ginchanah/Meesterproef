@@ -30,7 +30,7 @@
 </div>
 
 <script>
-    const letters = [...document.querySelectorAll(".word span:not(.space)")];
+    const letters = [...document.querySelectorAll<HTMLElement>(".word span:not(.space)")];
 
     const state = letters.map(() => ({
         energy: 0,
@@ -41,7 +41,7 @@
     let mouseY = -1000;
 
     let isMoving = false;
-    let moveTimeout;
+    let moveTimeout: ReturnType<typeof setTimeout> | undefined;
 
     let resetting = false;
 
@@ -61,14 +61,14 @@
         }, 60);
     });
 
-    function resetSystem() {
+    const resetSystem = () => {
         state.forEach((s) => {
             s.energy = 0;
             s.hoverInfluence = 0;
         });
-    }
+    };
 
-    function animate() {
+    const animate = () => {
         state.forEach((s) => {
             s.hoverInfluence = 0;
         });
@@ -200,7 +200,7 @@
         }
 
         requestAnimationFrame(animate);
-    }
+    };
 
     animate();
 </script>

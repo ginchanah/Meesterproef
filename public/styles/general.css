@@ -244,7 +244,7 @@ body {
     text-transform: var(--font-button-big-transform);
 }
 
-/* to do! */
+/* TODO */
 /* source: https://tobiasahlin.com/blog/css-trick-animating-link-underlines/ */
 .hover-underline {
     color: inherit;

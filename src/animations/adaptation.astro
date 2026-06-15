@@ -37,6 +37,59 @@
     let idleTimer: ReturnType<typeof setTimeout> | null = null; // timer to wait before playing the animation
     let animationTimer: ReturnType<typeof setTimeout> | null = null; // timer that loops the animation
 
+    const stopDragging = () => {
+        draggingSide = null;
+        background.style.cursor = "default";
+        resetIdleTimer();
+    };
+
+    const playAnimation = () => {
+        // turn on smooth sliding
+        panes.forEach(
+            (pane) => (pane.style.transition = "flex 1s ease-in-out"),
+        );
+
+        // pick random sizes (each between 10% and 43%)
+        const p1 = Math.random() * 33 + 10;
+        const p2 = Math.random() * 33 + 10;
+        const p3 = Math.max(10, 100 - p1 - p2);
+
+        // apply the new sizes
+        leftPane.style.flex = String(p1);
+        middlePane.style.flex = String(p2);
+        rightPane.style.flex = String(p3);
+
+        // loop the animation every 1.5 seconds
+        animationTimer = setTimeout(playAnimation, 1500);
+    };
+
+    const stopAnimation = () => {
+        if (animationTimer) clearTimeout(animationTimer);
+
+        // save the current sizes so they don't jump
+        const width = background.getBoundingClientRect().width;
+        leftPane.style.flex = String(
+            (leftPane.getBoundingClientRect().width / width) * 100,
+        );
+        middlePane.style.flex = String(
+            (middlePane.getBoundingClientRect().width / width) * 100,
+        );
+        rightPane.style.flex = String(
+            (rightPane.getBoundingClientRect().width / width) * 100,
+        );
+
+        // turn off smooth sliding so dragging feels instant
+        panes.forEach((pane) => (pane.style.transition = "none"));
+    };
+
+    const resetIdleTimer = () => {
+        if (idleTimer) clearTimeout(idleTimer);
+
+        if (draggingSide === null) {
+            idleTimer = setTimeout(playAnimation, 1000);
+        }
+    };
+
     // ---------- Initialization ----------
 
     // prevent page scrolling when touching the animation on mobile
@@ -120,63 +173,7 @@
     background.addEventListener("pointerup", stopDragging);
     background.addEventListener("pointercancel", stopDragging);
 
-    function stopDragging() {
-        draggingSide = null;
-        background.style.cursor = "default";
-        resetIdleTimer();
-    }
-
     // =====================================
     // MARK: Animation Logic
     // =====================================
-
-    // automatically move the panes to random sizes
-    function playAnimation() {
-        // turn on smooth sliding
-        panes.forEach(
-            (pane) => (pane.style.transition = "flex 1s ease-in-out"),
-        );
-
-        // pick random sizes (each between 10% and 43%)
-        const left = Math.random() * 33 + 10;
-        const middle = Math.random() * 33 + 10;
-        const right = 100 - left - middle;
-
-        // apply the sizes
-        leftPane.style.flex = String(left);
-        middlePane.style.flex = String(middle);
-        rightPane.style.flex = String(right);
-
-        // do it again in 1.5 seconds
-        animationTimer = setTimeout(playAnimation, 1500);
-    }
-
-    // stop the automatic animation and freeze the panes where they are
-    function stopAnimation() {
-        if (animationTimer) clearTimeout(animationTimer);
-
-        // save the current sizes so they don't jump
-        const width = window.innerWidth;
-        leftPane.style.flex = String(
-            (leftPane.getBoundingClientRect().width / width) * 100,
-        );
-        middlePane.style.flex = String(
-            (middlePane.getBoundingClientRect().width / width) * 100,
-        );
-        rightPane.style.flex = String(
-            (rightPane.getBoundingClientRect().width / width) * 100,
-        );
-
-        // turn off smooth sliding so dragging feels instant
-        panes.forEach((pane) => (pane.style.transition = "none"));
-    }
-
-    // wait 1 second, then start the animation (resets if called again)
-    function resetIdleTimer() {
-        if (idleTimer) clearTimeout(idleTimer);
-
-        if (draggingSide === null) {
-            idleTimer = setTimeout(playAnimation, 1000);
-        }
-    }
 </script>
