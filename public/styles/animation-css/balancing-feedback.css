@@ -13,6 +13,7 @@ MARK: Variables
 
 
 @layer components {
+
     /* ---------- Layout Containers ---------- */
     .balancing-container {
         display: flex;
@@ -28,16 +29,16 @@ MARK: Variables
     }
 
     .animation-section {
-        height: 80vh !important;
+        --animation-height: 80vh;
     }
 
     @media (min-width: 1024px) {
         .balancing-container {
             height: 100vh;
         }
-        
+
         .animation-section {
-            height: 100vh !important;
+            --animation-height: 100vh;
         }
     }
 
@@ -67,6 +68,7 @@ MARK: Variables
 }
 
 @layer utilities {
+
     /* ---------- Spacing ---------- */
     .margin-left {
         margin-left: var(--spacing-large);

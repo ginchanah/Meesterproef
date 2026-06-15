@@ -16,11 +16,11 @@ MARK: Layout Components
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 80vh !important;
+        --animation-height: 80vh;
     }
 
     #anim-5 {
-        height: 100% !important;
+        height: 100%;
     }
 
     @media (min-width: 1024px) {
@@ -29,7 +29,7 @@ MARK: Layout Components
         }
         
         .animation-section {
-            height: 100vh !important;
+            --animation-height: 100vh;
         }
     }
 
