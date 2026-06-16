@@ -15,7 +15,7 @@ export const data = {
           ],
           author: "W. Ross Ashby’s theory of adaptation",
           subtext: {
-            type: "source",
+            type: "link",
             text: `https://www.zorofeigl.nl/detour-a-long-and-winding-road-to-nowhere-in-particular/`
           },
           media: [

@@ -526,3 +526,12 @@ MARK: Footer
     text-transform: uppercase;
     color: var(--color-text);
 }
+
+/* =====================================
+MARK: Contact/About
+===================================== */
+
+.big-link {
+    display: inline-block;
+    margin: 1.5rem 0;
+}
