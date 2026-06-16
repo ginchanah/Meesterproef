@@ -7,22 +7,43 @@ MARK: Layout Components
 
     /* ---------- Layout ---------- */
     .container {
-        height: 100vh;
+        height: 80vh;
         position: relative;
     }
 
     .animation-section {
-        height: 100%;
+        position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
+        --animation-height: 80vh;
+    }
+
+    #anim-5 {
+        height: 100%;
+    }
+
+    @media (min-width: 1024px) {
+        .container {
+            height: 100vh;
+        }
+        
+        .animation-section {
+            --animation-height: 100vh;
+        }
     }
 
     /* ---------- Adaptation Animation ---------- */
     .assimilation-background {
         position: absolute;
-        inset: 0;
+        inset: 0 5vw;
         display: flex;
+    }
+
+    @media (min-width: 1024px) {
+        .assimilation-background {
+            inset: 0;
+        }
     }
 
     .assimilation-pane {
@@ -40,7 +61,8 @@ MARK: Layout Components
     .assimilation-word {
         position: relative;
         z-index: 10;
-        font-size: 10rem;
+        font-size: clamp(2rem, 10vw, 10rem);
+        white-space: nowrap;
         font-weight: 900;
         text-transform: uppercase;
         mix-blend-mode: difference;

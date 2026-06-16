@@ -37,28 +37,24 @@ const { item } = Astro.props;
                         <div class={`row ${section.type === "media-left" ? "row-reversed" : ""}`}>
                             <div class="row-text-side">
                                 <div class="block block-text-large">
-                                    {section.intro?.type === "quote" && (
-                                        <>
-                                            <blockquote set:html={section.intro.text} />
-                                            {section.author && (
-                                                <p class="block-author">{section.author}</p>
-                                            )}
-                                        </>
+                                    {section.intro?.map((block) =>
+                                        block.type === "quote" ? (
+                                            <blockquote set:html={block.text} />
+                                        ) : block.type === "text" ? (
+                                            <p set:html={block.text} />
+                                        ) : null
                                     )}
-                                    {section.intro?.type === "text" && (
-                                        <>
-                                            <p set:html={section.intro.text} />
-                                            {section.author && (
-                                                <p class="block-author">{section.author}</p>
-                                            )}
-                                        </>
+                                    
+                                    {section.author && (
+                                        <p class="block-author">{section.author}</p>
                                     )}
+
                                 </div>
                                 <div class="block block-text-small">
                                     {section.subtext?.type === "link" && (
-                                        <p>
+                                        <div>
                                             <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
-                                        </p>
+                                        </div>
                                     )}
                                     {section.subtext?.type === "source" && (
                                         <cite>{section.subtext.text}</cite>

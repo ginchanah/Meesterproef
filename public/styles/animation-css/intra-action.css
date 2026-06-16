@@ -3,7 +3,7 @@ MARK: specific animation styling
 ===================================== */
 /* give your css file the same slug name as the page you're working on */
 
-@property --animation-height {
+@property --animate-height {
     syntax: "<length> | <percentage>";
     inherits: true;
     initial-value: 0px;
@@ -19,7 +19,7 @@ MARK: specific animation styling
 }
 
 #intra-section-1, #intra-section-2, #intra-section-3 {
-    --animation-height: 160vh;
+    --animate-height: 160vh;
 
 
     display: grid;
@@ -137,7 +137,7 @@ MARK: specific animation styling
         transform: translateY(0);
     }
     50% {
-        transform: translateY(calc(var(--animation-height)/2));
+        transform: translateY(calc(var(--animate-height)/2));
     }
     100% {
         transform: translateY(0);

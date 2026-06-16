@@ -1,5 +1,4 @@
 ---
-
 // link to the header:
 // src/components/Header.astro
 
@@ -16,62 +15,88 @@ const { variant = "one", title, slug } = Astro.props;
 // Dynamically import the animation file based on slug
 const animations = import.meta.glob("../animations/*.astro", { eager: true });
 const animationPath = `../animations/${slug}.astro`;
-const AnimationComponent = (animations[animationPath] as { default: any } | undefined)?.default;
-
-
-
+const AnimationComponent = (
+    animations[animationPath] as { default: any } | undefined
+)?.default;
 ---
+
 <!-- here we define two different headers for the homepage and for the detail page -->
 <header class={`header header-${variant}`}>
     <!-- this is the header for the homepage -->
-    {variant === "one" && (
-
-        <h1 id="index-h1">
-            <span>(Inter)facing the Hybrid City</span>
-            <span>Glossary</span>
-        </h1>
-
-
-
-    )}
-    
-    <!-- this is the header for the glossary item page -->
-    {variant === "two" && (
-        <>
-        <nav class="header2-nav">
-            <div>
-                <a class="button-big hover-underline" href="/"><span aria-hidden="true">←</span> Glossary</a>
-                <p>(Inter)facing the Hybrid City</p>
-            </div>
-            <div>
-                <a href="/sub-pages/contact" class="hover-underline" >contact</a>
-                <a href="/sub-pages/about" class="hover-underline" >about</a>
-            </div>
-        </nav>
-
-        {AnimationComponent ? (
-            <div class="animation-section">
-                <h1 class="visually-hidden">{title}</h1>
-                <p class="visually-hidden">Inside this section, there is an interactive typographic animation of the word {title}.</p>
-                <div class="hidden-section" aria-hidden="true">
-                    <button class="animation-button"><span></span></button>
-                    <AnimationComponent />
+    {
+        variant === "one" && (
+            <div class="header1-container">
+                <h1 id="index-h1">
+                    <span>(Inter)facing the Hybrid City</span>
+                    <span>Glossary</span>
+                </h1>
+                <div class="header1-nav">
+                    <a href="/sub-pages/about" class="hover-underline button-small">ABOUT</a>
+                    <a href="/sub-pages/contact" class="hover-underline button-small">CONTACT</a>
                 </div>
             </div>
-        ) : null}
-        </>
-    )}
+        )
+    }
+
+    <!-- this is the header for the glossary item page -->
+    {
+        variant === "two" && (
+            <>
+                <nav class="header2-nav">
+                    <div>
+                        <a class="button-big hover-underline" href="/">
+                            <span aria-hidden="true">←</span> Glossary
+                        </a>
+                        <p>(Inter)facing the Hybrid City</p>
+                    </div>
+                    <div class="header2-links">
+                        <a href="/sub-pages/about" class="hover-underline button-small">ABOUT</a>
+                        <a href="/sub-pages/contact" class="hover-underline button-small">CONTACT</a>
+                    </div>
+                </nav>
+
+                {AnimationComponent ? (
+                    <div class="animation-section">
+                        <h1 class="visually-hidden">{title}</h1>
+                        <div aria-hidden="true">
+                            <AnimationComponent />
+                        </div>
+                    </div>
+                ) : null}
+            </>
+        )
+    }
 </header>
 <style>
-    .header2-nav {
-        background-color: var(--color-background);
-        width: 100%;
-        box-sizing: border-box;
-        padding: 1em;
-        font-family: var(--inter-regular);
-
+    .header1-container {
+        position: relative;
+    }
+    .header1-nav {
+        position: absolute;
+        top: 0;
+        right: 0;
         display: flex;
-        justify-content: center;
+        gap: 1em;
+    }
+
+    @media (max-width: 800px) {
+        .header1-nav {
+            position: relative;
+            justify-content: flex-start;
+            width: auto;
+            border-top: solid 2px var(--color-text);
+            border-bottom: solid 2px var(--color-text);
+            padding: 0.5em 0;
+            margin-bottom: 2rem;
+            gap: 2em;
+        }
+    }
+
+    .header2-nav {
+        font-family: var(--inter-regular);
+        margin: var(--body-padding);
+        display: flex;
+        align-items: center;
         justify-content: space-between;
     }
     .header2-nav a {
@@ -94,26 +119,28 @@ const AnimationComponent = (animations[animationPath] as { default: any } | unde
             border-right: solid 2px var(--color-text);
         }
     }
-    .header2-nav div:nth-child(1){
+    .header2-nav div:nth-child(1) {
         display: flex;
         align-items: center;
     }
-    .header2-nav div:nth-child(2){
+    .header2-links {
         display: flex;
-        align-items: center;
-        gap: 2em;
+        gap: 1em;
     }
     @media (max-width: 800px) {
         .header2-nav {
             flex-direction: column;
+            align-items: flex-start;
             gap: 1em;
-            div:nth-child(2){
-                width: auto;
-                border-top: solid 2px var(--color-text);
-                border-bottom: solid 2px var(--color-text);
-                padding: 0.5em 0;
-            }
-            
+        }
+        .header2-links {
+            width: 100%;
+            justify-content: flex-start;
+            border-top: solid 2px var(--color-text);
+            border-bottom: solid 2px var(--color-text);
+            padding: 0.5em 0;
+            margin-bottom: 2rem;
+            gap: 2em;
         }
         @media (max-width: 600px) {
             p {
