@@ -41,10 +41,6 @@ MARK: Header
 MARK: Term list
 ===================================== */
 
-main {
-    min-height: 70vh;
-}
-
 .term-list {
     font-family: var(--inter-regular);
     font-size: var(--term-list-font-size);
@@ -102,6 +98,10 @@ MARK: Category filter
     width: 100%;
     height: 100%;
     opacity: 0;
+
+    &:hover {
+        cursor: pointer;
+    }
 }
 
 .term-categories li:has(:checked) {

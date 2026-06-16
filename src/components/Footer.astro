@@ -3,13 +3,6 @@
 // src/components/Footer.astro
 import { data } from "../data/data.js";
 
-// define two variants for the footer
-interface Props {
-    variant?: "index" | "detail";
-    title?: String;
-    item?: any;
-}
-
 // define props to receive from other components
 const { variant = "home", title, item } = Astro.props;
 
@@ -56,6 +49,21 @@ if (variant === "detail" && item) {
         </div>
 
     )}
+
+    <!-- ---------- Subpage Footer ---------- -->
+    {variant === "subpage" && (
+
+        <div>
+            <!-- Banner -->
+            <div class="banner-container">
+                <div class="banner-content" id="bannerContent">
+                <!-- Populated by index.js -->
+                </div>
+            </div>
+            <p class="footer-copyright">&copy; 2026 MARJOLIJN RUYG, WEBSITE BUILT BY TEAM FONT-END.</p>
+        </div>
+
+    )}
     
     <!-- ---------- Detail Page Footer ---------- -->
     {variant === "detail" && (
@@ -63,16 +71,14 @@ if (variant === "detail" && item) {
         <!-- Navigation between glossary items -->
         <div>
             <nav class="footer-nav">
-                {prevItem ? (
-                    <a href={`/glossary-items/${prevItem.slug}`} class="hover-underline">&larr; {prevItem.title}</a>
-                ) : (
-                    <a href="#" class="hover-underline">&larr; PLACEHOLDER</a>
+                {prevItem && (
+                     <a href={`/glossary-items/${prevItem.slug}`} class="hover-underline">
+                         &larr; {prevItem.title}
+                    </a>
                 )}
                 <a href="/" class="hover-underline">BACK TO GLOSSARY</a>
-                {nextItem ? (
+                {nextItem && (
                     <a href={`/glossary-items/${nextItem.slug}`} class="hover-underline">{nextItem.title} &rarr;</a>
-                ) : (
-                    <a href="#" class="hover-underline">PLACEHOLDER &rarr;</a>
                 )}
             </nav>
                 <div class="banner-container">

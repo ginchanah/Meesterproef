@@ -37,28 +37,24 @@ const { item } = Astro.props;
                         <div class={`row ${section.type === "media-left" ? "row-reversed" : ""}`}>
                             <div class="row-text-side">
                                 <div class="block block-text-large">
-                                    {section.intro?.type === "quote" && (
-                                        <>
-                                            <blockquote set:html={section.intro.text} />
-                                            {section.author && (
-                                                <p class="block-author">{section.author}</p>
-                                            )}
-                                        </>
+                                    {section.intro?.map((block) =>
+                                        block.type === "quote" ? (
+                                            <blockquote set:html={block.text} />
+                                        ) : block.type === "text" ? (
+                                            <p set:html={block.text} />
+                                        ) : null
                                     )}
-                                    {section.intro?.type === "text" && (
-                                        <>
-                                            <p set:html={section.intro.text} />
-                                            {section.author && (
-                                                <p class="block-author">{section.author}</p>
-                                            )}
-                                        </>
+                                    
+                                    {section.author && (
+                                        <p class="block-author">{section.author}</p>
                                     )}
+
                                 </div>
                                 <div class="block block-text-small">
                                     {section.subtext?.type === "link" && (
-                                        <p>
-                                            <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
-                                        </p>
+                                        <div>
+                                            <a href={section.subtext.text} class="hover-underline">Go to source</a>
+                                        </div>
                                     )}
                                     {section.subtext?.type === "source" && (
                                         <cite>{section.subtext.text}</cite>
@@ -110,28 +106,19 @@ const { item } = Astro.props;
                     {section.type === "text-full" && (
                         <div class="row row-full">
                             <div class="block block-text-large block-text-full">
-                                {section.intro?.type === "quote" && (
-                                    <>
-                                        <blockquote set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
-                                {section.intro?.type === "text" && (
-                                    <>
-                                        <p set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
+                                {section.intro?.map((block) =>
+                                        block.type === "quote" ? (
+                                            <blockquote set:html={block.text} />
+                                        ) : block.type === "text" ? (
+                                            <p set:html={block.text} />
+                                        ) : null
+                                    )}
                                 {section.subtext?.type === "source" && (
                                     <cite class="block-cite">{section.subtext.text}</cite>
                                 )}
                                 {section.subtext?.type === "link" && (
                                     <p class="block-cite">
-                                        <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
+                                        <a href={section.subtext.text} class="hover-underline">Go to source</a>
                                     </p>
                                 )}
                             </div>
@@ -158,28 +145,19 @@ const { item } = Astro.props;
                                 ))}
                             </div>
                             <div class="block block-text-large block-text-full">
-                                {section.intro?.type === "quote" && (
-                                    <>
-                                        <blockquote set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
-                                {section.intro?.type === "text" && (
-                                    <>
-                                        <p set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
+                                {section.intro?.map((block) =>
+                                        block.type === "quote" ? (
+                                            <blockquote set:html={block.text} />
+                                        ) : block.type === "text" ? (
+                                            <p set:html={block.text} />
+                                        ) : null
+                                    )}
                                 {section.subtext?.type === "source" && (
                                     <cite class="block-cite">{section.subtext.text}</cite>
                                 )}
                                 {section.subtext?.type === "link" && (
                                     <p class="block-cite">
-                                        <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
+                                        <a href={section.subtext.text} class="hover-underline">Go to source</a>
                                     </p>
                                 )}
                             </div>
@@ -192,28 +170,19 @@ const { item } = Astro.props;
                     {section.type === "media-bottom" && (
                         <div class="row row-stacked">
                             <div class="block block-text-large block-text-full">
-                                {section.intro?.type === "quote" && (
-                                    <>
-                                        <blockquote set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
-                                {section.intro?.type === "text" && (
-                                    <>
-                                        <p set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
+                                {section.intro?.map((block) =>
+                                        block.type === "quote" ? (
+                                            <blockquote set:html={block.text} />
+                                        ) : block.type === "text" ? (
+                                            <p set:html={block.text} />
+                                        ) : null
+                                    )}
                                 {section.subtext?.type === "source" && (
                                     <cite class="block-cite">{section.subtext.text}</cite>
                                 )}
                                 {section.subtext?.type === "link" && (
                                     <p class="block-cite">
-                                        <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
+                                        <a href={section.subtext.text} class="hover-underline">Go to source</a>
                                     </p>
                                 )}
                             </div>
@@ -240,22 +209,13 @@ const { item } = Astro.props;
                     {section.type === "text-columns" && (
                         <div class="row row-text-columns">
                             <div class="block block-text-large">
-                                {section.intro?.type === "quote" && (
-                                    <>
-                                        <blockquote set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
-                                {section.intro?.type === "text" && (
-                                    <>
-                                        <p set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
+                                {section.intro?.map((block) =>
+                                        block.type === "quote" ? (
+                                            <blockquote set:html={block.text} />
+                                        ) : block.type === "text" ? (
+                                            <p set:html={block.text} />
+                                        ) : null
+                                    )}
                             </div>
                             <div class="block block-text-large">
                                 {section.subtext?.type === "source" && (
@@ -263,7 +223,7 @@ const { item } = Astro.props;
                                 )}
                                 {section.subtext?.type === "link" && (
                                     <p>
-                                        <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
+                                        <a href={section.subtext.text} class="hover-underline">Go to source</a>
                                     </p>
                                 )}
                                 {section.subtext?.type === "text" && (
@@ -280,6 +240,7 @@ const { item } = Astro.props;
     <script src="/js/index.js" is:inline></script>
 
     <script>
+        // @ts-nocheck
         // =====================================
         // MARK: Scroll Animations
         // =====================================
@@ -308,11 +269,8 @@ const { item } = Astro.props;
         document.addEventListener("DOMContentLoaded", initScrollAnimations);
 
         // ---------- Functions ----------
-        const handleIntersection = (
-            entries: IntersectionObserverEntry[],
-            observer: IntersectionObserver,
-        ) => {
-            entries.forEach((entry: IntersectionObserverEntry) => {
+        const handleIntersection = (entries, observer) => {
+            entries.forEach((entry) => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add("is-visible");
                     observer.unobserve(entry.target);

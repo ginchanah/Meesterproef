@@ -42,7 +42,7 @@ MARK: Variables
         }
     }
 
-    .row {
+    .balancing-container .row {
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -50,7 +50,7 @@ MARK: Variables
     }
 
     /* ---------- Blocks ---------- */
-    .block {
+    .balancing-container .block {
         width: var(--block-size-w);
         height: var(--block-size-h);
         display: flex;
@@ -70,7 +70,7 @@ MARK: Variables
 @layer utilities {
 
     /* ---------- Spacing ---------- */
-    .margin-left {
+    .balancing-container .margin-left {
         margin-left: var(--spacing-large);
     }
 }

@@ -18,6 +18,7 @@
 </div>
 
 <script>
+    // @ts-nocheck
     // =====================================
     // MARK: Adaptation Animation
     // =====================================
@@ -27,15 +28,15 @@
     // get the elements from the page
     const background = document.querySelector(
         ".assimilation-background",
-    ) as HTMLElement;
-    const panes = document.querySelectorAll<HTMLElement>(".assimilation-pane");
+    );
+    const panes = document.querySelectorAll(".assimilation-pane");
     const leftPane = panes[0];
     const middlePane = panes[1];
     const rightPane = panes[2];
 
-    let draggingSide: string | null = null; // tracks which boundary is being dragged ('left' or 'right')
-    let idleTimer: ReturnType<typeof setTimeout> | null = null; // timer to wait before playing the animation
-    let animationTimer: ReturnType<typeof setTimeout> | null = null; // timer that loops the animation
+    let draggingSide = null; // tracks which boundary is being dragged ('left' or 'right')
+    let idleTimer = null; // timer to wait before playing the animation
+    let animationTimer = null; // timer that loops the animation
 
     const stopDragging = () => {
         draggingSide = null;
@@ -103,7 +104,7 @@
     // =====================================
 
     // when the user clicks or touches the background
-    background.addEventListener("pointerdown", (event: PointerEvent) => {
+    background.addEventListener("pointerdown", (event) => {
         // stop the automatic animation
         stopAnimation();
 
@@ -129,7 +130,7 @@
     });
 
     // when the user moves the mouse or drags
-    background.addEventListener("pointermove", (event: PointerEvent) => {
+    background.addEventListener("pointermove", (event) => {
         // if not dragging, just show a drag cursor near the dividers
         if (draggingSide === null) {
             const leftEdge = leftPane.getBoundingClientRect().right;
