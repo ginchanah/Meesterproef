@@ -45,6 +45,7 @@ const pathname = Astro.url.pathname;
     {
         variant === "two" && (
             <>
+                <h1 class="visually-hidden">{title}</h1>
                 <nav class="header2-nav">
                     <div>
                         <a class="button-big hover-underline" href="/">
@@ -52,6 +53,7 @@ const pathname = Astro.url.pathname;
                         </a>
                         <p>(Inter)facing the Hybrid City</p>
                     </div>
+                    {/* in the class we check if the page is currently the active page */}
                     <div class="header2-links">
                         <a href="/sub-pages/about" class={`hover-underline button-small ${pathname === "/sub-pages/about" ? "active" : ""}`}>ABOUT</a>
                         <a href="/sub-pages/contact" class={`hover-underline button-small ${pathname === "/sub-pages/contact" ? "active" : ""}`}>CONTACT</a>
@@ -60,7 +62,7 @@ const pathname = Astro.url.pathname;
 
                 {AnimationComponent ? (
                     <div class="animation-section">
-                        <h1 class="visually-hidden">{title}</h1>
+                        
                         <div aria-hidden="true">
                             <AnimationComponent />
                         </div>
