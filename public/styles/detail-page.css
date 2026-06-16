@@ -187,6 +187,7 @@ MARK: Animation button
 ===================================== */
 .hidden-section {
     position: relative;
+    height: 100%;
 
     .animation-button {
         background: var(--black);
