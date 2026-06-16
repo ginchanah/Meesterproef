@@ -9,9 +9,9 @@ siblingIndexContainer?.forEach(container => {
     const directChildren = container.querySelectorAll(":scope > *");
     directChildren.forEach(item => {
         let selfIndex = Array.from(directChildren).indexOf(item);
-        item.setAttribute("style", `--index:${selfIndex}`);
+        item.style.setProperty("--index", selfIndex);
     });
-    container.setAttribute("style", `--count:${directChildren.length}`);
+    container.style.setProperty("--count", directChildren.length);
 });
 
 
@@ -28,7 +28,6 @@ spanSplitContainer?.forEach((element) => {
         .map((char) => `<span>${char === " " ? "&nbsp;" : char}</span>`)
         .join("");
 });
-
 
 
 
