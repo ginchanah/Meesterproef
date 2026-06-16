@@ -502,7 +502,7 @@ MARK: Footer
 /* ---------- Navigation ---------- */
 .footer-nav {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     box-sizing: border-box;
     padding: 2rem calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
@@ -514,7 +514,17 @@ MARK: Footer
     color: var(--color-text);
     font-weight: 300;
     font-size: clamp(0.7rem, 2vw, 1rem);
+
+    &:first-of-type {
+        margin-right: auto;
+    }
+
+    &:last-of-type {
+        margin-left: auto;
+    }
+
 }
+
 
 /* ---------- Copyright ---------- */
 .footer-copyright {
