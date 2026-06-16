@@ -31,15 +31,8 @@ const AnimationComponent = (
                     <span>Glossary</span>
                 </h1>
                 <div class="header1-nav">
-                    <a href="/sub-pages/about" class="hover-underline button-small">
-                        ABOUT
-                    </a>
-                    <a
-                        href="/sub-pages/contact"
-                        class="hover-underline button-small"
-                    >
-                        CONTACT
-                    </a>
+                    <a href="/sub-pages/about" class="hover-underline button-small">ABOUT</a>
+                    <a href="/sub-pages/contact" class="hover-underline button-small">CONTACT</a>
                 </div>
             </div>
         )
@@ -57,12 +50,8 @@ const AnimationComponent = (
                         <p>(Inter)facing the Hybrid City</p>
                     </div>
                     <div class="header2-links">
-                        <a href="/sub-pages/about" class="hover-underline button-small">
-                            ABOUT
-                        </a>
-                        <a href="/sub-pages/contact" class="hover-underline button-small">
-                            CONTACT
-                        </a>
+                        <a href="/sub-pages/about" class="hover-underline button-small">ABOUT</a>
+                        <a href="/sub-pages/contact" class="hover-underline button-small">CONTACT</a>
                     </div>
                 </nav>
 
@@ -105,8 +94,10 @@ const AnimationComponent = (
 
     .header2-nav {
         font-family: var(--inter-regular);
-        position: relative;
         margin: var(--body-padding);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
     .header2-nav a {
         width: auto;
@@ -133,22 +124,18 @@ const AnimationComponent = (
         align-items: center;
     }
     .header2-links {
-        position: absolute;
-        top: 0;
-        right: 0;
         display: flex;
         gap: 1em;
     }
     @media (max-width: 800px) {
         .header2-nav {
-            display: flex;
             flex-direction: column;
+            align-items: flex-start;
             gap: 1em;
         }
         .header2-links {
-            position: relative;
+            width: 100%;
             justify-content: flex-start;
-            width: auto;
             border-top: solid 2px var(--color-text);
             border-bottom: solid 2px var(--color-text);
             padding: 0.5em 0;
