@@ -106,22 +106,13 @@ const { item } = Astro.props;
                     {section.type === "text-full" && (
                         <div class="row row-full">
                             <div class="block block-text-large block-text-full">
-                                {section.intro?.type === "quote" && (
-                                    <>
-                                        <blockquote set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
-                                {section.intro?.type === "text" && (
-                                    <>
-                                        <p set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
+                                {section.intro?.map((block) =>
+                                        block.type === "quote" ? (
+                                            <blockquote set:html={block.text} />
+                                        ) : block.type === "text" ? (
+                                            <p set:html={block.text} />
+                                        ) : null
+                                    )}
                                 {section.subtext?.type === "source" && (
                                     <cite class="block-cite">{section.subtext.text}</cite>
                                 )}
@@ -154,22 +145,13 @@ const { item } = Astro.props;
                                 ))}
                             </div>
                             <div class="block block-text-large block-text-full">
-                                {section.intro?.type === "quote" && (
-                                    <>
-                                        <blockquote set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
-                                {section.intro?.type === "text" && (
-                                    <>
-                                        <p set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
+                                {section.intro?.map((block) =>
+                                        block.type === "quote" ? (
+                                            <blockquote set:html={block.text} />
+                                        ) : block.type === "text" ? (
+                                            <p set:html={block.text} />
+                                        ) : null
+                                    )}
                                 {section.subtext?.type === "source" && (
                                     <cite class="block-cite">{section.subtext.text}</cite>
                                 )}
@@ -188,22 +170,13 @@ const { item } = Astro.props;
                     {section.type === "media-bottom" && (
                         <div class="row row-stacked">
                             <div class="block block-text-large block-text-full">
-                                {section.intro?.type === "quote" && (
-                                    <>
-                                        <blockquote set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
-                                {section.intro?.type === "text" && (
-                                    <>
-                                        <p set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
+                                {section.intro?.map((block) =>
+                                        block.type === "quote" ? (
+                                            <blockquote set:html={block.text} />
+                                        ) : block.type === "text" ? (
+                                            <p set:html={block.text} />
+                                        ) : null
+                                    )}
                                 {section.subtext?.type === "source" && (
                                     <cite class="block-cite">{section.subtext.text}</cite>
                                 )}
@@ -236,22 +209,13 @@ const { item } = Astro.props;
                     {section.type === "text-columns" && (
                         <div class="row row-text-columns">
                             <div class="block block-text-large">
-                                {section.intro?.type === "quote" && (
-                                    <>
-                                        <blockquote set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
-                                {section.intro?.type === "text" && (
-                                    <>
-                                        <p set:html={section.intro.text} />
-                                        {section.author && (
-                                            <p class="block-author">{section.author}</p>
-                                        )}
-                                    </>
-                                )}
+                                {section.intro?.map((block) =>
+                                        block.type === "quote" ? (
+                                            <blockquote set:html={block.text} />
+                                        ) : block.type === "text" ? (
+                                            <p set:html={block.text} />
+                                        ) : null
+                                    )}
                             </div>
                             <div class="block block-text-large">
                                 {section.subtext?.type === "source" && (

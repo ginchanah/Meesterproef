@@ -43,7 +43,7 @@ export const data = {
               type: "text",
               text: `A machine constantly sweeps a green ribbon across the fl oor, creating malleable patterns as the green material itself moves the machine. An endless dance between machine and material emerges.`
             },
-          ], 
+          ],
           author: "Detour. A long and winding road to nowhere in particular, 2012 by Zoro Feigl",
           subtext: {
             type: "link",
@@ -68,8 +68,54 @@ export const data = {
       title: "Balancing Feedback",
       slug: "balancing-feedback",
       categories: [""],
+      content: [
+        {
+          type: "media-left",
+          heading: "",
+          intro: [
+            {
+              type: "text",
+              text: `Balancing or negative feedback loops are equilibrating or goal-seeking structures in systems and are both sources of stability and sources of resistance to change.`,
+            },
+          ],
+          author: "Meadows, D. (2008).",
+          subtext: {
+            type: "source",
+            text: "Thinking in systems: International bestseller. chelsea green publishing.",
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/balancing-feedback-2.png",
+              alt: "Repeating rows of text showing the words 'undesired state' and 'desired state' separated by arrows pointing inward, visualising a balancing feedback loop constantly correcting toward equilibrium."
+            },
+          ]
+        },
+        {
+          type: "media-right",
+          heading: "Simon Weckert Google Maps Hacks",
+          intro: [
+            {
+              type: "text",
+              text: `99 second hand smartphones are transported in a handcart to generate virtual traffic jam in Google Maps. Through this activity, it is possible to turn a green street red which has an impact in the physical world by navigating cars on another route to avoid being stuck in traffic.`
+            },
+          ],
+          author: "Simon Weckert (2020)",
+          subtext: {
+            type: "link",
+            text: `https://www.youtube.com/watch?v=OnfR3gLlaIc`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/balancing-feedback-1.jpg",
+              alt: "A four-panel collage from Simon Weckert's Google Maps Hacks: top-left shows a person pulling a handcart full of smartphones down an empty Berlin street, top-right shows a Google Maps view with red traffic indicators on the same street, and the bottom panels show wide views of the quiet, car-free Berlin street."
+            },
+          ]
+        }
+      ]
     },
-     {
+    {
       title: "Interface",
       slug: "interface",
       categories: ["Relation", "Agency"],
@@ -196,7 +242,7 @@ export const data = {
     {
       title: "Ma (in-between)",
       slug: "ma",
-      categories: ["Relation","Space"],
+      categories: ["Relation", "Space"],
       content: [
         {
           type: "media-left",
@@ -205,7 +251,7 @@ export const data = {
               type: "quote",
               text: `The Japanese concept of ma (間) assigns subjecthood to the tension between two entities. It suggests that the subject exists not in the human or the external world but in a third dimension - the dialogue between them. The in-between does not distinguish between humans, non-humans, nature, and man-made objects; rather, it represents a new nature of intelligence that emarges in the space between.`
             },
-          ], 
+          ],
           author: "",
           subtext: {
             type: "source",
@@ -227,7 +273,7 @@ export const data = {
               type: "text",
               text: `In Skyspace, James Turrell creates an architectural aperture where sky, light, and time merge in a single perceptual experience. A square or circular opening in the ceiling frames the sky, not as an object to observe, but as a presence that continuously shifts. Inside, silence prevails, allowing the viewer’s act of seeing itself to become the focus.`
             },
-          ], 
+          ],
           author: "James Turrell, skyspaces (1974 - now)",
           subtext: {
             type: "link",
@@ -249,7 +295,7 @@ export const data = {
               type: "text",
               text: `Massimo Vignelli talking about the space between the characters that makes it, in Helvetica, a documentary about the typeface Helvertica, directed by Gary`
             },
-          ], 
+          ],
           subtext: {
             type: "link",
             text: `https://www.youtube.com/watch?v=9g3Ogtgleyg`
@@ -269,7 +315,7 @@ export const data = {
         alt: "The word ma enclosed in a cropped rectangular frame"
       }
     },
-     {
+    {
       title: "Reinforcing Feedback",
       slug: "reinforcing-feedback",
       categories: [""],
@@ -303,7 +349,7 @@ export const data = {
               type: "text",
               text: `I'm Sitting in a Room by Alvin Lucier is a sound piece where the artist records himself reading a text, then repeatedly replays and re-records it in the same room. Over time, his speech dissolves, from intelligibility, leaving only the resonant frequencies of the space - the room itself becomes the music.`
             },
-          ], 
+          ],
           author: "I'm sitting in a room (1969). Alvin Lucier, performance",
           subtext: {
             type: "link",
@@ -342,7 +388,7 @@ export const data = {
               type: "text",
               text: `This is the <b>media-right</b> layout. Text on the left, image on the right. Two equal columns. The text block sits above a smaller subtext block, while the image fills the right column.`
             },
-          ], 
+          ],
           author: "Layout System",
           subtext: {
             type: "source",
@@ -364,7 +410,7 @@ export const data = {
               type: "text",
               text: `This is the <b>media-left</b> layout. Image on the left, text on the right. The row is visually reversed compared to media-right. The heading above also switches to right-aligned.`
             },
-          ], 
+          ],
           author: "Layout System",
           subtext: {
             type: "source",
@@ -397,7 +443,7 @@ export const data = {
               type: "text",
               text: `This is the <b>text-full</b> layout. A single full-width text block with no media. Useful for longer passages, standalone quotes, or transitional paragraphs that don't need an accompanying image or video.`
             },
-          ], 
+          ],
           author: "Layout System",
           subtext: {
             type: "source",
@@ -412,7 +458,7 @@ export const data = {
               type: "text",
               text: `This is the <b>media-top</b> layout. The media sits on top at full width, with the text block below it. Good for when you want the image to lead and the text to follow as context or explanation.`
             },
-          ], 
+          ],
           author: "Layout System",
           subtext: {
             type: "source",
@@ -434,7 +480,7 @@ export const data = {
               type: "text",
               text: `This is the <b>media-bottom</b> layout. The inverse of media-top: text sits on top at full width, with the media below it. Good for when you want the text to introduce the image or video.`
             },
-          ], 
+          ],
           author: "Layout System",
           subtext: {
             type: "source",
@@ -456,7 +502,7 @@ export const data = {
               type: "text",
               text: `This is the <b>left column</b> of the text-columns layout. Two text blocks sit side by side with no media. Useful for comparing ideas, bilingual text, or placing a quote beside its analysis.`
             },
-          ], 
+          ],
           author: "Layout System",
           subtext: {
             type: "text",

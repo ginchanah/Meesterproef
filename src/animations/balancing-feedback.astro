@@ -41,8 +41,14 @@
     // =====================================
 
     // ---------- DOM Elements ----------
-    // Grab all the letter blocks from our HTML page
-    const letters = Array.from(document.querySelectorAll<HTMLElement>(".block"));
+    // Grab the container that scopes all interactions
+    const container = document.querySelector<HTMLElement>(
+        ".balancing-container",
+    )!;
+    // Grab all the letter blocks from within the container only
+    const letters = Array.from(
+        container.querySelectorAll<HTMLElement>(".block"),
+    );
     // Count how many letters we have in total
     const totalLetters = letters.length;
 
@@ -62,22 +68,22 @@
     // =====================================
 
     // ---------- Setup ----------
-    // Watch for the mouse moving and update our target position
-    window.addEventListener("mousemove", (e) => updateTargetY(e.clientY));
-    // If the mouse leaves the screen, stop pulling (go back to 0)
-    window.addEventListener("mouseleave", () => {
+    // Watch for the mouse moving within the container and update the target position
+    container.addEventListener("mousemove", (e) => updateTargetY(e.clientY));
+    // If the mouse leaves the container, stop pulling (go back to 0)
+    container.addEventListener("mouseleave", () => {
         targetY = 0;
     });
 
     // Do the exact same thing for touch screens (like phones)
-    window.addEventListener(
+    container.addEventListener(
         "touchmove",
         (e) => {
             if (e.touches.length > 0) updateTargetY(e.touches[0].clientY);
         },
         { passive: true },
     );
-    window.addEventListener("touchend", () => {
+    container.addEventListener("touchend", () => {
         targetY = 0;
     });
 
@@ -98,8 +104,9 @@
 
     // ---------- Helpers ----------
     const updateTargetY = (clientY: number) => {
-        // Turn the mouse position into a number between -1 (top) and 1 (bottom)
-        const normY = (clientY / window.innerHeight) * 2 - 1;
+        // Turn the mouse position into a number relative to the container's bounds
+        const rect = container.getBoundingClientRect();
+        const normY = ((clientY - rect.top) / rect.height) * 2 - 1;
 
         // Multiply by 50 so it only pulls a maximum of 50 pixels up or down
         targetY = normY * 50;
