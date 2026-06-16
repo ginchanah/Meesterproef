@@ -2,10 +2,15 @@
     display: grid;
     place-items: center;
     height: 100%;
+
+    --count: 9;
+    --index: 0;
+    --delay: 1s;
 }
 
-.interface-button-container {
+/* .interface-button-container {
     display: flex;
+    --delay: 1s;
 
     button {
         appearance: none;
@@ -19,9 +24,47 @@
         transition: 0.2s;
 
         animation-name: typingKeys;
-        animation-duration: 1s;
-        animation-delay: calc(sibling-index() + 0.2s);
+        animation-duration: calc(var(--count) * var(--delay));
+        animation-delay: calc(var(--index) * var(--delay));
+        animation-iteration-count: infinite;
 
+        span {
+            transition: 0.2s;
+            &:hover {
+                transform: scale(1.2);
+                cursor: pointer;
+            }
+            
+            &:active {
+                transform: scale(0.8);
+            }
+        }
+
+        
+        
+        
+        
+    }
+} */
+
+.interface-button-container {
+    display: flex;
+    
+
+    button {
+        appearance: none;
+        border: none;
+        background: none;
+        width: max-content;
+        height: max-content;
+
+        font-size: 3rem;
+        font-weight: 900;
+        transition: transform 0.2s;
+
+        
+
+    
         &:hover {
             transform: scale(1.2);
             cursor: pointer;
@@ -30,6 +73,15 @@
         &:active {
             transform: scale(0.8);
         }
+
+        span {
+            display: inline-block;
+
+            animation-name: typingKeys;
+            animation-duration: calc(var(--count) * var(--delay));
+            animation-delay: calc(var(--index) * var(--delay));
+            animation-iteration-count: 1;
+        }
     }
 }
 
@@ -37,16 +89,37 @@
     text-align: center;
     font-size: 2rem;
     font-family: var(--courier-prime-regular);
+
+
+    span {
+        display: inline-block;
+        opacity: 0;
+
+        animation-name: revealLetter;
+        animation-duration: 0.2s;
+        animation-delay: calc(var(--index) * var(--delay));
+        animation-fill-mode: forwards;
+        animation-iteration-count: 1;
+    }
 }
 
 @keyframes typingKeys {
     0% {
         transform: scale(1);
     }
-    50% {
+    5% {
         transform: scale(0.8);
+    }
+    10% {
+        transform: scale(1);
     }
     100% {
         transform: scale(1);
     }
 }
+
+@keyframes revealLetter {
+    0%   { opacity: 0; }
+    100%   { opacity: 1; }   
+}
+

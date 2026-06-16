@@ -1,4 +1,19 @@
 // =====================================
+// MARK: Span Split
+// =====================================
+
+// add class .span-split on a container with text to put all letters inside in a separate span
+const spanSplitContainer = document.querySelectorAll(".span-split");
+
+spanSplitContainer?.forEach((element) => {
+    element.innerHTML = element.textContent
+        .split("")
+        .map((char) => `<span>${char === " " ? "&nbsp;" : char}</span>`)
+        .join("");
+});
+
+
+// =====================================
 // MARK: Sibling Index
 // =====================================
 
@@ -15,19 +30,7 @@ siblingIndexContainer?.forEach(container => {
 });
 
 
-// =====================================
-// MARK: Span Split
-// =====================================
 
-// add class .span-split on a container with text to put all letters inside in a separate span
-const spanSplitContainer = document.querySelectorAll(".span-split");
-
-spanSplitContainer?.forEach((element) => {
-    element.innerHTML = element.textContent
-        .split("")
-        .map((char) => `<span>${char === " " ? "&nbsp;" : char}</span>`)
-        .join("");
-});
 
 
 
