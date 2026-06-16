@@ -32,6 +32,8 @@
 <script>
     const letters = [...document.querySelectorAll(".word span:not(.space)")];
 
+    const wrapper = document.getElementById("animation-wrapper");
+
     const state = letters.map(() => ({
         energy: 0,
         hoverInfluence: 0,
@@ -182,15 +184,12 @@
             darkMode = !darkMode;
 
             if (darkMode) {
-                document.body.style.background = "black";
-
-                document.body.style.color = "white";
+                wrapper.style.backgroundColor = "var(--color-black)";
+                wrapper.style.color = "var(--color-white)";
             } else {
-                document.body.style.background = "white";
-
-                document.body.style.color = "black";
+                wrapper.style.backgroundColor = "var(--color-white)";
+                wrapper.style.color = "var(--color-black)";
             }
-
             // wait for inversion
             setTimeout(() => {
                 resetSystem();

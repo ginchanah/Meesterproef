@@ -1,9 +1,14 @@
+:root {
+    --color-white: #ffffff;
+    --color-black: #000000;
+}
+
 #animation-wrapper *{
     margin:0;
     padding:0;
     box-sizing:border-box;
 
-       color: black;
+    color: inherit;
 }
 
 #animation-wrapper{
@@ -13,8 +18,8 @@
     justify-content:center;
     align-items:center;
 
-    background:white;
-    color:black;
+    background:var(--color-white);
+    color: var(--color-black);
 
     overflow:hidden;
 
@@ -23,6 +28,11 @@
     transition:
         background-color 1.2s ease,
         color 1.2s ease;
+
+    & span {
+        color: inherit;
+    }
+
 }
 
 #animation-wrapper .word{
