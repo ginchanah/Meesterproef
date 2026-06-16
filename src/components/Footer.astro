@@ -3,13 +3,6 @@
 // src/components/Footer.astro
 import { data } from "../data/data.js";
 
-// define two variants for the footer
-interface Props {
-    variant?: "index" | "subpage" | "detail";
-    title?: String;
-    item?: any;
-}
-
 // define props to receive from other components
 const { variant = "home", title, item } = Astro.props;
 

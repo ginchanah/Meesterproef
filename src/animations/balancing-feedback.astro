@@ -36,18 +36,19 @@
 </div>
 
 <script>
+    // @ts-nocheck
     // =====================================
     // MARK: Variables
     // =====================================
 
     // ---------- DOM Elements ----------
     // Grab the container that scopes all interactions
-    const container = document.querySelector<HTMLElement>(
+    const container = document.querySelector(
         ".balancing-container",
-    )!;
+    );
     // Grab all the letter blocks from within the container only
     const letters = Array.from(
-        container.querySelectorAll<HTMLElement>(".block"),
+        container.querySelectorAll(".block"),
     );
     // Count how many letters we have in total
     const totalLetters = letters.length;
@@ -103,7 +104,7 @@
     // =====================================
 
     // ---------- Helpers ----------
-    const updateTargetY = (clientY: number) => {
+    const updateTargetY = (clientY) => {
         // Turn the mouse position into a number relative to the container's bounds
         const rect = container.getBoundingClientRect();
         const normY = ((clientY - rect.top) / rect.height) * 2 - 1;
@@ -112,7 +113,7 @@
         targetY = normY * 50;
     };
 
-    const handleLetterHover = (index: number) => {
+    const handleLetterHover = (index) => {
         // Random direction: UP (-1) or DOWN (1)
         const direction = Math.random() < 0.5 ? -1 : 1;
 
@@ -126,7 +127,7 @@
             letterStates[index + 1].speedY += direction * 1.2;
     };
 
-    const handleLetterClick = (index: number) => {
+    const handleLetterClick = (index) => {
         // Same as hovering, but use much bigger numbers so it swings wildly on click
         const direction = Math.random() < 0.5 ? -1 : 1;
         letterStates[index].speedY += direction * 35;

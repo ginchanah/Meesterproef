@@ -6,20 +6,21 @@
 </div>
 
 <script>
+// @ts-nocheck
 // Fill the paragraph with enough repeated text to cover the whole container
 const backgroundText = document.querySelector(".invisible-background-text")
 if (backgroundText) {
   backgroundText.textContent = "invisible".repeat(450)
 }
 
-const word = document.querySelector<HTMLElement>(".word")
-const container = document.querySelector<HTMLElement>(".mouse-tracker-container")
+const word = document.querySelector(".word")
+const container = document.querySelector(".mouse-tracker-container")
 
 if (word && container) {
     // Prevents queuing more than one rAF at a time — keeps animation in sync with the cursor
     let rafPending = false
 
-    const mouseFollower = (e: MouseEvent) => {
+    const mouseFollower = (e) => {
         if (rafPending) return
         rafPending = true
 

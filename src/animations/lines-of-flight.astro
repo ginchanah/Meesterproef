@@ -31,21 +31,22 @@
 </div>
 
 <script>
+    // @ts-nocheck
     // =====================================
     // MARK: Variables
     // =====================================
 
     // ---------- DOM Elements ----------
     const repeatedText = " LINES OF FLIGHT ".repeat(10);
-    const rows = document.querySelectorAll<HTMLElement>(".scrolling-text");
-    const rowContainers = document.querySelectorAll<HTMLElement>(".row");
-    const textPlane = document.querySelector<HTMLElement>(".text-plane");
+    const rows = document.querySelectorAll(".scrolling-text");
+    const rowContainers = document.querySelectorAll(".row");
+    const textPlane = document.querySelector(".text-plane");
 
     // ---------- State ----------
     // We store position, speed, and direction for each row
-    const positions: number[] = [];
+    const positions = [];
     const speeds = [1.2, 0.9, 1.4, 0.8, 1.5, 1.0, 1.3];
-    const directions: number[] = []; // -1 = scrolling left, 1 = scrolling right
+    const directions = []; // -1 = scrolling left, 1 = scrolling right
 
     // Where the mouse is on screen (0 to 1)
     let mouseX = 0.5;
