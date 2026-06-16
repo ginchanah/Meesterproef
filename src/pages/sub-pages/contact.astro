@@ -3,21 +3,32 @@ import DetailLayout from "../../layout/DetailLayout.astro";
 import Header from "../../components/Header.astro";
 ---
 
-<DetailLayout title="About">
+<DetailLayout title="Contact">
     <Header variant="two" title="About" />
 
     <main class="page">
-        <section>
-            <div class="block block--header animate-on-scroll is-visible">
+        <section class="content-section">
+            <div class="block block-header animate-on-scroll is-visible">
                 <h2>contact</h2>
             </div>
-            <div class="block block--text-large block--text-full animate-on-scroll is-visible">
-                <p>
-                    Feel free to get in touch regarding research,
-                    collaborations, lectures, or other inquiries.
-                </p>
-                <p><a href="m.ruyg@hva.nl">m.ruyg@hva.nl</a></p>
-                <p>Marjolijn Ruyg Amsterdam</p>
+            <div class="row row-full">
+                <div
+                    class="block block-text-large block-text-full animate-on-scroll is-visible"
+                >
+                    <p>
+                        Feel free to get in touch regarding research,
+                        collaborations, lectures, or other inquiries.
+                    </p>
+                    <!-- <div class="footer-buttons">
+
+                        <button class="button-small footer-links">Get in contact</button>
+                    </div> -->
+                    <p class="block-author">Marjolijn Ruyg <br /> Amsterdam</p>
+                </div>
+                    <p class="block block-text-small animate-on-scroll is-visible">
+                        <a href="mailto:m.ruyg@hva.nl">m.ruyg@hva.nl</a>
+                    </p>
+               
             </div>
         </section>
     </main>
