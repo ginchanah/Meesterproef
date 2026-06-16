@@ -248,6 +248,8 @@ body {
     text-transform: var(--font-button-big-transform);
 }
 
+/* ---------- Utility classes ---------- */
+
 /* TODO */
 /* source: https://tobiasahlin.com/blog/css-trick-animating-link-underlines/ */
 .hover-underline {
@@ -288,6 +290,9 @@ body {
     }
 }
 
+.full-height {
+    min-height: 70vh;
+}
 
 footer {
     font-family: var(--font-animation-family);
