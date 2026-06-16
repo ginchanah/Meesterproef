@@ -1,8 +1,10 @@
 ---
 
+  
+
 ---
+
 <div class="animation-container" aria-label="the word intra-action is written out several times on the screen and moves up and down, the words overlapping eachother. The single word is almost not visible but once it overlaps with another the contrast is hightened, making the word readable just in short glimpses.">
-	
 	<div class="set-sibling-index" id="intra-section-1" class="intra-section" aria-hidden="true">
 		<!-- inert als attribuut gebruiken ipv aria-hidden?? -->
 		<p class="blend" draggable="true">intra-action</p>
@@ -28,6 +30,7 @@
 		<p class="blend" draggable="true">intra-action</p>
 		<p class="blend" draggable="true">intra-action</p>
 	</div>
+
 	<div class="set-sibling-index" id="intra-section-2" class="intra-section" aria-hidden="true">
 		<p class="blend" draggable="true">intra-action</p>
 		<p class="blend" draggable="true">intra-action</p>
@@ -52,6 +55,7 @@
 		<p class="blend" draggable="true">intra-action</p>
 		<p class="blend" draggable="true">intra-action</p>
 	</div>
+
 	<div class="set-sibling-index" id="intra-section-3" class="intra-section" aria-hidden="true">
 		<p class="blend" draggable="true">intra-action</p>
 		<p class="blend" draggable="true">intra-action</p>
@@ -76,45 +80,54 @@
 		<p class="blend" draggable="true">intra-action</p>
 		<p class="blend" draggable="true">intra-action</p>
 	</div>
+
 </div>
 
+
+
 <script>
+	// @ts-nocheck
 	// =====================================
 	// MARK: Section 1
 	// =====================================
+
 	const section = document.getElementById('intra-section-1');
 	let draggedEl = null;
 	let offsetX = 0;
 	let offsetY = 0;
 
+
 	// Make .blend elements draggable
 	document.querySelectorAll('.blend').forEach(el => {
-		el.addEventListener('dragstart', e => {
-			draggedEl = e.target;
 
-			const rect = draggedEl.getBoundingClientRect();
-			offsetX = e.clientX - rect.left;
-			offsetY = e.clientY - rect.top;
+	el.addEventListener('dragstart', e => {
+		draggedEl = e.target;
 
-			// For some browsers, required to start drag
-			e.dataTransfer.setData('text/plain', '');
+		const rect = draggedEl.getBoundingClientRect();
+		offsetX = e.clientX - rect.left;
+		offsetY = e.clientY - rect.top;
 
-			draggedEl.classList.add('dragging');
-		});
+		// For some browsers, required to start drag
+		e.dataTransfer.setData('text/plain', '');
+		draggedEl.classList.add('dragging');
+	});
 
-		// remove dragging class when ending the drag
-		el.addEventListener('dragend', () => {
+	// remove dragging class when ending the drag
+	el.addEventListener('dragend', () => {
 			if (draggedEl) {
-			draggedEl.classList.remove('dragging');
-			draggedEl = null;
+				draggedEl.classList.remove('dragging');
+				draggedEl = null;
 			}
 		});
 	});
+
 
 	// Make drop possible inside the section
 	section.addEventListener('dragover', e => {
 		e.preventDefault();
 	});
+
+	
 
 	// Define the what happens on drop, making sure it's dropped inside the container
 	section.addEventListener('drop', e => {
@@ -124,33 +137,29 @@
 		// get size of the section
 		const sectionRect = section.getBoundingClientRect();
 
-		
 		// size of element to be dropped
-		const elWidth  = draggedEl.offsetWidth;
+		const elWidth = draggedEl.offsetWidth;
 		const elHeight = draggedEl.offsetHeight;
 
 		// Position of the element relative to the section
 		let x = e.clientX - sectionRect.left - offsetX;
-		let y = e.clientY - sectionRect.top  - offsetY;
+		let y = e.clientY - sectionRect.top - offsetY;
 
 		// Make sure the element dropped inside the box by calculating it's own dimenstions when dropping
-		const maxX = sectionRect.width  - elWidth;
+		const maxX = sectionRect.width - elWidth;
 		const maxY = sectionRect.height - elHeight;
 		x = Math.max(0, Math.min(x, maxX));
 		y = Math.max(0, Math.min(y, maxY));
 
 		draggedEl.style.position = 'absolute';
 		draggedEl.style.left = x + 'px';
-		draggedEl.style.top  = y + 'px';
+		draggedEl.style.top = y + 'px';
+
 
 		draggedEl.classList.remove('dragging');
 		draggedEl.classList.add('dragged');
 		draggedEl = null;
 	});
-
-
-
-
 
 
 	// =====================================
@@ -161,6 +170,7 @@
 	let draggedEl2 = null;
 	let offsetX2 = 0;
 	let offsetY2 = 0;
+
 
 	// Make .blend elements draggable
 	document.querySelectorAll('.blend').forEach(el => {
@@ -177,19 +187,23 @@
 			draggedEl2.classList.add('dragging');
 		});
 
+
 		// remove dragging class when ending the drag
 		el.addEventListener('dragend', () => {
 			if (draggedEl2) {
-			draggedEl2.classList.remove('dragging');
-			draggedEl2 = null;
+				draggedEl2.classList.remove('dragging');
+				draggedEl2 = null;
 			}
 		});
+
 	});
+
 
 	// Make drop possible inside the section
 	section2.addEventListener('dragover', e => {
 		e.preventDefault();
 	});
+
 
 	// Define the what happens on drop, making sure it's dropped inside the container
 	section2.addEventListener('drop', e => {
@@ -198,32 +212,29 @@
 
 		// get size of the section
 		const sectionRect = section2.getBoundingClientRect();
-
 		// size of element to be dropped
-		const elWidth  = draggedEl2.offsetWidth;
+		const elWidth = draggedEl2.offsetWidth;
 		const elHeight = draggedEl2.offsetHeight;
 
 		// Position of the element relative to the section
 		let x = e.clientX - sectionRect.left - offsetX2;
-		let y = e.clientY - sectionRect.top  - offsetY2;
+		let y = e.clientY - sectionRect.top - offsetY2;
+
 
 		// Make sure the element dropped inside the box by calculating it's own dimenstions when dropping
-		const maxX = sectionRect.width  - elWidth;
+		const maxX = sectionRect.width - elWidth;
 		const maxY = sectionRect.height - elHeight;
 		x = Math.max(0, Math.min(x, maxX));
 		y = Math.max(0, Math.min(y, maxY));
 
 		draggedEl2.style.position = 'absolute';
 		draggedEl2.style.left = x + 'px';
-		draggedEl2.style.top  = y + 'px';
+		draggedEl2.style.top = y + 'px';
 
 		draggedEl2.classList.remove('dragging');
 		draggedEl2.classList.add('dragged');
 		draggedEl2 = null;
 	});
-
-
-
 
 
 	// =====================================
@@ -248,16 +259,19 @@
 			e.dataTransfer.setData('text/plain', '');
 
 			draggedEl3.classList.add('dragging');
+
 		});
 
 		// remove dragging class when ending the drag
 		el.addEventListener('dragend', () => {
-			if (draggedEl3) {
-			draggedEl3.classList.remove('dragging');
-			draggedEl3 = null;
+		if (draggedEl3) {
+				draggedEl3.classList.remove('dragging');
+				draggedEl3 = null;
 			}
 		});
+
 	});
+
 
 	// Make drop possible inside the section
 	section3.addEventListener('dragover', e => {
@@ -273,27 +287,66 @@
 		const sectionRect = section3.getBoundingClientRect();
 
 		// size of element to be dropped
-		const elWidth  = draggedEl3.offsetWidth;
+		const elWidth = draggedEl3.offsetWidth;
 		const elHeight = draggedEl3.offsetHeight;
 
 		// Position of the element relative to the section
 		let x = e.clientX - sectionRect.left - offsetX3;
-		let y = e.clientY - sectionRect.top  - offsetY3;
+		let y = e.clientY - sectionRect.top - offsetY3;
 
 		// Make sure the element dropped inside the box by calculating it's own dimenstions when dropping
-		const maxX = sectionRect.width  - elWidth;
+		const maxX = sectionRect.width - elWidth;
 		const maxY = sectionRect.height - elHeight;
 		x = Math.max(0, Math.min(x, maxX));
 		y = Math.max(0, Math.min(y, maxY));
 
+
 		draggedEl3.style.position = 'absolute';
 		draggedEl3.style.left = x + 'px';
-		draggedEl3.style.top  = y + 'px';
-
+		draggedEl3.style.top = y + 'px';
 		draggedEl3.classList.remove('dragging');
 		draggedEl3.classList.add('dragged');
 		draggedEl3 = null;
+
 	});
 </script>
-	
-	
+
+
+
+<script>
+	// @ts-nocheck
+	// =====================================
+	// MARK: Animation Pause button
+	// =====================================
+
+	const animationButton = document.querySelector(".animation-button");
+	const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	let animationPlaying;
+
+	// check if the user has motion preferences and set the according class on the button
+	if(prefersReducedMotion === true) {
+		animationButton?.classList.add("stop-animation");
+		animationPlaying = false;
+	} else {
+		animationButton?.classList.add("play-animation");
+		animationPlaying = true;
+	}
+
+	// toggle animation
+	function toggleAnimation() {
+		animationButton.classList.toggle("stop-animation");
+		animationButton.classList.toggle("play-animation");
+
+		let animationClass = document.querySelector(".stop-animation");
+
+		animationClass ? animationPlaying = false : animationPlaying = true;
+
+		// use this if ever implemented in general js
+		// if (typeof onAnimationStateChange === "function") {
+		// 	onAnimationStateChange(animationPlaying);
+		// }
+	}
+
+	animationButton?.addEventListener("click", toggleAnimation)
+
+</script>

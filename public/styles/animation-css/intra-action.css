@@ -3,7 +3,7 @@ MARK: specific animation styling
 ===================================== */
 /* give your css file the same slug name as the page you're working on */
 
-@property --animate-height {
+@property --animation-height {
     syntax: "<length> | <percentage>";
     inherits: true;
     initial-value: 0px;
@@ -14,10 +14,12 @@ MARK: specific animation styling
     justify-content: center;
     width: 100%;
     overflow: clip;
+    gap: 1rem;
+    background: #111;
 }
 
 #intra-section-1, #intra-section-2, #intra-section-3 {
-    --animate-height: 160vh;
+    --animation-height: 160vh;
 
 
     display: grid;
@@ -39,24 +41,29 @@ MARK: specific animation styling
         font-size: 6.5vw;
 
         @media (max-width: 1551px) {
-            font-size: 6rem;
+            font-size: 5.9rem;
         }
-        @media (max-width: 1432px) {
+        @media (max-width: 1440px) {
             font-size: 5.5rem;
         }
-        @media (max-width: 1313px) {
+        @media (max-width: 1345px) {
             font-size: 5rem;
         }
+        @media (max-width: 1226px) {
+            font-size: 6vw;
+        }
         @media (max-width: 1193px) {
-            font-size: 10vw;
+            font-size: 9vw;
         }
          @media (max-width: 670px) {
-            font-size: 19vw;
+            font-size: 17vw;
         }
 
         margin: 0;
 
+    
         animation: moveUpDown 4s ease-in-out infinite alternate;
+
         animation-delay: calc(var(--index) * 0.3s );
 
         &.dragging {
@@ -79,6 +86,18 @@ MARK: specific animation styling
         cursor: grabbing;
     }
 }
+
+.animation-section:has(.stop-animation) * {
+    animation-play-state: paused !important;
+}
+
+.animation-section:has(.play-animation) * {
+    animation-play-state: running !important;
+}
+
+
+
+
 
 @media (max-width: 1193px) {
     #intra-section-3 {
@@ -118,9 +137,9 @@ MARK: specific animation styling
         transform: translateY(0);
     }
     50% {
-        transform: translateY(calc(var(--animate-height)/2));
+        transform: translateY(calc(var(--animation-height)/2));
     }
     100% {
         transform: translateY(0);
     }
-    }
+}

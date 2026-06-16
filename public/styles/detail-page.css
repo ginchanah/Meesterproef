@@ -181,4 +181,70 @@ MARK: Responsive
 }
 
 
-blockquote {}
+
+/* =====================================
+MARK: Animation button
+===================================== */
+.hidden-section {
+    position: relative;
+
+    .animation-button {
+        background: var(--black);
+        position: absolute;
+        z-index: 10000;
+        appearance: none;
+        border: none;
+        right: 20px;
+        top: 20px;
+        border-radius: 50%;
+        width: 3.5rem;
+        height: 3.5rem;
+        place-items: center;
+
+        cursor: pointer;
+
+        span {
+            display: inline-block;
+            width: 80%;
+            height: 80%;
+            
+            background-position: center;
+            
+            background-repeat: no-repeat;
+
+            
+        }
+
+        &.stop-animation span {
+            background-image: url("/assets/media/start.svg");
+            background-size: 80%;
+        }
+
+        &.play-animation span {
+            background-image: url("/assets/media/stop.svg");
+            background-size: 100%;
+        }
+    }
+}
+
+/* hidden by default */
+.animation-button {
+    display: none;
+}
+
+/* show when JS has initialized it */
+.animation-button.play-animation,
+.animation-button.stop-animation {
+    display: grid; 
+}
+
+/* pause/start animation */
+.animation-section:has(.stop-animation) * {
+    animation-play-state: paused !important;
+    transform: none;
+}
+
+.animation-section:has(.play-animation) * {
+    animation-play-state: running !important;
+    transform: none;
+}
