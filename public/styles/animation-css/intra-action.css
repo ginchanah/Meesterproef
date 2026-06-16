@@ -14,6 +14,8 @@ MARK: specific animation styling
     justify-content: center;
     width: 100%;
     overflow: clip;
+    gap: 1rem;
+    background: #111;
 }
 
 #intra-section-1, #intra-section-2, #intra-section-3 {
@@ -39,19 +41,22 @@ MARK: specific animation styling
         font-size: 6.5vw;
 
         @media (max-width: 1551px) {
-            font-size: 6rem;
+            font-size: 5.9rem;
         }
-        @media (max-width: 1432px) {
+        @media (max-width: 1440px) {
             font-size: 5.5rem;
         }
-        @media (max-width: 1313px) {
+        @media (max-width: 1345px) {
             font-size: 5rem;
         }
+        @media (max-width: 1226px) {
+            font-size: 6vw;
+        }
         @media (max-width: 1193px) {
-            font-size: 10vw;
+            font-size: 9vw;
         }
          @media (max-width: 670px) {
-            font-size: 19vw;
+            font-size: 17vw;
         }
 
         margin: 0;

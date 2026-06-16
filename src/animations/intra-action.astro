@@ -79,6 +79,7 @@
 </div>
 
 <script>
+	  // @ts-nocheck
 	// =====================================
 	// MARK: Section 1
 	// =====================================
@@ -295,5 +296,42 @@
 		draggedEl3 = null;
 	});
 </script>
+
+<script>
+        // @ts-nocheck
+        // =====================================
+        // MARK: Animation Pause button
+        // =====================================
+
+        const animationButton = document.querySelector(".animation-button");
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let animationPlaying;
+
+        // check if the user has motion preferences and set the according class on the button
+        if(prefersReducedMotion === true) {
+            animationButton?.classList.add("stop-animation");
+            animationPlaying = false;
+        } else {
+            animationButton?.classList.add("play-animation");
+            animationPlaying = true;
+        }
+
+        // toggle animation
+        function toggleAnimation() {
+            animationButton.classList.toggle("stop-animation");
+            animationButton.classList.toggle("play-animation");
+
+            let animationClass = document.querySelector(".stop-animation");
+
+            animationClass ? animationPlaying = false : animationPlaying = true;
+
+            if (typeof onAnimationStateChange === "function") {
+                onAnimationStateChange(animationPlaying);
+            }
+
+        }
+
+        animationButton?.addEventListener("click", toggleAnimation)
+    </script>
 	
 	
