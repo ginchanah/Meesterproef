@@ -18,6 +18,9 @@ const animationPath = `../animations/${slug}.astro`;
 const AnimationComponent = (
     animations[animationPath] as { default: any } | undefined
 )?.default;
+
+// get nav path
+const pathname = Astro.url.pathname;
 ---
 
 <!-- here we define two different headers for the homepage and for the detail page -->
@@ -50,8 +53,8 @@ const AnimationComponent = (
                         <p>(Inter)facing the Hybrid City</p>
                     </div>
                     <div class="header2-links">
-                        <a href="/sub-pages/about" class="hover-underline button-small">ABOUT</a>
-                        <a href="/sub-pages/contact" class="hover-underline button-small">CONTACT</a>
+                        <a href="/sub-pages/about" class={`hover-underline button-small ${pathname === "/sub-pages/about" ? "active" : ""}`}>ABOUT</a>
+                        <a href="/sub-pages/contact" class={`hover-underline button-small ${pathname === "/sub-pages/contact" ? "active" : ""}`}>CONTACT</a>
                     </div>
                 </nav>
 
