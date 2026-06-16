@@ -46,6 +46,8 @@ MARK: Variables
     --font-body-text-size: clamp(1rem, 1rem + 0.1vw, 1.2rem);
     --font-body-text-family: var(--courier-prime-regular);
     --font-body-text-weight: normal;
+    --font-body-line-height: 1.35;
+    --font-body-letter-spacing: -0.5px;
 
     /* Body Text Bold */
     --font-body-text-bold-size: 1.2rem;
@@ -228,6 +230,8 @@ body {
     font-size: var(--font-body-text-size);
     font-family: var(--font-body-text-family);
     font-weight: var(--font-body-text-weight);
+    line-height: var(--font-body-line-height);
+    letter-spacing: var(--font-body-letter-spacing);
 }
 
 .button-small {
@@ -244,7 +248,7 @@ body {
     text-transform: var(--font-button-big-transform);
 }
 
-/* to do! */
+/* TODO */
 /* source: https://tobiasahlin.com/blog/css-trick-animating-link-underlines/ */
 .hover-underline {
     color: inherit;
@@ -254,7 +258,7 @@ body {
     transition: var(--transition-time);
 
     &:active {
-        opacity: 0.8;
+        opacity: 0.6;
     }
 
     &::before {
@@ -274,6 +278,14 @@ body {
         transform: scaleX(1);
     }
 
+}
+
+.active {
+    cursor: default;
+
+    &::before {
+         transform: scaleX(1);
+    }
 }
 
 
@@ -299,10 +311,6 @@ p {
 
 figure {
     margin: 0;
-}
-
-header.header-two nav {
-    padding: var(--nav-padding);
 }
 
 @media (min-width: 0px) {
@@ -341,66 +349,6 @@ MARK: Visually hidden
 
     clip: inset(50%);
     white-space: nowrap;
-}
-
-/* =====================================
-MARK: Header
-===================================== */
-/* general header styling */
-/* TODO */
-.header {}
-
-/* header on the homepage */
-/* TODO */
-.header-one {}
-
-/* header on the glossary item page */
-.header-two {
-    display: grid;
-
-    nav {
-        width: max-content;
-
-        h2 {
-            text-transform: uppercase;
-            margin-right: 5rem;
-
-        }
-
-        h2,
-        .button-big {
-            font-size: clamp(1.8rem, 10vw, 3.5rem);
-        }
-
-        .button-big {
-            text-align: right;
-            width: 100%;
-            display: inline-block;
-            position: relative;
-
-        }
-    }
-}
-
-
-@media (max-width: 675px) {
-    .header-two {
-        justify-items: center;
-    }
-
-}
-
-
-/* =====================================
-MARK: Animation section
-===================================== */
-/* General animation styling, full screen */
-.animation-section {
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
-    overflow: clip;
 }
 
 
@@ -535,76 +483,6 @@ MARK: Footer
     color: var(--color-text);
     font-weight: 300;
     font-size: clamp(0.7rem, 2vw, 1rem);
-}
-
-/* ---------- Links ---------- */
-.footer-links {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
-    align-items: center;
-    box-sizing: border-box;
-    padding: 2rem calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
-    border-bottom: var(--thin-border) solid var(--color-border);
-}
-
-.footer-buttons {
-    display: flex;
-    gap: 1rem;
-    width: 100%;
-}
-
-.footer-links a.button-small {
-    border: 1px solid var(--color-border);
-    padding: var(--padding-buttons-standard);
-    text-decoration: none;
-    font-size: clamp(0.8rem, 2vw, 1.2rem);
-    font-weight: 300;
-    text-transform: uppercase;
-    color: var(--color-text);
-    background-color: transparent;
-    /* transition: background-color 0.2s, color 0.2s; */
-    flex: 1;
-    text-align: center;
-    white-space: nowrap;
-    transition: var(--transition-time);
-
-    &:hover {
-        opacity: var(--hover-opacity);
-    }
-
-    &:active {
-        background-color: var(--color-text);
-        color: var(--color-background);
-    }
-}
-
-/* .footer-links a.button-small:hover {
-    background-color: var(--color-text);
-    color: var(--color-background); 
-} */
-
-/* ---------- Footer text ---------- */
-.footer-links p {
-    margin: 0;
-    padding: 0;
-    font-size: clamp(1rem, 4vw, 2rem);
-    font-weight: 800;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-@media (max-width: 890px) {
-    .footer-links {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-    }
-
-    .footer-buttons {
-        width: auto;
-        gap: 0.5rem;
-    }
 }
 
 /* ---------- Copyright ---------- */

@@ -19,33 +19,29 @@ const { item } = Astro.props;
     <main class="page">
         {
             item.content?.map((section) => (
-                <>
+                <section class="content-section">
+                    {/* ===================================== */}
+                    {/* MARK: header                          */}
+                    {/* ===================================== */}
                     {/* Full-width heading block for sections with a heading */}
                     {section.heading && (
-                        <section
-                            class={`block block--header ${section.type === "media-left" ? "block--header--right" : ""}`}
-                        >
+                        <div class={`block block-header ${section.type === "media-left" ? "block-header-right" : ""}`}>
                             <h2>{section.heading}</h2>
-                        </section>
+                        </div>
                     )}
 
-                    {/* ===== Layout: media-left / media-right (two-column) ===== */}
-                    {(section.type === "media-left" ||
-                        section.type === "media-right") && (
-                        <section
-                            class={`row ${section.type === "media-left" ? "row--reversed" : ""}`}
-                        >
-                            <div class="row__text-side">
-                                <div class="block block--text-large">
+                    {/* ===================================== */}
+                    {/* MARK: media-left / media-right        */}
+                    {/* ===================================== */}
+                    {(section.type === "media-left" || section.type === "media-right") && (
+                        <div class={`row ${section.type === "media-left" ? "row-reversed" : ""}`}>
+                            <div class="row-text-side">
+                                <div class="block block-text-large">
                                     {section.intro?.type === "quote" && (
                                         <>
-                                            <blockquote
-                                                set:html={section.intro.text}
-                                            />
+                                            <blockquote set:html={section.intro.text} />
                                             {section.author && (
-                                                <h3 class="block-author">
-                                                    {section.author}
-                                                </h3>
+                                                <p class="block-author">{section.author}</p>
                                             )}
                                         </>
                                     )}
@@ -53,22 +49,15 @@ const { item } = Astro.props;
                                         <>
                                             <p set:html={section.intro.text} />
                                             {section.author && (
-                                                <h3 class="block-author">
-                                                    {section.author}
-                                                </h3>
+                                                <p class="block-author">{section.author}</p>
                                             )}
                                         </>
                                     )}
                                 </div>
-                                <div class="block block--text-small">
+                                <div class="block block-text-small">
                                     {section.subtext?.type === "link" && (
                                         <p>
-                                            <a
-                                                href={section.subtext.text}
-                                                class="hover-underline"
-                                            >
-                                                {section.subtext.text}
-                                            </a>
+                                            <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
                                         </p>
                                     )}
                                     {section.subtext?.type === "source" && (
@@ -76,70 +65,56 @@ const { item } = Astro.props;
                                     )}
                                 </div>
                             </div>
-                            <div class="block block--image">
+                            <div class="block block-image">
                                 {section.media?.map((media) => (
                                     <>
                                         {media.type === "image" && (
-                                            <img
-                                                src={media.src}
-                                                alt={media.alt}
-                                            />
+                                            <img src={media.src} alt={media.alt} />
                                         )}
                                         {media.type === "video" && (
-                                            <video
-                                                src={media.src}
-                                                aria-label={media.alt}
-                                                controls
-                                            >
+                                            <video src={media.src} aria-label={media.alt} controls>
                                                 <source src={media.src} />
                                             </video>
                                         )}
                                     </>
                                 ))}
                             </div>
-                        </section>
+                        </div>
                     )}
 
-                    {/* ===== Layout: media-full (full-width media block) ===== */}
+                    {/* ===================================== */}
+                    {/* MARK: media-full                      */}
+                    {/* ===================================== */}
                     {section.type === "media-full" && (
-                        <section class="row row--full">
-                            <div class="block block--image block--image-full">
+                        <div class="row row-full">
+                            <div class="block block-image block-image-full">
                                 {section.media?.map((media) => (
                                     <>
                                         {media.type === "image" && (
-                                            <img
-                                                src={media.src}
-                                                alt={media.alt}
-                                            />
+                                            <img src={media.src} alt={media.alt} />
                                         )}
                                         {media.type === "video" && (
-                                            <video
-                                                src={media.src}
-                                                aria-label={media.alt}
-                                                controls
-                                            >
+                                            <video src={media.src} aria-label={media.alt} controls>
                                                 <source src={media.src} />
                                             </video>
                                         )}
                                     </>
                                 ))}
                             </div>
-                        </section>
+                        </div>
                     )}
 
-                    {/* ===== Layout: text-full (full-width text, no media) ===== */}
+                    {/* ===================================== */}
+                    {/* MARK: text-full                       */}
+                    {/* ===================================== */}
                     {section.type === "text-full" && (
-                        <section class="row row--full">
-                            <div class="block block--text-large block--text-full">
+                        <div class="row row-full">
+                            <div class="block block-text-large block-text-full">
                                 {section.intro?.type === "quote" && (
                                     <>
-                                        <blockquote
-                                            set:html={section.intro.text}
-                                        />
+                                        <blockquote set:html={section.intro.text} />
                                         {section.author && (
-                                            <h3 class="block-author">
-                                                {section.author}
-                                            </h3>
+                                            <p class="block-author">{section.author}</p>
                                         )}
                                     </>
                                 )}
@@ -147,65 +122,47 @@ const { item } = Astro.props;
                                     <>
                                         <p set:html={section.intro.text} />
                                         {section.author && (
-                                            <h3 class="block-author">
-                                                {section.author}
-                                            </h3>
+                                            <p class="block-author">{section.author}</p>
                                         )}
                                     </>
                                 )}
                                 {section.subtext?.type === "source" && (
-                                    <cite class="block-cite">
-                                        {section.subtext.text}
-                                    </cite>
+                                    <cite class="block-cite">{section.subtext.text}</cite>
                                 )}
                                 {section.subtext?.type === "link" && (
                                     <p class="block-cite">
-                                        <a
-                                            href={section.subtext.text}
-                                            class="hover-underline"
-                                        >
-                                            {section.subtext.text}
-                                        </a>
+                                        <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
                                     </p>
                                 )}
                             </div>
-                        </section>
+                        </div>
                     )}
 
-                    {/* ===== Layout: media-top (media above, text below — both full width) ===== */}
+                    {/* ===================================== */}
+                    {/* MARK: media-top                       */}
+                    {/* ===================================== */}
                     {section.type === "media-top" && (
-                        <section class="row row--stacked">
-                            <div class="block block--image block--image-full">
+                        <div class="row row-stacked">
+                            <div class="block block-image block-image-full">
                                 {section.media?.map((media) => (
                                     <>
                                         {media.type === "image" && (
-                                            <img
-                                                src={media.src}
-                                                alt={media.alt}
-                                            />
+                                            <img src={media.src} alt={media.alt} />
                                         )}
                                         {media.type === "video" && (
-                                            <video
-                                                src={media.src}
-                                                aria-label={media.alt}
-                                                controls
-                                            >
+                                            <video src={media.src} aria-label={media.alt} controls>
                                                 <source src={media.src} />
                                             </video>
                                         )}
                                     </>
                                 ))}
                             </div>
-                            <div class="block block--text-large block--text-full">
+                            <div class="block block-text-large block-text-full">
                                 {section.intro?.type === "quote" && (
                                     <>
-                                        <blockquote
-                                            set:html={section.intro.text}
-                                        />
+                                        <blockquote set:html={section.intro.text} />
                                         {section.author && (
-                                            <h3 class="block-author">
-                                                {section.author}
-                                            </h3>
+                                            <p class="block-author">{section.author}</p>
                                         )}
                                     </>
                                 )}
@@ -213,44 +170,33 @@ const { item } = Astro.props;
                                     <>
                                         <p set:html={section.intro.text} />
                                         {section.author && (
-                                            <h3 class="block-author">
-                                                {section.author}
-                                            </h3>
+                                            <p class="block-author">{section.author}</p>
                                         )}
                                     </>
                                 )}
                                 {section.subtext?.type === "source" && (
-                                    <cite class="block-cite">
-                                        {section.subtext.text}
-                                    </cite>
+                                    <cite class="block-cite">{section.subtext.text}</cite>
                                 )}
                                 {section.subtext?.type === "link" && (
                                     <p class="block-cite">
-                                        <a
-                                            href={section.subtext.text}
-                                            class="hover-underline"
-                                        >
-                                            {section.subtext.text}
-                                        </a>
+                                        <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
                                     </p>
                                 )}
                             </div>
-                        </section>
+                        </div>
                     )}
 
-                    {/* ===== Layout: media-bottom (text above, media below — both full width) ===== */}
+                    {/* ===================================== */}
+                    {/* MARK: media-bottom                    */}
+                    {/* ===================================== */}
                     {section.type === "media-bottom" && (
-                        <section class="row row--stacked">
-                            <div class="block block--text-large block--text-full">
+                        <div class="row row-stacked">
+                            <div class="block block-text-large block-text-full">
                                 {section.intro?.type === "quote" && (
                                     <>
-                                        <blockquote
-                                            set:html={section.intro.text}
-                                        />
+                                        <blockquote set:html={section.intro.text} />
                                         {section.author && (
-                                            <h3 class="block-author">
-                                                {section.author}
-                                            </h3>
+                                            <p class="block-author">{section.author}</p>
                                         )}
                                     </>
                                 )}
@@ -258,65 +204,47 @@ const { item } = Astro.props;
                                     <>
                                         <p set:html={section.intro.text} />
                                         {section.author && (
-                                            <h3 class="block-author">
-                                                {section.author}
-                                            </h3>
+                                            <p class="block-author">{section.author}</p>
                                         )}
                                     </>
                                 )}
                                 {section.subtext?.type === "source" && (
-                                    <cite class="block-cite">
-                                        {section.subtext.text}
-                                    </cite>
+                                    <cite class="block-cite">{section.subtext.text}</cite>
                                 )}
                                 {section.subtext?.type === "link" && (
                                     <p class="block-cite">
-                                        <a
-                                            href={section.subtext.text}
-                                            class="hover-underline"
-                                        >
-                                            {section.subtext.text}
-                                        </a>
+                                        <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
                                     </p>
                                 )}
                             </div>
-                            <div class="block block--image block--image-full">
+                            <div class="block block-image block-image-full">
                                 {section.media?.map((media) => (
                                     <>
                                         {media.type === "image" && (
-                                            <img
-                                                src={media.src}
-                                                alt={media.alt}
-                                            />
+                                            <img src={media.src} alt={media.alt} />
                                         )}
                                         {media.type === "video" && (
-                                            <video
-                                                src={media.src}
-                                                aria-label={media.alt}
-                                                controls
-                                            >
+                                            <video src={media.src} aria-label={media.alt} controls>
                                                 <source src={media.src} />
                                             </video>
                                         )}
                                     </>
                                 ))}
                             </div>
-                        </section>
+                        </div>
                     )}
 
-                    {/* ===== Layout: text-columns (two text blocks side by side, no media) ===== */}
+                    {/* ===================================== */}
+                    {/* MARK: text-columns                    */}
+                    {/* ===================================== */}
                     {section.type === "text-columns" && (
-                        <section class="row row--text-columns">
-                            <div class="block block--text-large">
+                        <div class="row row-text-columns">
+                            <div class="block block-text-large">
                                 {section.intro?.type === "quote" && (
                                     <>
-                                        <blockquote
-                                            set:html={section.intro.text}
-                                        />
+                                        <blockquote set:html={section.intro.text} />
                                         {section.author && (
-                                            <h3 class="block-author">
-                                                {section.author}
-                                            </h3>
+                                            <p class="block-author">{section.author}</p>
                                         )}
                                     </>
                                 )}
@@ -324,34 +252,27 @@ const { item } = Astro.props;
                                     <>
                                         <p set:html={section.intro.text} />
                                         {section.author && (
-                                            <h3 class="block-author">
-                                                {section.author}
-                                            </h3>
+                                            <p class="block-author">{section.author}</p>
                                         )}
                                     </>
                                 )}
                             </div>
-                            <div class="block block--text-large">
+                            <div class="block block-text-large">
                                 {section.subtext?.type === "source" && (
                                     <p>{section.subtext.text}</p>
                                 )}
                                 {section.subtext?.type === "link" && (
                                     <p>
-                                        <a
-                                            href={section.subtext.text}
-                                            class="hover-underline"
-                                        >
-                                            {section.subtext.text}
-                                        </a>
+                                        <a href={section.subtext.text} class="hover-underline">{section.subtext.text}</a>
                                     </p>
                                 )}
                                 {section.subtext?.type === "text" && (
                                     <p set:html={section.subtext.text} />
                                 )}
                             </div>
-                        </section>
+                        </div>
                     )}
-                </>
+                </section>
             ))
         }
     </main>

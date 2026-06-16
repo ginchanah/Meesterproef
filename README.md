@@ -385,7 +385,6 @@ generalImage: {
 - Use CSS nesting thoughtfully:
   - Nest when it improves readability.
   - Avoid deep nesting that makes selectors hard to follow.
-- Use `@layer` to organize CSS (e.g. base, components, utilities).
 
 #### CSS Comment Style
 
