@@ -243,7 +243,3 @@ MARK: Animation button
     animation-play-state: paused !important;
     transition: none;
 }
-
-.animation-section:has(.play-animation) * {
-    animation-play-state: running !important;
-}
