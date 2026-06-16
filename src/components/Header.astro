@@ -142,9 +142,13 @@ const pathname = Astro.url.pathname;
             margin-bottom: 2rem;
             gap: 2em;
         }
-        @media (max-width: 600px) {
-            p {
-                font-size: 0.75em;
+        @media (max-width: 500px) {
+            .header2-nav a.button-big {
+                font-size: min(3.5rem, 10vw);
+            }
+            .header2-nav p {
+                font-size: min(1rem, 2.86vw);
+                height: min(3.5rem, 10vw);
             }
         }
     }
