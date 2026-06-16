@@ -1,12 +1,12 @@
 ---
-import DetailLayout from "../../layout/DetailLayout.astro";
+import SubPageLayout from "../../layout/SubPageLayout.astro";
 import Header from "../../components/Header.astro";
 ---
 
-<DetailLayout title="About">
+<SubPageLayout title="About">
     <Header variant="two" title="About" />
 
-    <main class="page">
+    <main class="page full-height">
         <section class="content-section">
             <div class="block block-header animate-on-scroll is-visible">
                 <h2>About (inter)facing the hybrid city</h2>
@@ -67,4 +67,6 @@ import Header from "../../components/Header.astro";
             </div>
         </section>
     </main>
-</DetailLayout>
+
+    <script src="/js/index.js" is:inline></script>
+</SubPageLayout>

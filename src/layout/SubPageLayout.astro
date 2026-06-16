@@ -1,7 +1,12 @@
 ---
+interface Props {
+	title?: string;
+}
+
 // import the components to reuse
 import Footer from "../components/Footer.astro";
 
+const { title } = Astro.props;
 ---
 <!-- ===================================== -->
 <!-- MARK: Layout for the subpags (about and contact) -->
@@ -25,7 +30,7 @@ import Footer from "../components/Footer.astro";
 			<slot />
 		</main>
 
-        <Footer variant="subPage"/>
+        <Footer variant="subpage"/>
 
     </body>
 </html>

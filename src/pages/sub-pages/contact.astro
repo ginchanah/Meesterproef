@@ -1,12 +1,12 @@
 ---
-import DetailLayout from "../../layout/DetailLayout.astro";
+import SubPageLayout from "../../layout/SubPageLayout.astro";
 import Header from "../../components/Header.astro";
 ---
 
-<DetailLayout title="Contact">
-    <Header variant="two" title="About" />
+<SubPageLayout title="Contact">
+    <Header variant="two" title="Contact" />
 
-    <main class="page">
+    <main class="page full-height">
         <section class="content-section">
             <div class="block block-header animate-on-scroll is-visible">
                 <h2>contact</h2>
@@ -19,11 +19,9 @@ import Header from "../../components/Header.astro";
                         Feel free to get in touch regarding research,
                         collaborations, lectures, or other inquiries.
                     </p>
-                    <!-- <div class="footer-buttons">
+                    <a href="mailto:m.ruyg@hva.nl" class="hover-underline button-small">Get in contact →</a>
 
-                        <button class="button-small footer-links">Get in contact</button>
-                    </div> -->
-                    <p class="block-author">Marjolijn Ruyg <br /> Amsterdam</p>
+                    <p class="block-author">Marjolijn Ruyg <br/> Amsterdam</p>
                 </div>
                     <p class="block block-text-small animate-on-scroll is-visible">
                         <a href="mailto:m.ruyg@hva.nl">m.ruyg@hva.nl</a>
@@ -32,4 +30,6 @@ import Header from "../../components/Header.astro";
             </div>
         </section>
     </main>
-</DetailLayout>
+
+    <script src="/js/index.js" is:inline></script>
+</SubPageLayout>

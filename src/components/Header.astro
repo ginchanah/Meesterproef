@@ -18,6 +18,9 @@ const animationPath = `../animations/${slug}.astro`;
 const AnimationComponent = (
     animations[animationPath] as { default: any } | undefined
 )?.default;
+
+// get nav path
+const pathname = Astro.url.pathname;
 ---
 
 <!-- here we define two different headers for the homepage and for the detail page -->
@@ -42,6 +45,7 @@ const AnimationComponent = (
     {
         variant === "two" && (
             <>
+                <h1 class="visually-hidden">{title}</h1>
                 <nav class="header2-nav">
                     <div>
                         <a class="button-big hover-underline" href="/">
@@ -49,16 +53,16 @@ const AnimationComponent = (
                         </a>
                         <p>(Inter)facing the Hybrid City</p>
                     </div>
+                    {/* in the class we check if the page is currently the active page */}
                     <div class="header2-links">
-                        <a href="/sub-pages/about" class="hover-underline button-small">ABOUT</a>
-                        <a href="/sub-pages/contact" class="hover-underline button-small">CONTACT</a>
+                        <a href="/sub-pages/about" class={`hover-underline button-small ${pathname === "/sub-pages/about" ? "active" : ""}`}>ABOUT</a>
+                        <a href="/sub-pages/contact" class={`hover-underline button-small ${pathname === "/sub-pages/contact" ? "active" : ""}`}>CONTACT</a>
                     </div>
                 </nav>
 
 
                 {AnimationComponent ? (
                     <div class="animation-section">
-                        <h1 class="visually-hidden">{title}</h1>
                         <p class="visually-hidden">Inside this section, there is an interactive typographic animation of the word {title}.</p>
                         <div class="hidden-section" aria-hidden="true">
                             <button class="animation-button"><span></span></button>

@@ -248,6 +248,34 @@ body {
     text-transform: var(--font-button-big-transform);
 }
 
+/* ---------- Utility classes ---------- */
+
+
+.button {
+    transition: var(--transition-time);
+    box-sizing: border-box;
+    font-size: var(--font-button-small-size);
+    font-family: var(--font-button-small-family);
+    font-weight: var(--font-button-small-weight);
+    display: block;
+    margin: 1rem 0 1.5rem;
+    padding: var(--padding-small);
+    background: var(--color-background);
+    color: var(--color-text);
+    text-decoration: none;
+    /* font-weight: bolder; */
+    width: max-content;
+    border: solid var(--thin-border) var(--color-text);
+
+    &:hover {
+        background: var(--color-text);
+        border: solid var(--thin-border) var(--color-background);
+        color: var(--color-background);
+    }
+    
+}
+
+
 /* TODO */
 /* source: https://tobiasahlin.com/blog/css-trick-animating-link-underlines/ */
 .hover-underline {
@@ -288,6 +316,9 @@ body {
     }
 }
 
+.full-height {
+    min-height: 70vh;
+}
 
 footer {
     font-family: var(--font-animation-family);

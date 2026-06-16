@@ -41,10 +41,6 @@ MARK: Header
 MARK: Term list
 ===================================== */
 
-main {
-    min-height: 70vh;
-}
-
 .term-list {
     font-family: var(--inter-regular);
     font-size: var(--term-list-font-size);
