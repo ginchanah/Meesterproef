@@ -50,6 +50,61 @@ In this file, link your script within the ``<DetailLayout> </DetailLayout>`` tag
 
 Animation-specific JavaScript should be added inline within the ``<script></script>`` tag within your animation file at **src > pages > animations > example-item.astro** (replace with your slug name).
 
+## How to add the accessible start- stop button to a new animation
+
+In case you add a new animation to a glossary item, you can add a start- and stop button to it that is also connected to the users preferences. 
+
+**This button currently only works if your animation is CSS only and doesn't involve JavaScript.**
+This should be true for all the animations coming out of the animation tool.
+
+When you have added a file with your animation, (see: Adding an animation for a specific glossary item) inside this file, all the way at the bottom, you can add the following code:
+
+```
+<script>
+
+	// @ts-nocheck
+	// =====================================
+	// MARK: Animation Pause button
+	// =====================================
+	
+	  
+	const animationButton = document.querySelector(".animation-button");
+	const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	
+	let animationPlaying;
+	
+	// check if the user has motion preferences and set the according class on the button
+	if(prefersReducedMotion === true) {
+		animationButton?.classList.add("stop-animation");
+		animationPlaying = false;
+	} else {
+		animationButton?.classList.add("play-animation");
+		animationPlaying = true;
+	}
+	
+	// toggle animation
+	function toggleAnimation() {
+		
+		animationButton.classList.toggle("stop-animation");
+		animationButton.classList.toggle("play-animation");
+		
+		let animationClass = document.querySelector(".stop-animation");
+		animationClass ? animationPlaying = false : animationPlaying = true;
+		
+
+		// use this if ever implemented in general js
+		// if (typeof onAnimationStateChange === "function") {
+		// onAnimationStateChange(animationPlaying);	
+		// }
+	}
+	
+	animationButton?.addEventListener("click", toggleAnimation)
+
+</script>
+```
+
+This enables the start- stop button on the page.
+
 ## Explanation of all folders:
 
 ```
