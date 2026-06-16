@@ -16,7 +16,7 @@ const { item } = Astro.props;
 <DetailLayout title={item.title} slug={item.slug} item={item}>
     <Header variant="two" title={item.title} slug={item.slug} />
 
-    <main class="page">
+    <main class="page page--detail">
         {
             item.content?.map((section) => (
                 <section class="content-section">
