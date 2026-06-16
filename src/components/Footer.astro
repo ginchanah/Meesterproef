@@ -71,16 +71,14 @@ if (variant === "detail" && item) {
         <!-- Navigation between glossary items -->
         <div>
             <nav class="footer-nav">
-                {prevItem ? (
-                    <a href={`/glossary-items/${prevItem.slug}`} class="hover-underline">&larr; {prevItem.title}</a>
-                ) : (
-                    <a href="#" class="hover-underline">&larr; PLACEHOLDER</a>
+                {prevItem && (
+                     <a href={`/glossary-items/${prevItem.slug}`} class="hover-underline">
+                         &larr; {prevItem.title}
+                    </a>
                 )}
                 <a href="/" class="hover-underline">BACK TO GLOSSARY</a>
-                {nextItem ? (
+                {nextItem && (
                     <a href={`/glossary-items/${nextItem.slug}`} class="hover-underline">{nextItem.title} &rarr;</a>
-                ) : (
-                    <a href="#" class="hover-underline">PLACEHOLDER &rarr;</a>
                 )}
             </nav>
                 <div class="banner-container">
