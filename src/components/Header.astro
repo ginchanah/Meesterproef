@@ -2,22 +2,14 @@
 // link to the header:
 // src/components/Header.astro
 
-// define two variants for the header
-interface Props {
-    variant?: "one" | "two";
-    title?: String;
-    slug?: String;
-}
-
 // define props to receive from other components
 const { variant = "one", title, slug } = Astro.props;
 
 // Dynamically import the animation file based on slug
 const animations = import.meta.glob("../animations/*.astro", { eager: true });
 const animationPath = `../animations/${slug}.astro`;
-const AnimationComponent = (
-    animations[animationPath] as { default: any } | undefined
-)?.default;
+const animationModule = animations[animationPath];
+const AnimationComponent = animationModule ? animationModule.default : undefined;
 
 // get nav path
 const pathname = Astro.url.pathname;
