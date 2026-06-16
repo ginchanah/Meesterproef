@@ -373,7 +373,71 @@ export const data = {
     {
       title: "System",
       slug: "system",
-      categories: [""],
+      categories: ["Process", "Agency"],
+      content: [
+        {
+          type: "text-full",
+          intro: [
+            {
+              type: "text",
+              text: `<b>System:</b> A set of elements or parts that is coherently organized and interconnected in a pattern or structure that produces a characteristic set of behaviors, often classifi ed as its “function” or “purpose.”`
+            },
+          ],
+          subtext: {
+            type: "source",
+            text: `Meadows, D. (2008). Thinking in systems: International bestseller. chelsea green publishing.`
+          },
+        },
+        {
+          type: "media-right",
+          heading: "",
+          intro: [
+            {
+              type: "text",
+              text: `<b>Condensation Cube</b> (1963-65) by <b>Hans Haacke</b> is a hermetically sealed, clear acrylic plexiglass box, thirty centimeters on the side that holds about one centimeter or so of water. Condensation collects against the inner surface of the plexiglass forming vertical streaks on the inside.`
+            },
+          ],
+          author: "Hans Haacke",
+          subtext: {
+            type: "link",
+            text: `https://www.tate.org.uk/art/artists/hans-haacke-2217/hans-haacke-exposing-systems-power`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/system-1.png",
+              alt: "A glass cube with a layer of water that is condensating on the inside."
+            },
+          ]
+        },
+        {
+          type: "media-right",
+          heading: "",
+          intro: [
+            {
+              type: "text",
+              text: `<b>Shapolsky et al. Manhattan Real Estate Holdings, a Real Time Social System, 1971.</b> Hans Haacke’s interest in real-time systems propelled him into his criticism of <b>social and political systems.</b> This work is one of the most system-like of Haacke’s politically focused works is which clearly shows how economic and social systems interrelate.`
+            },
+          ],
+          author: "Hans Haacke",
+          subtext: {
+            type: "link",
+            text: `https://www.textezurkunst.de/en/117/defining-limits-system/`
+          },
+          media: [
+            {
+              type: "image",
+              src: "/assets/media/system-2.png",
+              alt: "Words on paper, connected by lines, creating a mesh."
+            },
+          ]
+        }
+      ],
+      generalImage: {
+        type: "image",
+        src: "/assets/media/system-3.png",
+        alt: "A visual typographic representation of the word system"
+      }
     },
     {
       title: "Layout Demo",

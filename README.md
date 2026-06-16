@@ -209,7 +209,12 @@ content: [
 The type inside the content section is the name of the CSS-class that is added to the section. This is where the different layouts can be defined. You can choose here out of a set of existing CSS classes that we added as presets. But it is possible to add new classes and layouts by adding additional CSS classes in the stylesheet that is linked to the page.
 The current options to choose from are:
 - **"media-left"** -> the image/video on the left, the text on the right
-- **"media-right"** -> the image/video on the right, the text on the left
+- **"media-right"** -> the image video on the right, the text on the left
+- **"media-full"** -> only media, no text
+- **"text-full** -> no image, only text
+- **"media-top"** -> media on top, text on the bottom
+- **"media-bottom"** -> media on the bottom, text on the top 
+- **"text-columns"** -> two text blocks next to each other
 
 
 ```
