@@ -19,6 +19,7 @@ MARK: General detail page styling
     font-family: var(--font-animation-family);
 }
 
+
 /* =====================================
 MARK: Section components
 ===================================== */
@@ -30,16 +31,66 @@ MARK: Section components
     margin: 0 auto;
     padding-top: 2rem;
     padding: 2rem 0;
+    position: relative;
 }
+
+/* Vertical lines at the .page container edges */
+.page-detail::before, .page-detail::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: 1px solid var(--color-border);
+    pointer-events: none;
+}
+
+.page-detail::before { left: 0; }
+.page-detail::after  { right: 0; }
 
 .page .block {
     border: 1px solid var(--color-border);
 }
 
 /* Base grid layout applied to all rows and headers */
-.page .row, .block-header {
+.page .row, .page .block-header {
     margin-top: -1px;
     margin-inline: clamp(1rem, 1rem + 3vw, 4rem);
+    position: relative;
+}
+
+/* Extend grid lines outward to viewport edges */
+.page-detail .row::before, .page-detail .row::after,
+.page-detail .block-header::before, .page-detail .block-header::after {
+    content: "";
+    position: absolute;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    pointer-events: none;
+}
+
+/* Rows have no border — align with block edges */
+.page-detail .row::before, .page-detail .row::after {
+    top: 0;
+    bottom: 0;
+}
+
+/* Block-headers have their own border — extend past it */
+.page-detail .block-header::before, .page-detail .block-header::after {
+    top: -1px;
+    bottom: -1px;
+}
+
+.page-detail .row::before, .page-detail .block-header::before {
+    right: 100%;
+    left: calc(-1 * (50vw - 50%));
+    border-left: 1px solid var(--color-border);
+}
+
+.page-detail .row::after, .page-detail .block-header::after {
+    left: 100%;
+    right: calc(-1 * (50vw - 50%));
+    border-right: 1px solid var(--color-border);
 }
 
 .page .row {
