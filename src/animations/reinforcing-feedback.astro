@@ -10,7 +10,7 @@
 
 <script>
     // ====================================
-    // TUNING VARIABLES
+    // MARK: TUNING VARIABLES
     // ====================================
 
     // Mouse interaction
@@ -103,9 +103,9 @@
             s.hoverInfluence = 0;
         });
 
-        // --------------------
-        // MOUSE INFLUENCE
-        // --------------------
+        // ---------------------
+        // MARK: MOUSE INFLUENCE
+        // ---------------------
 
         letters.forEach((letter, i) => {
             const rect = letter.getBoundingClientRect();
@@ -119,10 +119,7 @@
             const dist = Math.sqrt(dx * dx + dy * dy);
 
             if (dist < interactionRadius) {
-                const influence = Math.pow(
-                    1 - dist / interactionRadius,
-                    influencePower,
-                );
+                const influence = Math.pow(1 - dist / interactionRadius, influencePower);
 
                 state[i].energy += influence * energyGain;
 
@@ -130,9 +127,9 @@
             }
         });
 
-        // --------------------
-        // NEIGHBOUR SPREAD
-        // --------------------
+        // ----------------------
+        // MARK: NEIGHBOUR SPREAD
+        // ----------------------
 
         if (isMoving) {
             state.forEach((s, i) => {
@@ -149,7 +146,7 @@
         }
 
         // --------------------
-        // AVERAGE ENERGY
+        // MARK: AVERAGE ENERGY
         // --------------------
 
         let totalEnergy = 0;
@@ -161,14 +158,11 @@
         const averageEnergy = totalEnergy / state.length;
 
         // --------------------
-        // LETTERS
+        // MARK: LETTERS
         // --------------------
 
         state.forEach((s, i) => {
-            const weight = Math.min(
-                maxWeight,
-                baseWeight + s.energy * weightMultiplier,
-            );
+            const weight = Math.min(maxWeight, baseWeight + s.energy * weightMultiplier);
 
             let scaleX = 1;
             let scaleY = 1;
@@ -179,12 +173,7 @@
             // --------------------------------
 
             if (s.energy > scaleStartEnergy) {
-                const growth =
-                    1 +
-                    Math.pow(
-                        (s.energy - scaleStartEnergy) / scaleDivisor,
-                        scaleCurve,
-                    );
+                const growth = 1 + Math.pow((s.energy - scaleStartEnergy) / scaleDivisor, scaleCurve);
 
                 scaleX = growth;
                 scaleY = growth;
@@ -213,7 +202,7 @@
         });
 
         // --------------------
-        // COLLAPSE EVENT
+        // MARK: COLLAPSE EVENT
         // --------------------
 
         if (averageEnergy > collapseThreshold && !resetting) {
