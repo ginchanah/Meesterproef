@@ -34,19 +34,19 @@ MARK: Layout Components
     }
 
     /* ---------- Adaptation Animation ---------- */
-    .assimilation-background {
+    .adaptation-background {
         position: absolute;
         inset: 0 5vw;
         display: flex;
     }
 
     @media (min-width: 1024px) {
-        .assimilation-background {
+        .adaptation-background {
             inset: 0;
         }
     }
 
-    .assimilation-pane {
+    .adaptation-pane {
         flex: 1;
     }
 
@@ -58,7 +58,7 @@ MARK: Layout Components
         background-color: var(--color-text);
     }
 
-    .assimilation-word {
+    .adaptation-word {
         position: relative;
         z-index: 10;
         font-size: clamp(2rem, 10vw, 10rem);
