@@ -2,10 +2,6 @@
     --animation-height: 90vh;
 }
 
-body {
-    overflow-x: clip;
-}
-
 
 /* =====================================
 MARK: General detail page styling
@@ -23,6 +19,7 @@ MARK: General detail page styling
     font-family: var(--font-animation-family);
 }
 
+
 /* =====================================
 MARK: Section components
 ===================================== */
@@ -38,7 +35,7 @@ MARK: Section components
 }
 
 /* Vertical lines at the .page container edges */
-.page--detail::before, .page--detail::after {
+.page-detail::before, .page-detail::after {
     content: "";
     position: absolute;
     top: 0;
@@ -48,8 +45,8 @@ MARK: Section components
     pointer-events: none;
 }
 
-.page--detail::before { left: 0; }
-.page--detail::after  { right: 0; }
+.page-detail::before { left: 0; }
+.page-detail::after  { right: 0; }
 
 .page .block {
     border: 1px solid var(--color-border);
@@ -63,8 +60,8 @@ MARK: Section components
 }
 
 /* Extend grid lines outward to viewport edges */
-.page--detail .row::before, .page--detail .row::after,
-.page--detail .block-header::before, .page--detail .block-header::after {
+.page-detail .row::before, .page-detail .row::after,
+.page-detail .block-header::before, .page-detail .block-header::after {
     content: "";
     position: absolute;
     border-top: 1px solid var(--color-border);
@@ -73,24 +70,24 @@ MARK: Section components
 }
 
 /* Rows have no border — align with block edges */
-.page--detail .row::before, .page--detail .row::after {
+.page-detail .row::before, .page-detail .row::after {
     top: 0;
     bottom: 0;
 }
 
 /* Block-headers have their own border — extend past it */
-.page--detail .block-header::before, .page--detail .block-header::after {
+.page-detail .block-header::before, .page-detail .block-header::after {
     top: -1px;
     bottom: -1px;
 }
 
-.page--detail .row::before, .page--detail .block-header::before {
+.page-detail .row::before, .page-detail .block-header::before {
     right: 100%;
     left: calc(-1 * (50vw - 50%));
     border-left: 1px solid var(--color-border);
 }
 
-.page--detail .row::after, .page--detail .block-header::after {
+.page-detail .row::after, .page-detail .block-header::after {
     left: 100%;
     right: calc(-1 * (50vw - 50%));
     border-right: 1px solid var(--color-border);
