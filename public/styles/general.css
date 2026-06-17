@@ -2,122 +2,114 @@
 MARK: Variables
 ===================================== */
 :root {
-    /* ---------- Fonts ---------- */
-    --inter-regular: "Inter", Helvetica;
-    --inter-italic: "Inter Italic", Helvetica;
+  /* ---------- Fonts ---------- */
+  --inter-regular: "Inter", Helvetica;
+  --inter-italic: "Inter Italic", Helvetica;
 
-    --courier-prime-regular: "Courier Prime Regular", Courier, Monaco;
-    --courier-prime-italic: "Courier Prime Italic", Courier, Monaco;
-    --courier-prime-bold: "Courier Prime Bold", Courier, Monaco;
-    --courier-prime-bold-italic: "Courier Prime Bold Italic", Courier, Monaco;
+  --courier-prime-regular: "Courier Prime Regular", Courier, Monaco;
+  --courier-prime-italic: "Courier Prime Italic", Courier, Monaco;
+  --courier-prime-bold: "Courier Prime Bold", Courier, Monaco;
+  --courier-prime-bold-italic: "Courier Prime Bold Italic", Courier, Monaco;
 
+  /* ---------- Colors ---------- */
+  --black: #000;
+  --white: #ffffff;
+  --grey: grey;
 
-    /* ---------- Colors ---------- */
-    --black: #000;
-    --white: #ffffff;
-    --grey: grey;
+  --color-text: var(--black);
+  --color-background: var(--white);
+  --color-border: var(--black);
 
-    --color-text: var(--black);
-    --color-background: var(--white);
-    --color-border: var(--black);
+  /* ---------- Text ---------- */
+  /* Title/H1 */
+  --font-title-size: 5rem;
+  --font-title-size-index: clamp(3.5rem, 2rem + 5vw, 5rem);
 
+  --font-title-family: var(--inter-regular);
+  --font-title-weight: bold;
+  --font-title-transform: uppercase;
 
+  /* Heading 2 */
+  --font-heading-2-size: 3.5rem;
+  --font-heading-2-family: var(--inter-regular);
+  --font-heading-2-weight: bold;
 
-    /* ---------- Text ---------- */
-    /* Title/H1 */
-    --font-title-size: 5rem;
-    --font-title-size-index: clamp(3.5rem, 2rem + 5vw, 5rem);
+  /* Heading 2 in body text */
+  --font-heading-2-text-size: 1.2rem;
+  --font-heading-2-text-family: var(--courier-prime-bold);
+  --font-heading-2-text-weight: bold;
 
-    --font-title-family: var(--inter-regular);
-    --font-title-weight: bold;
-    --font-title-transform: uppercase;
+  /* Body Text */
+  --font-body-text-size: clamp(1rem, 1rem + 0.1vw, 1.2rem);
+  --font-body-text-family: var(--courier-prime-regular);
+  --font-body-text-weight: normal;
+  --font-body-line-height: 1.35;
+  --font-body-letter-spacing: -0.5px;
 
-    /* Heading 2 */
-    --font-heading-2-size: 3.5rem;
-    --font-heading-2-family: var(--inter-regular);
-    --font-heading-2-weight: bold;
+  /* Body Text Bold */
+  --font-body-text-bold-size: 1.2rem;
+  --font-body-text-bold-family: var(--courier-prime-bold);
+  --font-body-text-bold-weight: bold;
 
-    /* Heading 2 in body text */
-    --font-heading-2-text-size: 1.2rem;
-    --font-heading-2-text-family: var(--courier-prime-bold);
-    --font-heading-2-text-weight: bold;
+  /* Body Text Italic */
+  --font-body-text-italic-size: 1.2rem;
+  --font-body-text-italic-family: var(--courier-prime-italic);
+  --font-body-text-italic-weight: normal;
+  --font-body-text-italic-style: italic;
 
-    /* Body Text */
-    --font-body-text-size: clamp(1rem, 1rem + 0.1vw, 1.2rem);
-    --font-body-text-family: var(--courier-prime-regular);
-    --font-body-text-weight: normal;
-    --font-body-line-height: 1.35;
-    --font-body-letter-spacing: -0.5px;
+  /* Button Small */
+  --font-button-small-size: 1.2rem;
+  --font-button-small-family: var(--inter-regular);
+  --font-button-small-weight: light;
+  --font-button-small-transform: uppercase;
 
-    /* Body Text Bold */
-    --font-body-text-bold-size: 1.2rem;
-    --font-body-text-bold-family: var(--courier-prime-bold);
-    --font-body-text-bold-weight: bold;
+  /* Button Big */
+  --font-button-big-size: 3.5rem;
+  --font-button-big-family: var(--inter-regular);
+  --font-button-big-weight: light;
+  --font-button-big-transform: uppercase;
 
-    /* Body Text Italic */
-    --font-body-text-italic-size: 1.2rem;
-    --font-body-text-italic-family: var(--courier-prime-italic);
-    --font-body-text-italic-weight: normal;
-    --font-body-text-italic-style: italic;
+  /* Animation */
+  --font-animation-size: 1.2rem;
+  --font-animation-family: var(--inter-regular);
+  --font-animation-weight: light;
+  --font-animation-transform: uppercase;
 
-    /* Button Small */
-    --font-button-small-size: 1.2rem;
-    --font-button-small-family: var(--inter-regular);
-    --font-button-small-weight: light;
-    --font-button-small-transform: uppercase;
+  /* ---------- Sizes & Styles ---------- */
+  --thin-border: 1px;
+  --transition-time: 0.3s;
+  --hover-opacity: 65%;
 
-    /* Button Big */
-    --font-button-big-size: 3.5rem;
-    --font-button-big-family: var(--inter-regular);
-    --font-button-big-weight: light;
-    --font-button-big-transform: uppercase;
+  /* ---------- Margin & Paddings ---------- */
+  /* body padding */
+  --body-padding: clamp(1.3rem, 1rem + 1vw, 2rem);
+  --padding-medium: 2em;
+  --padding-small: 1rem;
+  --padding-extra-small: 0.5rem;
+  --padding-buttons-standard: 1em 1.5em;
 
-    /* Animation */
-    --font-animation-size: 1.2rem;
-    --font-animation-family: var(--inter-regular);
-    --font-animation-weight: light;
-    --font-animation-transform: uppercase;
+  /* desktop */
+  --section-padding-large: 4rem 15rem;
+  --section-margin-large: 0rem 0;
 
+  --nav-padding-large: 4rem 15rem;
 
-    /* ---------- Sizes & Styles ---------- */
-    --thin-border: 1px;
-    --transition-time: 0.3s;
-    --hover-opacity: 65%;
+  /* tablet */
+  --section-padding-medium: 0 5rem;
+  --section-margin-medium: 4rem 0;
 
+  --nav-padding-medium: 4rem 2rem;
 
-    /* ---------- Margin & Paddings ---------- */
-    /* body padding */
-    --body-padding: clamp(1.3rem, 1rem + 1vw, 2rem);
-    --padding-medium: 2em;
-    --padding-small: 1rem;
-    --padding-extra-small: 0.5rem;
-    --padding-buttons-standard: 1em 1.5em;
+  /* phone */
+  --section-padding-small: 0 1rem;
+  --section-margin-small: 4rem 0;
 
+  --nav-padding-small: 0;
 
-    /* desktop */
-    --section-padding-large: 4rem 15rem;
-    --section-margin-large: 0rem 0;
-
-    --nav-padding-large: 4rem 15rem;
-
-    /* tablet */
-    --section-padding-medium: 0 5rem;
-    --section-margin-medium: 4rem 0;
-
-    --nav-padding-medium: 4rem 2rem;
-
-    /* phone */
-    --section-padding-small: 0 1rem;
-    --section-margin-small: 4rem 0;
-
-    --nav-padding-small: 0;
-
-
-
-    /* ---------- Breakpoints ---------- */
-    --breakpoint-phone: 0px;
-    --breakpoint-tablet: 490px;
-    --breakpoint-desktop: 891px;
+  /* ---------- Breakpoints ---------- */
+  --breakpoint-phone: 0px;
+  --breakpoint-tablet: 490px;
+  --breakpoint-desktop: 891px;
 }
 
 /* =====================================
@@ -125,67 +117,64 @@ MARK: Light & Dark Mode
 ===================================== */
 
 * {
-    color: var(--color-text);
-
+  color: var(--color-text);
 }
 
 body {
-    background-color: var(--color-background);
+  background-color: var(--color-background);
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {
-        --color-text: var(--white);
-        --color-background: var(--black);
-        --color-border: var(--white);
-    }
+  :root {
+    --color-text: var(--white);
+    --color-background: var(--black);
+    --color-border: var(--white);
+  }
 }
 
 @media (prefers-color-scheme: light) {
-    :root {
-        --color-text: var(--white);
-        --color-background: var(--black);
-        --color-border: var(--white);
-    }
+  :root {
+    --color-text: var(--white);
+    --color-background: var(--black);
+    --color-border: var(--white);
+  }
 }
-
-
 
 /* =====================================
 MARK: Fonts
 ===================================== */
 /* Inter */
 @font-face {
-    font-family: "Inter";
-    src: url(/assets/fonts/Inter/Inter-VariableFont_opsz\,wght.ttf);
-    font-weight: 100 900;
+  font-family: "Inter";
+  src: url(/assets/fonts/Inter/Inter-VariableFont_opsz\,wght.ttf);
+  font-weight: 100 900;
 }
 
 @font-face {
-    font-family: "Inter Italic";
-    src: url(/assets/fonts/Inter/Inter-Italic-VariableFont_opsz\,wght.ttf);
-    font-weight: 100 900;
+  font-family: "Inter Italic";
+  src: url(/assets/fonts/Inter/Inter-Italic-VariableFont_opsz\,wght.ttf);
+  font-weight: 100 900;
 }
 
 /* Courier */
 @font-face {
-    font-family: "Courier Prime Regular";
-    src: url(/assets/fonts/Courier_Prime/CourierPrime-Regular.ttf);
+  font-family: "Courier Prime Regular";
+  src: url(/assets/fonts/Courier_Prime/CourierPrime-Regular.ttf);
 }
 
 @font-face {
-    font-family: "Courier Prime Italic";
-    src: url(/assets/fonts/Courier_Prime/CourierPrime-Italic.ttf);
+  font-family: "Courier Prime Italic";
+  src: url(/assets/fonts/Courier_Prime/CourierPrime-Italic.ttf);
 }
 
 @font-face {
-    font-family: "Courier Prime Bold";
-    src: url(/assets/fonts/Courier_Prime/CourierPrime-Bold.ttf);
+  font-family: "Courier Prime Bold";
+  src: url(/assets/fonts/Courier_Prime/CourierPrime-Bold.ttf);
 }
 
 @font-face {
-    font-family: "Courier Prime Bold Italic";
-    src: url(/assets/fonts/Courier_Prime/CourierPrime-BoldItalic.ttf);
+  font-family: "Courier Prime Bold Italic";
+  src: url(/assets/fonts/Courier_Prime/CourierPrime-BoldItalic.ttf);
 }
 
 /* =====================================
@@ -198,135 +187,131 @@ h3,
 h4,
 h5,
 label {
-    font-family: var(--inter-regular);
+  font-family: var(--inter-regular);
 }
 
 h1 {
-    font-size: var(--font-title-size);
-    font-family: var(--font-title-family);
-    font-weight: var(--font-title-weight);
-    text-transform: var(--font-title-transform);
+  font-size: var(--font-title-size);
+  font-family: var(--font-title-family);
+  font-weight: var(--font-title-weight);
+  text-transform: var(--font-title-transform);
 }
 
 h2 {
-    font-size: var(--font-heading-2-size);
-    font-family: var(--font-heading-2-family);
-    font-weight: var(--font-heading-2-weight);
+  font-size: var(--font-heading-2-size);
+  font-family: var(--font-heading-2-family);
+  font-weight: var(--font-heading-2-weight);
 }
 
 .heading-2-text {
-    font-size: var(--font-heading-2-text-size);
-    font-family: var(--font-heading-2-text-family);
-    font-weight: var(--font-heading-2-text-weight);
+  font-size: var(--font-heading-2-text-size);
+  font-family: var(--font-heading-2-text-family);
+  font-weight: var(--font-heading-2-text-weight);
 }
 
 .heading-2-big {
-    font-size: var(--font-heading-2-big-size);
-    font-family: var(--font-heading-2-big-family);
-    font-weight: var(--font-heading-2-big-weight);
+  font-size: var(--font-heading-2-big-size);
+  font-family: var(--font-heading-2-big-family);
+  font-weight: var(--font-heading-2-big-weight);
 }
 
 body {
-    font-size: var(--font-body-text-size);
-    font-family: var(--font-body-text-family);
-    font-weight: var(--font-body-text-weight);
-    line-height: var(--font-body-line-height);
-    letter-spacing: var(--font-body-letter-spacing);
+  font-size: var(--font-body-text-size);
+  font-family: var(--font-body-text-family);
+  font-weight: var(--font-body-text-weight);
+  line-height: var(--font-body-line-height);
+  letter-spacing: var(--font-body-letter-spacing);
 }
 
 .button-small {
-    font-size: var(--font-button-small-size);
-    font-family: var(--font-button-small-family);
-    font-weight: var(--font-button-small-weight);
-    text-transform: var(--font-button-small-transform);
+  font-size: var(--font-button-small-size);
+  font-family: var(--font-button-small-family);
+  font-weight: var(--font-button-small-weight);
+  text-transform: var(--font-button-small-transform);
 }
 
 .button-big {
-    font-size: var(--font-button-big-size);
-    font-family: var(--font-button-big-family);
-    font-weight: var(--font-button-big-weight);
-    text-transform: var(--font-button-big-transform);
+  font-size: var(--font-button-big-size);
+  font-family: var(--font-button-big-family);
+  font-weight: var(--font-button-big-weight);
+  text-transform: var(--font-button-big-transform);
 }
 
 /* ---------- Utility classes ---------- */
 
-
 .button {
-    transition: var(--transition-time);
-    box-sizing: border-box;
-    font-size: var(--font-button-small-size);
-    font-family: var(--font-button-small-family);
-    font-weight: var(--font-button-small-weight);
-    display: block;
-    margin: 1rem 0 1.5rem;
-    padding: var(--padding-small);
-    background: var(--color-background);
-    color: var(--color-text);
-    text-decoration: none;
-    /* font-weight: bolder; */
-    width: max-content;
-    border: solid var(--thin-border) var(--color-text);
+  transition: var(--transition-time);
+  box-sizing: border-box;
+  font-size: var(--font-button-small-size);
+  font-family: var(--font-button-small-family);
+  font-weight: var(--font-button-small-weight);
+  display: block;
+  margin: 1rem 0 1.5rem;
+  padding: var(--padding-small);
+  background: var(--color-background);
+  color: var(--color-text);
+  text-decoration: none;
+  /* font-weight: bolder; */
+  width: max-content;
+  border: solid var(--thin-border) var(--color-text);
 
-    &:hover {
-        background: var(--color-text);
-        border: solid var(--thin-border) var(--color-background);
-        color: var(--color-background);
-    }
-    
+  &:hover {
+    background: var(--color-text);
+    border: solid var(--thin-border) var(--color-background);
+    color: var(--color-background);
+  }
 }
-
 
 /* TODO */
 /* source: https://tobiasahlin.com/blog/css-trick-animating-link-underlines/ */
 .hover-underline {
-    color: inherit;
-    text-decoration: none;
-    cursor: pointer;
-    position: relative;
-    transition: var(--transition-time);
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition-time);
 
-    &:active {
-        opacity: 0.6;
-    }
+  &:active {
+    opacity: 0.6;
+  }
 
-    &::before {
-        content: "";
-        position: absolute;
-        display: block;
-        width: 100%;
-        height: 2px;
-        bottom: 0;
-        left: 0;
-        background-color: var(--white);
-        transform: scaleX(0);
-        transition: transform 0.3s ease;
-    }
+  &::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--white);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
 
-    &:hover::before {
-        transform: scaleX(1);
-    }
-
+  &:hover::before {
+    transform: scaleX(1);
+  }
 }
 
 .active {
-    cursor: default;
+  cursor: default;
 
-    &::before {
-         transform: scaleX(1);
-    }
+  &::before {
+    transform: scaleX(1);
+  }
 }
 
 .full-height {
-    min-height: 70vh;
+  min-height: 70vh;
 }
 
 footer {
-    font-family: var(--font-animation-family);
+  font-family: var(--font-animation-family);
 }
 
 /* ---------- Styling ---------- */
 body {
-    margin: 0;
+  margin: 0;
 }
 
 /* ---------- Margins & Paddings ---------- */
@@ -337,126 +322,114 @@ h3,
 h4,
 h5,
 p {
-    margin: 0;
+  margin: 0;
 }
 
 figure {
-    margin: 0;
+  margin: 0;
 }
 
 @media (min-width: 0px) {
-    :root {
-        --nav-padding: var(--nav-padding-small);
-    }
+  :root {
+    --nav-padding: var(--nav-padding-small);
+  }
 }
 
 @media (min-width: 490px) {
-    :root {
-        --nav-padding: var(--nav-padding-medium);
-    }
+  :root {
+    --nav-padding: var(--nav-padding-medium);
+  }
 }
 
 @media (min-width: 891px) {
-    :root {
-        --nav-padding: var(--nav-padding-large);
-    }
+  :root {
+    --nav-padding: var(--nav-padding-large);
+  }
 }
-
-
-
-
-
 
 /* =====================================
 MARK: Visually hidden
 ===================================== */
 
 .visually-hidden {
-    position: absolute;
-    overflow: hidden;
+  position: absolute;
+  overflow: hidden;
 
-    width: 1px;
-    height: 1px;
+  width: 1px;
+  height: 1px;
 
-    clip: inset(50%);
-    white-space: nowrap;
+  clip: inset(50%);
+  white-space: nowrap;
 }
-
-
 
 /* =====================================
 MARK: Section components
 ===================================== */
 /* general section styling */
 .media-section {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 7.5rem;
-    padding: var(--section-padding);
-    margin: var(--section-margin);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7.5rem;
+  padding: var(--section-padding);
+  margin: var(--section-margin);
 
+  figure {
+    width: 100%;
+    margin: 0;
 
-    figure {
-        width: 100%;
-        margin: 0;
-
-        img {
-            width: 100%;
-        }
+    img {
+      width: 100%;
     }
+  }
 }
 
 @media (min-width: 1px) {
-    :root {
-        --section-padding: var(--section-padding-small);
-        --section-margin: var(--section-margin-small);
-    }
+  :root {
+    --section-padding: var(--section-padding-small);
+    --section-margin: var(--section-margin-small);
+  }
 }
 
 @media (min-width: 490px) {
-    :root {
-        --section-padding: var(--section-padding-medium);
-        --section-margin: var(--section-margin-medium);
-    }
+  :root {
+    --section-padding: var(--section-padding-medium);
+    --section-margin: var(--section-margin-medium);
+  }
 }
 
 @media (min-width: 891px) {
-    :root {
-        --section-padding: var(--section-padding-large);
-        --section-margin: var(--section-margin-large);
-    }
+  :root {
+    --section-padding: var(--section-padding-large);
+    --section-margin: var(--section-margin-large);
+  }
 }
 
 /* for images on the left */
-.media-right {}
-
-
-@media (min-width: 1240px) {
-    .media-section {
-        grid-template-columns: 1fr 1fr;
-
-        div {
-            grid-row: 1/2;
-        }
-
-    }
-
-    .media-left {
-        .section-text {
-            grid-column: 2/3;
-        }
-
-        .section-media {
-            grid-column: 1/2;
-        }
-    }
-
+.media-right {
 }
 
+@media (min-width: 1240px) {
+  .media-section {
+    grid-template-columns: 1fr 1fr;
 
-blockquote {}
+    div {
+      grid-row: 1/2;
+    }
+  }
 
+  .media-left {
+    .section-text {
+      grid-column: 2/3;
+    }
 
+    .section-media {
+      grid-column: 1/2;
+    }
+  }
+}
+
+blockquote {
+}
 
 /* =====================================
 MARK: Footer
@@ -464,77 +437,77 @@ MARK: Footer
 
 /* ---------- Rotating Banner ---------- */
 .banner-container {
-    width: 100%;
-    overflow: hidden;
-    background: #fff;
-    padding: clamp(10px, 2vw, 20px) 0;
-    display: flex;
+  width: 100%;
+  overflow: hidden;
+  background: #fff;
+  padding: clamp(5px, 2vw, 8px) 0;
+  display: flex;
 }
 
 .banner-content {
-    display: inline-flex;
-    animation: scroll-banner 15s linear infinite;
+  display: inline-flex;
+  animation: scroll-banner 15s linear infinite;
 }
 
 .banner-text {
-    font-size: clamp(1.5rem, 5vw, 3rem);
-    font-weight: 100;
-    text-transform: uppercase;
-    margin: 0 0.3em;
-    color: #000;
-    text-wrap: nowrap;
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-weight: 100;
+  text-transform: uppercase;
+  margin: 0 0.3em;
+  color: #000;
+  text-wrap: nowrap;
 }
 
 .banner-text:nth-child(5n) {
-    font-weight: 800;
+  font-weight: 800;
 }
 
 @keyframes scroll-banner {
-    0% {
-        transform: translateX(0);
-    }
+  0% {
+    transform: translateX(0);
+  }
 
-    100% {
-        transform: translateX(-50%);
-    }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* ---------- Navigation ---------- */
 .footer-nav {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    padding: 2rem calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 2rem
+    calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
 }
 
 .footer-nav a {
-    text-decoration: none;
-    text-transform: uppercase;
-    color: var(--color-text);
-    font-weight: 300;
-    font-size: clamp(0.7rem, 2vw, 1rem);
+  text-decoration: none;
+  text-transform: uppercase;
+  color: var(--color-text);
+  font-weight: 300;
+  font-size: clamp(0.7rem, 2vw, 1rem);
 
-    &:first-of-type {
-        margin-right: auto;
-    }
+  &:first-of-type {
+    margin-right: auto;
+  }
 
-    &:last-of-type {
-        margin-left: auto;
-    }
-
+  &:last-of-type {
+    margin-left: auto;
+  }
 }
-
 
 /* ---------- Copyright ---------- */
 .footer-copyright {
-    box-sizing: border-box;
-    padding: 1.5rem calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
-    text-align: center;
-    font-size: 0.6rem;
-    font-weight: 200;
-    text-transform: uppercase;
-    color: var(--color-text);
+  box-sizing: border-box;
+  padding: 1.5rem
+    calc(max(0px, (100% - 1100px) / 2) + clamp(1rem, 1rem + 3vw, 4rem));
+  text-align: center;
+  font-size: 0.6rem;
+  font-weight: 200;
+  text-transform: uppercase;
+  color: var(--color-text);
 }
 
 /* =====================================
@@ -542,6 +515,6 @@ MARK: Contact/About
 ===================================== */
 
 .big-link {
-    display: inline-block;
-    margin: 1.5rem 0;
+  display: inline-block;
+  margin: 1.5rem 0;
 }
