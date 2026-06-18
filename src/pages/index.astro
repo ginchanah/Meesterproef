@@ -1,15 +1,15 @@
 ---
 // import MainLayout
 import MainLayout from "../layout/MainLayout.astro"
-
-// MARK: data.js
+// import data from data.js
 import { data } from "../data/data.js";
 
+// define the items to use from data.js
 const items = data.glossaryItems;
 
 // get all the categories
 const allCategories = items.flatMap(item => item.categories);
-// remove duplicates
+// remove duplicates and turn in back into an array
 const categories = [...new Set(allCategories)];
 
 ---
@@ -17,17 +17,14 @@ const categories = [...new Set(allCategories)];
 <MainLayout>
 	<!-- dynamically add all links to the glossary-item pages -->
 	<ul class="term-categories">
-		 {categories?.map((category) =>
-			!category || category.trim() === ""
-			? null
-			: (
+		 {categories?.map((category) => !category || category.trim() === "" ? null : (
 				<li class={category}>
 					<label>
 					<input type="checkbox" />
 					{category}
 					</label>
 				</li>
-				)
+			)
 		)}
 	</ul>
 
@@ -46,10 +43,12 @@ const categories = [...new Set(allCategories)];
 
 	<script is:inline define:vars={{ categories }}>
 		// Dynamically generate one highlight selector per category
+		// first filter out empty categories
 		const validCategories = (categories ?? []).filter(
 			(category) => category && category.trim() !== ""
 		);
 
+		// if there are valid categories, return the highlighted style on selection
 		if (validCategories.length > 0) {
 			const style = document.createElement("style");
 			style.textContent =
