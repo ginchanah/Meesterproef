@@ -1,51 +1,54 @@
 <div class="invisible-container">
   <p class="invisible-title">INVISIBLE</p>
   <div class="mouse-tracker-container">
-    <p class="word invisible-background-text">invisible</p>
+    <p class="background-word"></p>
   </div>
 </div>
 
 <script>
+// =====================================
+// MARK: move letters
+// =====================================
 // @ts-nocheck
-// Fill the paragraph with enough repeated text to cover the whole container
-const backgroundText = document.querySelector(".invisible-background-text")
+
+// ---------- creating background ----------
+const backgroundText = document.querySelector(".background-word")
 if (backgroundText) {
+  // repeats the word invisible a whole lot
   backgroundText.textContent = "invisible".repeat(450)
 }
 
-const word = document.querySelector(".word")
+// selects the background text container to also use it to track the mouse position
 const container = document.querySelector(".mouse-tracker-container")
 
-if (word && container) {
-    // Prevents queuing more than one rAF at a time — keeps animation in sync with the cursor
-    let rafPending = false
+if (backgroundText && container) {
+    container.addEventListener("mousemove", (e) => {
+        const widthX = container.clientWidth
+        const heightY = container.clientHeight
+        // Get height and width of textcontainer
 
-    const mouseFollower = (e) => {
-        if (rafPending) return
-        rafPending = true
+        const centerX = widthX / 2
+        const centerY = heightY / 2
+        // Gets center of the axis
 
-        requestAnimationFrame(() => {
-            // Read layout inside rAF so it reflects the previous frame's settled state —
-            // avoids forced reflow and keeps the center accurate as spacing changes
-            const rect = container.getBoundingClientRect()
-            const centerX = rect.left + rect.width / 2
-            const centerY = rect.top + rect.height / 2
+        const rect = container.getBoundingClientRect()
+        const mouseX = e.clientX - rect.left
+        const mouseY = e.clientY - rect.top
+        // Tracks mousePosition
+        // Source: https://stackoverflow.com/questions/3234256/find-mouse-position-relative-to-element
 
-            // Normalize mouse distance from center to 0 (center) → 1 (edge) per axis
-            const percentageX = Math.abs(e.clientX - centerX) / (rect.width / 2)
-            const percentageY = Math.abs(e.clientY - centerY) / (rect.height / 2)
+        const ratioX = Math.abs(mouseX - centerX) / centerX
+        const ratioY = Math.abs(mouseY - centerY) / centerY
+        // Calcs the percentage of mouse from the center
+        console.log("mouseX" + ratioX)
+        console.log("mouseY" + ratioY) 
 
-            // 1 at center (max spread), 0 at edge (min spread); larger axis drives the effect
-            const biggest = 1 - Math.max(percentageX, percentageY)
-            const min_spacing = 0.02 // minimum letter/line gap when mouse is at the edge
-            const spacing = (2 * biggest) + min_spacing
-
-            word.style.letterSpacing = spacing + "em"             // horizontal expansion
-            word.style.lineHeight = (0.75 + 2 * spacing) + "em"  // vertical expansion (base 0.75 + top & bottom spacing)
-            rafPending = false
-        })
-    }
-
-    container.addEventListener("mousemove", mouseFollower)
+        const biggest = 1 - Math.max(ratioX, ratioY)
+        // Get's biggest of the two percentages
+        const spacing = (2 * biggest) + 0.02
+        backgroundText.style.letterSpacing = spacing + "em"
+        backgroundText.style.lineHeight = (0.75 + 2 * spacing) + "em"
+        // Changes letter spacing and lineheight based on mouseposition.
+    })
 }
 </script>

@@ -1,25 +1,37 @@
 .system {
     width: 100dvw;
     height: 90dvh;
+
+    /* positions all p elements in center */
     display: grid;
     place-items: center;
+
     position: relative;
 }
 
 .system p{
     position: absolute;
+
+    /* Sets width of p element, incrementing per element */
     width: calc(9rem * (1.25 + var(--index)));
+
     aspect-ratio: 1/1;
     border-radius: 50%;
 
     font-size: 3em;
     font-weight: bold;
+
+    /* Takes index of p and set's it to parent index to use with the spans */
     --parent-index: var(--index);
+
+    /* Inverses p layering */
     z-index: calc(var(--count) - var(--index));
     display: grid;
     place-items: center;
-    /* background-color: red; */
-      background-image: 
+
+
+    background-image: 
+    /* Creates black circles around every p-tag */
     radial-gradient(
       closest-side,
       #0000 calc(100% - .6em), 
@@ -35,25 +47,28 @@
             rotateZ(calc(var(--index) * 360deg / var(--count)))
             translateY(calc((var(--parent-index) + 1) * -4.5rem))
         ;
+        /* Layers letters on top of the circles */
         z-index: 1;
-        background-color: black;
+        background-color: var(--color-background);
     }
 }
 
+/* Plays the animation  */
 .system p:nth-child(2n) {
   animation: rotateSystem calc(var(--index) * 2s + 5s) calc(var(--index) * -0.5s) infinite;
 }
 
 .system p:nth-child(2n-1) {
-/*   rotate: z 30deg; */
   animation: rotateSystem calc(var(--index) * 2s + 5s) calc(var(--index) * -0.5s) infinite reverse;
 }
+
 
 .system p:hover,
 .system p:hover ~ p {
   animation-play-state: paused;
 }
 
+/* Rotates object with pauses in between */
 @keyframes rotateSystem {
   0%   { transform: rotate(0deg); }
   9%   { transform: rotate(60deg); }
