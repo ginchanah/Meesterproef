@@ -86,7 +86,7 @@ MARK: Category filter
     transition: var(--transition-time);
     font-weight: 300;
 
-    &:hover {
+    &:hover, &:focus-visible {
         opacity: var(--hover-opacity);
     }
 }
@@ -121,6 +121,8 @@ MARK: Category filter
     pointer-events: none;
 }
 
+
+
 @media (max-width: 800px) {
     :root {
         --term-list-font-size: 1.2rem;
@@ -128,3 +130,12 @@ MARK: Category filter
         --term-category-gap: 0.5rem;
     }
 }
+
+/* *************** */
+/* MARK: Keyboard focus
+/* ************** */
+.term-categories li:has(:focus-visible) {
+    outline: 3px solid var(--color-text, white);
+}
+
+

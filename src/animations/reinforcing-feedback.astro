@@ -4,33 +4,64 @@
 
 <div id="animation-wrapper">
     <div class="word" id="word">
-        <span>r</span>
-        <span>e</span>
-        <span>i</span>
-        <span>n</span>
-        <span>f</span>
-        <span>o</span>
-        <span>r</span>
-        <span>c</span>
-        <span>i</span>
-        <span>n</span>
-        <span>g</span>
-
-        <span class="space">&nbsp;</span>
-
-        <span>f</span>
-        <span>e</span>
-        <span>e</span>
-        <span>d</span>
-        <span>b</span>
-        <span>a</span>
-        <span>c</span>
-        <span>k</span>
+        <p class="span-split">reinforcing feedback</p>
     </div>
 </div>
 
 <script>
-    const letters = [...document.querySelectorAll(".word span:not(.space)")];
+    // ====================================
+    // MARK: TUNING VARIABLES
+    // ====================================
+
+    // Mouse interaction
+    const mouseStopDelay = 60;
+    const interactionRadius = 200;
+    const influencePower = 4;
+    const energyGain = 1.4;
+
+    // Neighbour spread
+    const neighbourSpread = 0.5;
+    const neighbourGain = 0.1;
+
+    // Weight
+    const baseWeight = 100;
+    const maxWeight = 900;
+    const weightMultiplier = 25;
+    const weightStep = 10;
+
+    // Scaling
+    const scaleStartEnergy = 20;
+    const scaleDivisor = 15;
+    const scaleCurve = 1.4;
+
+    const maxScaleX = 5;
+    const maxScaleY = 5;
+
+    // Vertical takeover
+    const stretchStartScale = 3;
+    const stretchRange = 0.5;
+    const stretchMultiplier = 25;
+    const stretchBaseScale = 4;
+
+    // Collapse
+    const collapseThreshold = 60;
+    const resetDelay = 600;
+
+    // Colors
+    const lightBackground = "var(--color-white)";
+    const lightText = "var(--color-black)";
+    const darkBackground = "var(--color-black)";
+    const darkText = "var(--color-white)";
+
+    // ====================================
+
+    const letters = [...document.querySelectorAll(".word span")];
+
+    const wrapper = document.getElementById("animation-wrapper");
+
+    // Start black background with white text
+
+    
 
     const state = letters.map(() => ({
         energy: 0,
@@ -45,8 +76,7 @@
 
     let resetting = false;
 
-    // starts white
-    let darkMode = false;
+    let darkMode = true;
 
     document.addEventListener("mousemove", (e) => {
         mouseX = e.clientX;
@@ -58,7 +88,7 @@
 
         moveTimeout = setTimeout(() => {
             isMoving = false;
-        }, 60);
+        }, mouseStopDelay);
     });
 
     function resetSystem() {
@@ -73,9 +103,9 @@
             s.hoverInfluence = 0;
         });
 
-        // --------------------
-        // MOUSE INFLUENCE
-        // --------------------
+        // ---------------------
+        // MARK: MOUSE INFLUENCE
+        // ---------------------
 
         letters.forEach((letter, i) => {
             const rect = letter.getBoundingClientRect();
@@ -88,37 +118,35 @@
 
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            const radius = 200;
+            if (dist < interactionRadius) {
+                const influence = Math.pow(1 - dist / interactionRadius, influencePower);
 
-            if (dist < radius) {
-                const influence = Math.pow(1 - dist / radius, 3);
-
-                state[i].energy += influence * 0.9;
+                state[i].energy += influence * energyGain;
 
                 state[i].hoverInfluence = influence;
             }
         });
 
-        // --------------------
-        // NEIGHBOUR SPREAD
-        // --------------------
+        // ----------------------
+        // MARK: NEIGHBOUR SPREAD
+        // ----------------------
 
         if (isMoving) {
             state.forEach((s, i) => {
-                const spread = s.hoverInfluence * 0.4;
+                const spread = s.hoverInfluence * neighbourSpread;
 
                 if (state[i - 1]) {
-                    state[i - 1].energy += spread * 0.05;
+                    state[i - 1].energy += spread * neighbourGain;
                 }
 
                 if (state[i + 1]) {
-                    state[i + 1].energy += spread * 0.05;
+                    state[i + 1].energy += spread * neighbourGain;
                 }
             });
         }
 
         // --------------------
-        // AVERAGE ENERGY
+        // MARK: AVERAGE ENERGY
         // --------------------
 
         let totalEnergy = 0;
@@ -130,11 +158,11 @@
         const averageEnergy = totalEnergy / state.length;
 
         // --------------------
-        // LETTERS
+        // MARK: LETTERS
         // --------------------
 
         state.forEach((s, i) => {
-            const weight = Math.min(900, 100 + s.energy * 25);
+            const weight = Math.min(maxWeight, baseWeight + s.energy * weightMultiplier);
 
             let scaleX = 1;
             let scaleY = 1;
@@ -144,59 +172,59 @@
             // Uniform growth
             // --------------------------------
 
-            if (s.energy > 30) {
-                const growth = 1 + Math.pow((s.energy - 30) / 35, 1.4);
+            if (s.energy > scaleStartEnergy) {
+                const growth = 1 + Math.pow((s.energy - scaleStartEnergy) / scaleDivisor, scaleCurve);
 
                 scaleX = growth;
                 scaleY = growth;
             }
 
-            scaleX = Math.min(scaleX, 4);
-            scaleY = Math.min(scaleY, 4);
+            scaleX = Math.min(scaleX, maxScaleX);
+            scaleY = Math.min(scaleY, maxScaleY);
 
             // --------------------------------
             // PHASE 2
             // Vertical takeover
             // --------------------------------
 
-            if (scaleY > 3.8) {
-                const stretchProgress = (scaleY - 3.8) / 0.2;
+            if (scaleY > stretchStartScale) {
+                const stretchProgress =
+                    (scaleY - stretchStartScale) / stretchRange;
 
-                scaleY = 4 + stretchProgress * 20;
+                scaleY = stretchBaseScale + stretchProgress * stretchMultiplier;
             }
 
-            letters[i].style.fontVariationSettings =
-                `"wght" ${Math.round(weight / 10) * 10}`;
+            letters[i].style.fontVariationSettings = `"wght" ${
+                Math.round(weight / weightStep) * weightStep
+            }`;
 
             letters[i].style.transform = `scale(${scaleX},${scaleY})`;
         });
 
         // --------------------
-        // COLLAPSE EVENT
+        // MARK: COLLAPSE EVENT
         // --------------------
 
-        if (averageEnergy > 110 && !resetting) {
+        if (averageEnergy > collapseThreshold && !resetting) {
             resetting = true;
 
-            // invert world
             darkMode = !darkMode;
 
             if (darkMode) {
-                document.body.style.background = "black";
+                wrapper.style.backgroundColor = darkBackground;
 
-                document.body.style.color = "white";
+                wrapper.style.color = darkText;
             } else {
-                document.body.style.background = "white";
+                wrapper.style.backgroundColor = lightBackground;
 
-                document.body.style.color = "black";
+                wrapper.style.color = lightText;
             }
 
-            // wait for inversion
             setTimeout(() => {
                 resetSystem();
 
                 resetting = false;
-            }, 1200);
+            }, resetDelay);
         }
 
         requestAnimationFrame(animate);

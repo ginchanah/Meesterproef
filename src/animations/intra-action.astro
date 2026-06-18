@@ -1,88 +1,17 @@
 ---
-
-  
-
+const sections = [1, 2, 3];
+const pPerSection = 22;
 ---
-
-<div class="animation-container" aria-label="the word intra-action is written out several times on the screen and moves up and down, the words overlapping eachother. The single word is almost not visible but once it overlaps with another the contrast is hightened, making the word readable just in short glimpses.">
-	<div class="set-sibling-index" id="intra-section-1" class="intra-section" aria-hidden="true">
-		<!-- inert als attribuut gebruiken ipv aria-hidden?? -->
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-	</div>
-
-	<div class="set-sibling-index" id="intra-section-2" class="intra-section" aria-hidden="true">
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-	</div>
-
-	<div class="set-sibling-index" id="intra-section-3" class="intra-section" aria-hidden="true">
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-		<p class="blend" draggable="true">intra-action</p>
-	</div>
-
+<!-- generate three sections with each 22 p's inside -->
+<div class="animation-container">
+	{sections.map((section) => (
+		<div class="set-sibling-index intra-section" id={`intra-section-${section}`}>
+			{Array.from({ length: pPerSection }).map(() => (
+				<p class="blend" draggable="true">intra-action</p>
+			))}
+		</div>
+	))}
 </div>
-
 
 
 <script>
@@ -90,89 +19,98 @@
 	// =====================================
 	// MARK: Section 1
 	// =====================================
-
+	// define section to do drag & drop in
 	const section = document.getElementById('intra-section-1');
+	// define the element that is being dragged
 	let draggedEl = null;
+	// define the offset where the element is being dropped
 	let offsetX = 0;
 	let offsetY = 0;
 
 
-	// Make .blend elements draggable
+	// Make a .blend elements draggable
 	document.querySelectorAll('.blend').forEach(el => {
+		// what happens when dragging is initiated
+		el.addEventListener('dragstart', e => {
+			// which element is being dragged
+			draggedEl = e.target;
 
-	el.addEventListener('dragstart', e => {
-		draggedEl = e.target;
+			// get the mouse coordinates
+			const rect = draggedEl.getBoundingClientRect();
+			
+			// distance from the element's top‑left corner to the mouse pointer, in viewport coordinates
+			offsetX = e.clientX - rect.left;
+			offsetY = e.clientY - rect.top;
 
-		const rect = draggedEl.getBoundingClientRect();
-		offsetX = e.clientX - rect.left;
-		offsetY = e.clientY - rect.top;
-
-		// For some browsers, required to start drag
-		e.dataTransfer.setData('text/plain', '');
-		draggedEl.classList.add('dragging');
-	});
-
-	// remove dragging class when ending the drag
-	el.addEventListener('dragend', () => {
-			if (draggedEl) {
-				draggedEl.classList.remove('dragging');
-				draggedEl = null;
-			}
+			// For some browsers, required to start drag
+			e.dataTransfer.setData('text/plain', '');
+			// add dragging class for styling
+			draggedEl.classList.add('dragging');
 		});
-	});
+
+		// remove dragging class when ending the drag
+		el.addEventListener('dragend', () => {
+				if (draggedEl) {
+					draggedEl.classList.remove('dragging');
+					draggedEl = null;
+				}
+			});
+		});
 
 
-	// Make drop possible inside the section
-	section.addEventListener('dragover', e => {
-		e.preventDefault();
-	});
+		// Make drop possible inside the section
+		section.addEventListener('dragover', e => {
+			e.preventDefault();
+		});
 
-	
+		
 
-	// Define the what happens on drop, making sure it's dropped inside the container
-	section.addEventListener('drop', e => {
-		e.preventDefault();
-		if (!draggedEl) return;
+		// Define the what happens on drop, making sure it's dropped inside the container
+		section.addEventListener('drop', e => {
+			e.preventDefault();
+			if (!draggedEl) return;
 
-		// get size of the section
-		const sectionRect = section.getBoundingClientRect();
+			// get size of the section
+			const sectionRect = section.getBoundingClientRect();
 
-		// size of element to be dropped
-		const elWidth = draggedEl.offsetWidth;
-		const elHeight = draggedEl.offsetHeight;
+			// size of element to be dropped, offsetWidth gets the size including padding and margin
+			const elWidth = draggedEl.offsetWidth;
+			const elHeight = draggedEl.offsetHeight;
 
-		// Position of the element relative to the section
-		let x = e.clientX - sectionRect.left - offsetX;
-		let y = e.clientY - sectionRect.top - offsetY;
+			// Position of the element relative to the section
+			// mouse position - left edge of the section - distance from the element’s left edge to the mouse when you started dragging
+			let x = e.clientX - sectionRect.left - offsetX;
+			let y = e.clientY - sectionRect.top - offsetY;
 
-		// Make sure the element dropped inside the box by calculating it's own dimenstions when dropping
-		const maxX = sectionRect.width - elWidth;
-		const maxY = sectionRect.height - elHeight;
-		x = Math.max(0, Math.min(x, maxX));
-		y = Math.max(0, Math.min(y, maxY));
+			// make sure the element doesn't escape the section
+			const maxX = sectionRect.width - elWidth;
+			const maxY = sectionRect.height - elHeight;
+			// max -> use the largest number of any of the two, so anything below 0 is always 0
+			// min -> use the smallest number -> if x is bigger than maxX use maxX instead
+			x = Math.max(0, Math.min(x, maxX));
+			y = Math.max(0, Math.min(y, maxY));
 
-		draggedEl.style.position = 'absolute';
-		draggedEl.style.left = x + 'px';
-		draggedEl.style.top = y + 'px';
+			draggedEl.style.position = 'absolute';
+			draggedEl.style.left = x + 'px';
+			draggedEl.style.top = y + 'px';
 
 
-		draggedEl.classList.remove('dragging');
-		draggedEl.classList.add('dragged');
-		draggedEl = null;
-	});
+			draggedEl.classList.remove('dragging');
+			draggedEl.classList.add('dragged');
+
+			draggedEl = null;
+		});
 
 
 	// =====================================
 	// MARK: Section 2
 	// =====================================
-
 	const section2 = document.getElementById('intra-section-2');
 	let draggedEl2 = null;
 	let offsetX2 = 0;
 	let offsetY2 = 0;
 
 
-	// Make .blend elements draggable
 	document.querySelectorAll('.blend').forEach(el => {
 		el.addEventListener('dragstart', e => {
 			draggedEl2 = e.target;
@@ -181,14 +119,12 @@
 			offsetX2 = e.clientX - rect.left;
 			offsetY2 = e.clientY - rect.top;
 
-			// For some browsers, required to start drag
 			e.dataTransfer.setData('text/plain', '');
 
 			draggedEl2.classList.add('dragging');
 		});
 
 
-		// remove dragging class when ending the drag
 		el.addEventListener('dragend', () => {
 			if (draggedEl2) {
 				draggedEl2.classList.remove('dragging');
@@ -199,29 +135,24 @@
 	});
 
 
-	// Make drop possible inside the section
 	section2.addEventListener('dragover', e => {
 		e.preventDefault();
 	});
 
 
-	// Define the what happens on drop, making sure it's dropped inside the container
 	section2.addEventListener('drop', e => {
 		e.preventDefault();
 		if (!draggedEl2) return;
 
-		// get size of the section
 		const sectionRect = section2.getBoundingClientRect();
-		// size of element to be dropped
+	
 		const elWidth = draggedEl2.offsetWidth;
 		const elHeight = draggedEl2.offsetHeight;
 
-		// Position of the element relative to the section
 		let x = e.clientX - sectionRect.left - offsetX2;
 		let y = e.clientY - sectionRect.top - offsetY2;
 
 
-		// Make sure the element dropped inside the box by calculating it's own dimenstions when dropping
 		const maxX = sectionRect.width - elWidth;
 		const maxY = sectionRect.height - elHeight;
 		x = Math.max(0, Math.min(x, maxX));
@@ -246,7 +177,6 @@
 	let offsetX3 = 0;
 	let offsetY3 = 0;
 
-	// Make .blend elements draggable
 	document.querySelectorAll('.blend').forEach(el => {
 		el.addEventListener('dragstart', e => {
 			draggedEl3 = e.target;
@@ -255,14 +185,12 @@
 			offsetX3 = e.clientX - rect.left;
 			offsetY3 = e.clientY - rect.top;
 
-			// For some browsers, required to start drag
 			e.dataTransfer.setData('text/plain', '');
 
 			draggedEl3.classList.add('dragging');
 
 		});
 
-		// remove dragging class when ending the drag
 		el.addEventListener('dragend', () => {
 		if (draggedEl3) {
 				draggedEl3.classList.remove('dragging');
@@ -273,28 +201,22 @@
 	});
 
 
-	// Make drop possible inside the section
 	section3.addEventListener('dragover', e => {
 		e.preventDefault();
 	});
 
-	// Define the what happens on drop, making sure it's dropped inside the container
 	section3.addEventListener('drop', e => {
 		e.preventDefault();
 		if (!draggedEl3) return;
 
-		// get size of the section
 		const sectionRect = section3.getBoundingClientRect();
 
-		// size of element to be dropped
 		const elWidth = draggedEl3.offsetWidth;
 		const elHeight = draggedEl3.offsetHeight;
 
-		// Position of the element relative to the section
 		let x = e.clientX - sectionRect.left - offsetX3;
 		let y = e.clientY - sectionRect.top - offsetY3;
 
-		// Make sure the element dropped inside the box by calculating it's own dimenstions when dropping
 		const maxX = sectionRect.width - elWidth;
 		const maxY = sectionRect.height - elHeight;
 		x = Math.max(0, Math.min(x, maxX));
@@ -307,7 +229,6 @@
 		draggedEl3.classList.remove('dragging');
 		draggedEl3.classList.add('dragged');
 		draggedEl3 = null;
-
 	});
 </script>
 

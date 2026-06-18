@@ -1,5 +1,6 @@
 ---
 // link to the header:
+// @ts-nocheck
 // src/components/Header.astro
 
 // define props to receive from other components
@@ -56,8 +57,10 @@ const pathname = Astro.url.pathname;
                 {AnimationComponent ? (
                     <div class="animation-section">
                         <p class="visually-hidden">Inside this section, there is an interactive typographic animation of the word {title}.</p>
+                        {/* the entire section is hidden for screenreaders for now, since we haven't found an accessible way to display our animations */}
                         <div class="hidden-section" aria-hidden="true">
                             <button class="animation-button"><span></span></button>
+                            {/* the animation is added here */}
                             <AnimationComponent />
                         </div>
                     </div>

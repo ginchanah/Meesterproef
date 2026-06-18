@@ -2,13 +2,18 @@
 // MARK: Span Split
 // =====================================
 
-// add class .span-split on a container with text to put all letters inside in a separate span
+// looks for an element with the class .span-split
 const spanSplitContainer = document.querySelectorAll(".span-split");
 
+// goes over each element and performs the function
 spanSplitContainer?.forEach((element) => {
+
     element.innerHTML = element.textContent
+        // splits text into separate elements
         .split("")
+        // loop over every element in split and put it in a span
         .map((char) => `<span>${char === " " ? "&nbsp;" : char}</span>`)
+        // join every element together again
         .join("");
 });
 
@@ -16,15 +21,21 @@ spanSplitContainer?.forEach((element) => {
 // MARK: Sibling Index
 // =====================================
 
-// add class .set-sibling-index to add sibling index to all items in a container
+// looks for an element with the class .set-sibling-index
 const siblingIndexContainer = document.querySelectorAll(".set-sibling-index");
 
+// For each element it finds it does the following script
 siblingIndexContainer?.forEach(container => {
+// :scope refers to parent element, so all the direct children elements
     const directChildren = container.querySelectorAll(":scope > *");
+    // for each of the directChildren does the following script
     directChildren.forEach(item => {
+        // Provides the index of the children elements
         let selfIndex = Array.from(directChildren).indexOf(item);
+        // Sets the index as an propery on the item
         item.style.setProperty("--index", selfIndex);
     });
+    // Sets the length of the directChildren array as a property on the container
     container.style.setProperty("--count", directChildren.length);
 });
 

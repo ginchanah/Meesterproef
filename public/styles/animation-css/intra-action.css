@@ -19,7 +19,7 @@ MARK: specific animation styling
 }
 
 #intra-section-1, #intra-section-2, #intra-section-3 {
-    --animation-height: 160vh;
+    --animation-height: 140vh;
 
 
     display: grid;
@@ -55,7 +55,7 @@ MARK: specific animation styling
         @media (max-width: 1193px) {
             font-size: 9vw;
         }
-         @media (max-width: 670px) {
+        @media (max-width: 670px) {
             font-size: 17vw;
         }
 
