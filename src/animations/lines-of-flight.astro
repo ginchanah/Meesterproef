@@ -2,10 +2,14 @@
 
 ---
 
-<!-- ===================================== --><!-- MARK: Lines of Flight                 --><!-- ===================================== -->
+<!-- ===================================== -->
+<!-- MARK: Lines of Flight                 -->
+<!-- ===================================== -->
+<!-- This animation shows 7 rows of scrolling "LINES OF FLIGHT" text on a 3D-tilted plane.
+    Moving the mouse tilts the plane and speeds up nearby rows. Clicking a row reverses its direction. -->
 <div class="main-frame">
     <div class="text-plane set-sibling-index">
-        <!-- ---------- Rows ---------- -->
+        <!-- 7 rows of scrolling text, each scrolls at a different speed -->
         <div class="row">
             <div class="scrolling-text"></div>
         </div>
@@ -32,48 +36,69 @@
 
 <script>
     // @ts-nocheck
+    
     // =====================================
-    // MARK: Variables
+    // MARK: Lines of Flight Animation
+    //
+    // How this animation works:
+    // 7 rows of text all say "LINES OF FLIGHT" and scroll horizontally.
+    // Each row scrolls at its own speed. The whole text block is tilted
+    // in 3D perspective, and moving the mouse changes the tilt angle.
+    // Rows near the mouse speed up. Clicking a row flips its direction.
+    // The text loops seamlessly by using two copies placed side by side.
     // =====================================
 
-    // ---------- DOM Elements ----------
+    // ---------- Setup ----------
+
+    // The text that will be repeated across each row
     const repeatedText = " LINES OF FLIGHT ".repeat(10);
+
+    // Select all 7 scrolling text elements and their parent row containers
     const rows = document.querySelectorAll(".scrolling-text");
     const rowContainers = document.querySelectorAll(".row");
+
+    // The 3D-tilted plane that holds all the rows
     const textPlane = document.querySelector(".text-plane");
 
     // ---------- State ----------
-    // We store position, speed, and direction for each row
-    const positions = [];
-    const speeds = [1.2, 0.9, 1.4, 0.8, 1.5, 1.0, 1.3];
-    const directions = []; // -1 = scrolling left, 1 = scrolling right
 
-    // Where the mouse is on screen (0 to 1)
+    // Each row has its own horizontal position (how far it has scrolled)
+    const positions = [];
+
+    // Each row scrolls at a different base speed (pixels per frame)
+    const speeds = [1.2, 0.9, 1.4, 0.8, 1.5, 1.0, 1.3];
+
+    // Each row has a direction: -1 means scrolling left, 1 means scrolling right
+    const directions = [];
+
+    // Track the mouse position as a value between 0 and 1
+    // (0 = left/top edge of the screen, 1 = right/bottom edge)
     let mouseX = 0.5;
     let mouseY = 0.5;
     let mouseOnScreen = false;
 
-    // Current and target rotation for the 3D perspective
-    let rotationY = 30;
-    let rotationX = 0;
+    // The current 3D rotation angles of the text plane (in degrees)
+    let rotationY = 30; // horizontal tilt (left/right)
+    let rotationX = 0; // vertical tilt (up/down)
 
     // =====================================
     // MARK: Initialization
     // =====================================
 
-    // ---------- Event Listeners ----------
-    // Track the mouse position
+    // When the user moves the mouse, save its position
+    // and mark that the mouse is on screen
     window.addEventListener("mousemove", (e) => {
         mouseX = e.clientX / window.innerWidth;
         mouseY = e.clientY / window.innerHeight;
         mouseOnScreen = true;
     });
 
+    // When the mouse leaves the browser window, stop tracking it
     window.addEventListener("mouseleave", () => {
         mouseOnScreen = false;
     });
 
-    // Track touch position (same idea as mouse)
+    // Same behavior for touch screens (phones and tablets)
     window.addEventListener(
         "touchmove",
         (e) => {
@@ -86,11 +111,13 @@
         { passive: true },
     );
 
+    // When the finger is lifted, stop tracking
     window.addEventListener("touchend", () => {
         mouseOnScreen = false;
     });
 
-    // Clicking a row flips its scroll direction
+    // When a row is clicked, reverse its scroll direction
+    // (if it was going left, it now goes right, and vice versa)
     rowContainers.forEach((row, i) => {
         row.addEventListener("click", () => {
             directions[i] *= -1;
@@ -101,71 +128,99 @@
     // MARK: Functions
     // =====================================
 
-    // ---------- Population ----------
-    // Fill each row with two copies of the text so we can loop seamlessly
+    // Fill each row with two identical copies of the text placed side by side.
+    // This creates the illusion of infinite scrolling: when one copy scrolls
+    // off-screen, the other copy is already in view, and the position resets.
     const fillRows = () => {
         rows.forEach((row, i) => {
+            // Place two copies of the text next to each other
             row.innerHTML = `<span>${repeatedText}</span><span>${repeatedText}</span>`;
-            positions.push(-i * 100); // stagger starting positions
-            directions.push(-1); // all start scrolling left
+
+            // Give each row a slightly different starting position so they don't all align
+            positions.push(-i * 100);
+
+            // All rows start scrolling to the left
+            directions.push(-1);
         });
     };
 
-    // ---------- Animation Loop ----------
-    // This runs ~60 times per second and moves everything
+    // =====================================
+    // MARK: Main Animation Loop
+    // This function runs once per frame.
+    // It updates the 3D tilt and moves every row of text.
+    // =====================================
     const animate = () => {
-        // 1. Update the 3D perspective to follow the mouse
+        // --- Part 1: Update the 3D tilt of the text plane ---
+
+        // Default tilt when the mouse is not on screen
         let targetY = 30;
         let targetX = 0;
 
         if (mouseOnScreen) {
-            targetY = 20 + mouseX * 25; // rotate between 20° and 45°
-            targetX = (mouseY - 0.5) * -8; // tilt between -4° and 4°
+            // Moving the mouse left-to-right rotates the plane between 20° and 45°
+            targetY = 20 + mouseX * 25;
+            // Moving the mouse up-to-down tilts the plane between -4° and 4°
+            targetX = (mouseY - 0.5) * -8;
         }
 
-        // Smoothly move towards the target (lerp)
+        // Smoothly move the current rotation toward the target
+        // (only move 4% of the remaining distance each frame, so it feels smooth)
         rotationY += (targetY - rotationY) * 0.04;
         rotationX += (targetX - rotationX) * 0.04;
 
+        // Apply the 3D rotation to the text plane
         if (textPlane) {
             textPlane.style.transform = `rotateY(${rotationY}deg) rotateX(${rotationX}deg)`;
         }
 
-        // 2. Move each row of text
+        // --- Part 2: Move each row of scrolling text ---
         rows.forEach((row, i) => {
-            // Figure out how fast this row should go right now
+            // Start with this row's base speed
             let speed = speeds[i];
 
-            // If the mouse is on screen, speed up rows that are close to the cursor
+            // If the mouse is on screen, speed up rows that are close to the cursor.
+            // The closer the mouse is to a row, the faster that row scrolls.
             if (mouseOnScreen) {
+                // Find the vertical center of this row on screen
                 const rect = rowContainers[i].getBoundingClientRect();
                 const rowMiddle = (rect.top + rect.bottom) / 2;
+
+                // Find the mouse's vertical position in pixels
                 const mousePixelY = mouseY * window.innerHeight;
+
+                // Calculate the distance between the mouse and this row
                 const distance = Math.abs(mousePixelY - rowMiddle);
+
+                // Convert distance to a "closeness" value (1 = right on it, 0 = far away)
                 const closeness = Math.max(
                     0,
                     1 - distance / (window.innerHeight / 2),
                 );
 
-                speed += closeness * 3; // up to 3x faster when the mouse is right on it
+                // Add up to 3x extra speed based on how close the mouse is
+                speed += closeness * 3;
             }
 
-            // Move the row in its current direction
+            // Move the row by its speed in its current direction
             positions[i] += speed * directions[i];
 
-            // Loop seamlessly: when text scrolls too far, jump back
+            // Seamless looping: the text is two copies side by side.
+            // When the first copy scrolls completely off-screen, jump back
+            // so the second copy takes its place (the user doesn't see the jump).
             const halfWidth = row.scrollWidth / 2;
             if (positions[i] <= -halfWidth) positions[i] += halfWidth;
             if (positions[i] >= 0) positions[i] -= halfWidth;
 
-            // Apply the new position
+            // Apply the new horizontal position to this row
             row.style.transform = `translateX(${positions[i]}px)`;
         });
 
+        // Run this function again on the next frame to keep the animation going
         requestAnimationFrame(animate);
     };
 
     // ---------- Start ----------
+    // Fill the rows with text, then begin the animation loop
     fillRows();
     requestAnimationFrame(animate);
 </script>
