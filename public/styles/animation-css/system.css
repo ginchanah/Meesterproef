@@ -64,7 +64,9 @@
 
 
 .system p:hover,
-.system p:hover ~ p {
+.system p:hover ~ p,
+.system p:focus-visible,
+.system p:focus-visible ~ p {
   animation-play-state: paused;
 }
 

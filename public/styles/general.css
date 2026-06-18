@@ -267,7 +267,7 @@ body {
     width: max-content;
     border: solid var(--thin-border) var(--color-text);
 
-    &:hover {
+    &:hover, &:focus-visible {
         background: var(--color-text);
         border: solid var(--thin-border) var(--color-background);
         color: var(--color-background);
@@ -302,7 +302,7 @@ body {
         transition: transform 0.3s ease;
     }
 
-    &:hover::before {
+    &:hover::before, &:focus-visible::before {
         transform: scaleX(1);
     }
 
@@ -544,4 +544,17 @@ MARK: Contact/About
 .big-link {
     display: inline-block;
     margin: 1.5rem 0;
+}
+
+
+/* *************** */
+/* MARK: Keyboard focus
+/* ************** */
+
+a:focus-visible {
+    outline: none;
+}
+
+button:focus-visible {
+    outline: 3px solid var(--white);
 }
