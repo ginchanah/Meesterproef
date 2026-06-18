@@ -1,28 +1,7 @@
-.invisible-container{
+.invisible-container {
     width: 100dvw;
-    height: 100dvh;
+    height: 90dvh;
     position: relative;
-
-    .invisible-title {
-        font-family: Inter;
-        font-weight: bold;
-        text-transform: uppercase;
-        position: absolute;
-        display: block;
-        left: 50%;
-        top: 50%;
-        translate: -50% -50%;
-        color: var(--color-background);
-        font-size: clamp(1rem, 20vw, 12em);
-        text-wrap: nowrap;
-        display: block;
-        place-items: center;
-        pointer-events: none;
-    }
-
-    span {
-        margin: 1em;
-    }
 
     div {
         width: 101%;
@@ -31,28 +10,52 @@
         place-items: center;
         overflow: hidden;
     }
-    p{
+
+    p {
         font-family: 'Courier Prime', monospace;
-        font-size: 1.75em;
+        pointer-events: none;
         font-size: clamp(0.75em, 4vw, 1.75em);
         line-height: 0.75;
-        /* overflow: hidden; */
+
         text-wrap: wrap;
-        margin: 0;
         word-break: break-all;
-        width: 100%;
         text-align: center;
+        /* breaks words at every letters */
+
+        width: 100%;
+        margin: 0;
     }
 
-}
+    span {
+        margin: 1em;
+    }
+
+    .invisible-title {
+        font-family: Inter;
+        font-weight: bold;
+        font-size: clamp(1rem, 20vw, 12em);
+        text-transform: uppercase;
+        text-wrap: nowrap;
+        color: var(--color-background);
+
+        position: absolute;
+        display: block;
+        place-items: center;
+        left: 50%;
+        top: 50%;
+        translate: -50% -50%;
+        /* displays title center */
+        
+        
+        pointer-events: none;
+    }
 
     @media (max-width: 800px) {
-        .invisible-container{
-            .invisible-title{
-                /* transform: rotateZ(-90deg); */
-                font-size: 9em;
-                writing-mode: vertical-rl;
-                width: fit-content;
-            }
+        .invisible-title {
+            font-size: 9em;
+            writing-mode: vertical-rl;
+            width: fit-content;
+            /* changes font size and direction */
         }
     }
+}
