@@ -24,9 +24,13 @@ const { item } = Astro.props;
                     {/* MARK: header                          */}
                     {/* ===================================== */}
                     {/* Full-width heading block for sections with a heading */}
-                    {section.heading && (
+                    {section.heading ? (
                         <div class={`block block-header ${section.type === "media-left" ? "block-header-right" : ""}`}>
                             <h2>{section.heading}</h2>
+                        </div>
+                    ): (
+                        <div class="visually-hidden">
+                            <h2>{item.title}</h2>
                         </div>
                     )}
 
