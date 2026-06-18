@@ -103,7 +103,6 @@ MARK: Section components
     font-size: 0.75rem;
     line-height: 1.5;
     font-family: var(--font-body-text-family);
-    opacity: 0.65;
 }
 .block-text-small cite, .block-cite { font-style: normal; display: block; }
 .block-text-small a, .block-cite a { word-break: break-all; }
