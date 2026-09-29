@@ -545,14 +545,13 @@
     </section>
 </div>
 
-    <script>
-    // =====================================
-    // MARK: Script liminal-space
-    // =====================================
-    // @ts-nocheck
+<script>
+// =====================================
+// MARK: Script liminal-space
+// =====================================
+// @ts-nocheck
 
-
-    const root = document.documentElement;
+const root = document.documentElement;
 
 let mouseFollower = (e) => {
     let middleScreenX = window.innerWidth / 2
@@ -562,17 +561,14 @@ let mouseFollower = (e) => {
     let offsetX = e.clientX - middleScreenX;
     let offsetY = middleScreenY - e.clientY;
 
-
     const percentX = (offsetX / middleScreenX)
     const percentY = (offsetY / middleScreenY)
-// Bron: https://www.tutorialspoint.com/article/how-to-write-a-javascript-function-to-get-the-difference-between-two-numbers
+    // Bron: https://www.tutorialspoint.com/article/how-to-write-a-javascript-function-to-get-the-difference-between-two-numbers
     root.style.setProperty("--mouse-x", percentX);
-  root.style.setProperty("--mouse-y", percentY);
+    root.style.setProperty("--mouse-y", percentY);
 }
-
-
 
 document.addEventListener("mousemove", (e) => {
     mouseFollower(e)
 })
-    </script>
+</script>
