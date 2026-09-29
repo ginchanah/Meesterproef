@@ -1,0 +1,186 @@
+---
+
+---
+
+<div class="intraface-wrapper">
+    <div class="scene">
+        <div class="cube">
+            <!-- 6 Vlakken -->
+            <div class="face front">
+                <div class="ascii-container">
+                    <div class="ascii-layer base"></div><div
+                        class="ascii-layer glitch-1"
+                    >
+                    </div><div class="ascii-layer glitch-2 invert"></div>
+                </div>
+            </div>
+            <div class="face back">
+                <div class="ascii-container">
+                    <div class="ascii-layer base"></div><div
+                        class="ascii-layer glitch-1"
+                    >
+                    </div><div class="ascii-layer glitch-2 invert"></div>
+                </div>
+            </div>
+            <div class="face left">
+                <div class="ascii-container">
+                    <div class="ascii-layer base"></div><div
+                        class="ascii-layer glitch-1"
+                    >
+                    </div><div class="ascii-layer glitch-2 invert"></div>
+                </div>
+            </div>
+            <div class="face right">
+                <div class="ascii-container">
+                    <div class="ascii-layer base"></div><div
+                        class="ascii-layer glitch-1"
+                    >
+                    </div><div class="ascii-layer glitch-2 invert"></div>
+                </div>
+            </div>
+            <div class="face top">
+                <div class="ascii-container">
+                    <div class="ascii-layer base"></div><div
+                        class="ascii-layer glitch-1"
+                    >
+                    </div><div class="ascii-layer glitch-2 invert"></div>
+                </div>
+            </div>
+            <div class="face bottom">
+                <div class="ascii-container">
+                    <div class="ascii-layer base"></div><div
+                        class="ascii-layer glitch-1"
+                    >
+                    </div><div class="ascii-layer glitch-2 invert"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // @ts-nocheck
+
+    // =====================================
+    // MARK: Intraface Animation
+    // =====================================
+
+    // Vind de wrapper
+    const wrapper = document.querySelector(".intraface-wrapper");
+
+    // Theme wissel functionaliteit (automatisch + klik)
+    let themeInterval;
+
+    function toggleTheme() {
+        wrapper.classList.toggle("inverted");
+    }
+
+    function startThemeInterval() {
+        themeInterval = setInterval(toggleTheme, 4000);
+    }
+
+    // Start de timer de eerste keer
+    startThemeInterval();
+
+    // Invert als de gebruiker op de wrapper klikt
+    wrapper.addEventListener("click", () => {
+        toggleTheme();
+        // Reset de timer zodat hij niet direct na de klik weer omdraait
+        clearInterval(themeInterval);
+        startThemeInterval();
+    });
+
+    // Karakter sets voor de dynamic generator
+    const symbolsFull = "@%#*+=-::";
+    const symbolsHeavy = "@%#*";
+    const symbolsLight = "+=-::";
+    const numbersFull = "0123456789";
+    const numbersBinary = "01";
+
+    function generateRandomString(chars, length) {
+        let result = "";
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    function generateFragment(type) {
+        if (Math.random() < 0.15) return "        ";
+
+        let len = Math.floor(Math.random() * 6) + 3;
+
+        switch (type) {
+            case "front":
+                return generateRandomString(symbolsFull, len);
+            case "back":
+                return generateRandomString(numbersBinary, len + 4);
+            case "left":
+                return generateRandomString(numbersFull, len);
+            case "right":
+                return generateRandomString(symbolsFull + numbersFull, len);
+            case "top":
+                return generateRandomString(symbolsHeavy, len);
+            case "bottom":
+                return generateRandomString(symbolsLight, len);
+            default:
+                return generateRandomString(symbolsFull, len);
+        }
+    }
+
+    function generateTypingGlitchLayer(wordsArray) {
+        return wordsArray
+            .map((w) => {
+                if (w === "        ") return w;
+                if (w.length > 3 && Math.random() < 0.4) {
+                    let keepLen =
+                        Math.floor(Math.random() * (w.length - 1)) + 1;
+                    let chopped = w.substring(0, keepLen);
+                    return chopped + (Math.random() > 0.5 ? "_" : "");
+                }
+                return w;
+            })
+            .join("  ");
+    }
+
+    // Zoek alleen faces binnen de wrapper (niet de hele pagina)
+    const faceElements = wrapper.querySelectorAll(".face");
+    const faceData = [];
+
+    faceElements.forEach((face) => {
+        const type = face.classList[1];
+
+        let words = [];
+        for (let i = 0; i < 100; i++) {
+            words.push(generateFragment(type));
+        }
+
+        faceData.push({
+            type: type,
+            words: words,
+            baseLayer: face.querySelector(".base"),
+            glitch1Layer: face.querySelector(".glitch-1"),
+            glitch2Layer: face.querySelector(".glitch-2"),
+        });
+    });
+
+    setInterval(() => {
+        faceData.forEach((data) => {
+            // Verschuif en voeg nieuw woord toe (voor de basis laag)
+            data.words.shift();
+            data.words.push(generateFragment(data.type));
+
+            // Basis en Glitch-1 (niet-inverted) tonen de normale matrix-achtige code
+            data.baseLayer.textContent = data.words.join("  ");
+            data.glitch1Layer.textContent = generateTypingGlitchLayer(
+                data.words,
+            );
+
+            // Glitch-2 (de inverterende witte vlakken) toont uitsluitend 'intraface'
+            const intrafaceArray = new Array(data.words.length).fill(
+                "intraface",
+            );
+            data.glitch2Layer.textContent = intrafaceArray.join("  ");
+        });
+    }, 150);
+</script>

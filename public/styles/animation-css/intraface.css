@@ -1,0 +1,146 @@
+/* =====================================
+MARK: Intraface Animation
+Scoped to .intraface-wrapper so it doesn't
+affect the rest of the page layout.
+===================================== */
+
+/* --- Ensure parent fills the animation-section height --- */
+.animation-section .hidden-section {
+    height: 100%;
+}
+
+/* --- WRAPPER (replaces old body styles) --- */
+.intraface-wrapper {
+    background-color: #050505;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
+    transition: background-color 0.5s;
+    cursor: pointer;
+}
+
+/* Automatische achtergrondwissel op basis van de .inverted class op de wrapper */
+.intraface-wrapper.inverted {
+    background-color: #fafafa;
+}
+
+/* --- 3D KUBUS --- */
+.intraface-wrapper .scene {
+    width: 300px;
+    height: 300px;
+    perspective: 100px;
+}
+
+.intraface-wrapper .cube {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: spinCube 45s infinite linear; 
+}
+
+.intraface-wrapper .face {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background-color: #000;
+    border: 1px solid #111;
+    transition: background-color 0.3s;
+}
+
+.intraface-wrapper .front  { transform: rotateY(  0deg) translateZ(150px); }
+.intraface-wrapper .back   { transform: rotateY(180deg) translateZ(150px); }
+.intraface-wrapper .left   { transform: rotateY(-90deg) translateZ(150px); }
+.intraface-wrapper .right  { transform: rotateY( 90deg) translateZ(150px); }
+.intraface-wrapper .top    { transform: rotateX( 90deg) translateZ(150px); }
+.intraface-wrapper .bottom { transform: rotateX(-90deg) translateZ(150px); }
+
+@keyframes spinCube {
+    0%   { transform: rotateX(0deg) rotateY(0deg); }
+    100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+/* --- ASCII GLITCH EFFECT --- */
+.intraface-wrapper .ascii-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 15px;
+    line-height: 15px; 
+    letter-spacing: -1px; 
+    white-space: pre-wrap; 
+    word-break: break-all; 
+    font-weight: bold;
+    overflow: hidden; 
+    transform: scaleX(-1); /* Spiegel de tekst */
+}
+
+.intraface-wrapper .ascii-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: background-color 0.1s, color 0.1s;
+}
+
+/* Standaard kleuren */
+.intraface-wrapper .base {
+    z-index: 1;
+    color: #fff;
+    background-color: #000;
+}
+.intraface-wrapper .glitch-1 {
+    z-index: 2;
+    background-color: #000; 
+    color: #fff;
+    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+}
+.intraface-wrapper .glitch-2.invert {
+    z-index: 3;
+    background-color: #fff;
+    color: #000;
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+}
+
+/* --- OMGEKEERDE KLEUREN (op de wrapper, niet op body) --- */
+.intraface-wrapper.inverted .face {
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+.intraface-wrapper.inverted .base {
+    color: #000;
+    background-color: #fff;
+}
+.intraface-wrapper.inverted .glitch-1 {
+    background-color: #fff;
+    color: #000;
+}
+.intraface-wrapper.inverted .glitch-2.invert {
+    background-color: #000;
+    color: #fff;
+}
+
+/* Glitch animaties (dit creëert de bewegende vlakjes via clip-path) */
+@keyframes glitch-anim-1 {
+    0% { clip-path: inset(10% 0 80% 0); transform: translate(-4px, 0); }
+    20% { clip-path: inset(80% 0 10% 0); transform: translate(4px, 0); }
+    40% { clip-path: inset(30% 0 50% 0); transform: translate(-4px, 0); }
+    60% { clip-path: inset(50% 0 30% 0); transform: translate(4px, 0); }
+    80% { clip-path: inset(5% 0 90% 0); transform: translate(-4px, 0); }
+    100% { clip-path: inset(90% 0 5% 0); transform: translate(4px, 0); }
+}
+
+@keyframes glitch-anim-2 {
+    0% { clip-path: inset(15% 0 70% 0); transform: translate(3px, 0); }
+    25% { clip-path: inset(60% 0 20% 0); transform: translate(-3px, 0); }
+    50% { clip-path: inset(25% 0 55% 0); transform: translate(3px, 0); }
+    75% { clip-path: inset(85% 0 10% 0); transform: translate(-3px, 0); }
+    100% { clip-path: inset(40% 0 40% 0); transform: translate(3px, 0); }
+}
