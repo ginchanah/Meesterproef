@@ -240,6 +240,11 @@ export const data = {
       categories: [""],
     },
     {
+      title: "Liminal Space",
+      slug: "liminal-space",
+      categories: ["Space"],
+    },
+    {
       title: "Lines of Flight",
       slug: "lines-of-flight",
       categories: ["Space"],
