@@ -67,7 +67,7 @@ export const data = {
     {
       title: "Balancing Feedback",
       slug: "balancing-feedback",
-      categories: [""],
+      categories: ["System"],
       content: [
         {
           type: "media-left",
@@ -118,7 +118,7 @@ export const data = {
     {
       title: "Interface",
       slug: "interface",
-      categories: ["Relation", "Agency"],
+      categories: ["Relation", "Agency", "Space"],
       content: [
         {
           type: "media-left",
@@ -230,6 +230,11 @@ export const data = {
       }
     },
     {
+      title: "Intraface",
+      slug: "intraface",
+      categories: ["Space"],
+    },
+    {
       title: "Invisible",
       slug: "invisible",
       categories: [""],
@@ -318,7 +323,7 @@ export const data = {
     {
       title: "Reinforcing Feedback",
       slug: "reinforcing-feedback",
-      categories: [""],
+      categories: ["System"],
       content: [
         {
           type: "media-left",
@@ -373,7 +378,7 @@ export const data = {
     {
       title: "System",
       slug: "system",
-      categories: ["Process", "Agency"],
+      categories: ["Process", "Agency", "System"],
       content: [
         {
           type: "text-full",
