@@ -69,7 +69,7 @@
 .track p {
 flex: 0 0 calc(100cqw * var(--repeat-span));
 margin: 0;
-font-family: helvetica, arial, sans-serif;
+font-family: var(--inter-regular);
 font-weight: 500;
 font-size: var(--font-size);
 line-height: 1;
