@@ -1,0 +1,13 @@
+.latent-space-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.latent-space-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
