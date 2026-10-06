@@ -116,6 +116,11 @@ export const data = {
       ]
     },
     {
+      title: "Ecology",
+      slug: "ecology",
+      categories: ["System"],
+    },
+    {
       title: "Interface",
       slug: "interface",
       categories: ["Relation", "Agency", "Space"],

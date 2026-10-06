@@ -1,0 +1,40 @@
+/* ==========================================
+    1. CSS VARIABELEN (KLEUREN)
+    ==========================================
+    Hier definiëren we de kleuren op het hoogste niveau (:root).
+    JavaScript leest deze uit, zodat je kleuren alleen hier in CSS hoeft aan te passen.
+*/
+:root {
+    --bg-color: #000000;
+    /* Achtergrondkleur (donkergrijs/zwart) */
+    --text-color: rgba(255, 255, 255, 1);
+    /* Kleur van de letters (bijv. ECOLOGY) */
+    --edges-color: rgba(255, 255, 255, 0.8);
+    /* Kleur van de lijnen tussen bolletjes */
+    --nodes-color: #ffffff;
+    /* Kleur van de bolletjes (nodes) zelf */
+}
+
+/* ==========================================
+    2. BASIS OPMAAK (scoped to animation container)
+    ========================================== */
+.animation-container {
+    margin: 0;
+    overflow: clip;
+    /* Voorkom scrollbalken zonder scroll te blokkeren */
+    background-color: var(--bg-color);
+    /* Gebruik de CSS variabele voor de achtergrond */
+    width: 100%;
+    height: var(--animation-height, 90vh);
+}
+
+.animation-container canvas {
+    display: block;
+    cursor: grab;
+    /* Geef aan dat je het canvas kunt vastpakken en slepen */
+}
+
+/* Verander de cursor als de gebruiker de muisknop ingedrukt houdt */
+.animation-container canvas:active {
+    cursor: grabbing;
+}
