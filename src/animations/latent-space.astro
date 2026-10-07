@@ -8,17 +8,19 @@
 
 <script>
     // @ts-nocheck
-
-    // ==========================================
-    // KLEUR VARIABELEN
-    // ==========================================
-    const COLOR_BACKGROUND = "#000"; // Kleur van de ruimte/achtergrond
-    const COLOR_PARTICLES = "#fff"; // Kleur van de bolletjes
-    // ==========================================
-
     const container = document.getElementById("latentSpaceContainer");
     const canvas = document.getElementById("spaceCanvas");
     const ctx = canvas.getContext("2d");
+
+    // ==========================================
+    // KLEUR VARIABELEN (uit CSS custom properties)
+    // ==========================================
+    const containerStyles = getComputedStyle(container);
+    const COLOR_BACKGROUND =
+        containerStyles.getPropertyValue("--color-background").trim() || "#000";
+    const COLOR_PARTICLES =
+        containerStyles.getPropertyValue("--color-particles").trim() || "#fff";
+    // ==========================================
 
     let width, height;
     let particles = [];

@@ -1,4 +1,8 @@
 .latent-space-container {
+    /* Kleur variabelen */
+    --color-background: #000; /* Kleur van de ruimte/achtergrond */
+    --color-particles: #fff; /* Kleur van de bolletjes */
+
     position: relative;
     width: 100%;
     height: 100vh;
