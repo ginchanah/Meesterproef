@@ -1,0 +1,281 @@
+---
+
+---
+
+<div class="latent-space-container" id="latentSpaceContainer">
+    <canvas id="spaceCanvas"></canvas>
+</div>
+
+<script>
+    // @ts-nocheck
+    const container = document.getElementById("latentSpaceContainer");
+    const canvas = document.getElementById("spaceCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // ==========================================
+    // KLEUR VARIABELEN (uit CSS custom properties)
+    // ==========================================
+    const containerStyles = getComputedStyle(container);
+    const COLOR_BACKGROUND =
+        containerStyles.getPropertyValue("--color-background").trim() || "#000";
+    const COLOR_PARTICLES =
+        containerStyles.getPropertyValue("--color-particles").trim() || "#fff";
+    // ==========================================
+
+    let width, height;
+    let particles = [];
+    let textCoordinates = [];
+
+    const NUM_PARTICLES = 8000;
+    const FIELD_DEPTH = 3000;
+    const BASE_SPEED = 12;
+    const FOV = 1000;
+
+    const STATES = ["TEXT", "CHAOS"];
+    let currentStateIndex = 0;
+    let time = 0;
+    let autoTimer;
+
+    let camX = 0;
+    let camY = 0;
+    let targetCamX = 0;
+    let targetCamY = 0;
+
+    function extractTextCoordinates() {
+        const offCanvas = document.createElement("canvas");
+        const offCtx = offCanvas.getContext("2d", { willReadFrequently: true });
+        offCanvas.width = container.clientWidth;
+        offCanvas.height = container.clientHeight;
+
+        // Deze kleuren bepalen alleen het onzichtbare masker voor de tekstvorm,
+        // deze hoeven niet aangepast te worden als je het uiterlijk verandert.
+        offCtx.fillStyle = "black";
+        offCtx.fillRect(0, 0, offCanvas.width, offCanvas.height);
+
+        offCtx.fillStyle = "white";
+        const fontSize = Math.min(window.innerWidth * 0.16, 220);
+        offCtx.font = `900 ${fontSize}px 'Inter', sans-serif`;
+        offCtx.textAlign = "center";
+        offCtx.textBaseline = "middle";
+
+        offCtx.fillText(
+            "LATENT",
+            offCanvas.width / 2,
+            offCanvas.height / 2 - fontSize * 0.45,
+        );
+        offCtx.fillText(
+            "SPACE",
+            offCanvas.width / 2,
+            offCanvas.height / 2 + fontSize * 0.45,
+        );
+
+        const imgData = offCtx.getImageData(
+            0,
+            0,
+            offCanvas.width,
+            offCanvas.height,
+        ).data;
+        textCoordinates = [];
+
+        const step = 4;
+        for (let y = 0; y < offCanvas.height; y += step) {
+            for (let x = 0; x < offCanvas.width; x += step) {
+                const index = (y * offCanvas.width + x) * 4;
+                const red = imgData[index];
+
+                if (red > 128) {
+                    textCoordinates.push({
+                        x: x - offCanvas.width / 2,
+                        y: y - offCanvas.height / 2,
+                    });
+                }
+            }
+        }
+    }
+
+    class Particle {
+        constructor() {
+            this.z = Math.random() * FIELD_DEPTH;
+            this.angle = Math.random() * Math.PI * 2;
+            this.textTargetIndex = Math.floor(Math.random() * 999999);
+
+            const chaosRadius = Math.random() * 3000;
+            this.cx = Math.cos(this.angle) * chaosRadius;
+            this.cy = Math.sin(this.angle) * chaosRadius;
+
+            this.x = this.cx;
+            this.y = this.cy;
+
+            this.vx = 0;
+            this.vy = 0;
+
+            // Gebruikt de variabele voor de deeltjeskleur
+            this.color = COLOR_PARTICLES;
+
+            this.baseSize = Math.random() * 1.2 + 0.5;
+        }
+
+        update(state) {
+            this.z -= BASE_SPEED;
+
+            if (this.z <= 0) {
+                this.z += FIELD_DEPTH;
+                this.x = this.getTargetX(state);
+                this.y = this.getTargetY(state);
+                this.vx = 0;
+                this.vy = 0;
+            }
+
+            const targetX = this.getTargetX(state);
+            const targetY = this.getTargetY(state);
+
+            let force = state === "TEXT" ? 0.02 : 0.002;
+            let friction = state === "TEXT" ? 0.85 : 0.95;
+
+            this.vx += (targetX - this.x) * force;
+            this.vy += (targetY - this.y) * force;
+
+            this.vx *= friction;
+            this.vy *= friction;
+
+            this.x += this.vx;
+            this.y += this.vy;
+        }
+
+        getTargetX(state) {
+            return this.calculateTarget(state, "x");
+        }
+
+        getTargetY(state) {
+            return this.calculateTarget(state, "y");
+        }
+
+        calculateTarget(state, axis) {
+            if (state === "TEXT" && textCoordinates.length > 0) {
+                const target =
+                    textCoordinates[
+                        this.textTargetIndex % textCoordinates.length
+                    ];
+                const val = axis === "x" ? target.x : target.y;
+
+                const zScale = (FOV + this.z) / FOV;
+                return val * zScale;
+            }
+
+            return axis === "x" ? this.cx : this.cy;
+        }
+
+        draw(ctx, camX, camY) {
+            const scale = FOV / (FOV + this.z);
+
+            let projX = (this.x - camX) * scale;
+            let projY = (this.y - camY) * scale;
+
+            const rot = time * 0.0003;
+            const screenX =
+                projX * Math.cos(rot) - projY * Math.sin(rot) + width / 2;
+            const screenY =
+                projY * Math.cos(rot) + projX * Math.sin(rot) + height / 2;
+
+            if (
+                screenX < 0 ||
+                screenX > width ||
+                screenY < 0 ||
+                screenY > height
+            )
+                return;
+
+            const size = this.baseSize * scale * 2;
+            if (size < 0.2) return;
+
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function toggleState(isManual = false) {
+        currentStateIndex = (currentStateIndex + 1) % STATES.length;
+
+        if (isManual) {
+            clearInterval(autoTimer);
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        autoTimer = setInterval(() => {
+            toggleState(false);
+        }, 7000);
+    }
+
+    function init() {
+        window.addEventListener("resize", onResize);
+        onResize();
+
+        container.addEventListener("mousemove", (e) => {
+            const rect = container.getBoundingClientRect();
+            targetCamX = (e.clientX - rect.left - width / 2) * 2.0;
+            targetCamY = (e.clientY - rect.top - height / 2) * 2.0;
+        });
+        container.addEventListener("touchmove", (e) => {
+            const rect = container.getBoundingClientRect();
+            targetCamX = (e.touches[0].clientX - rect.left - width / 2) * 2.0;
+            targetCamY = (e.touches[0].clientY - rect.top - height / 2) * 2.0;
+        });
+
+        container.addEventListener("click", () => toggleState(true));
+        container.addEventListener(
+            "touchstart",
+            (e) => {
+                e.preventDefault();
+                toggleState(true);
+            },
+            { passive: false },
+        );
+
+        for (let i = 0; i < NUM_PARTICLES; i++) {
+            particles.push(new Particle());
+        }
+
+        startTimer();
+        requestAnimationFrame(animate);
+    }
+
+    function onResize() {
+        width = container.clientWidth;
+        height = container.clientHeight;
+        canvas.width = width;
+        canvas.height = height;
+        extractTextCoordinates();
+    }
+
+    let lastTime = 0;
+
+    function animate(timestamp) {
+        const deltaTime = timestamp - lastTime;
+        lastTime = timestamp;
+        time += deltaTime;
+
+        // Gebruikt de variabele voor de achtergrondkleur
+        ctx.fillStyle = COLOR_BACKGROUND;
+        ctx.fillRect(0, 0, width, height);
+
+        const currentState = STATES[currentStateIndex];
+
+        camX += (targetCamX - camX) * 0.05;
+        camY += (targetCamY - camY) * 0.05;
+
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update(currentState);
+            particles[i].draw(ctx, camX, camY);
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    document.fonts.ready.then(() => {
+        init();
+    });
+</script>

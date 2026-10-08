@@ -116,6 +116,11 @@ export const data = {
       ]
     },
     {
+      title: "Ecology",
+      slug: "ecology",
+      categories: ["System"],
+    },
+    {
       title: "Interface",
       slug: "interface",
       categories: ["Relation", "Agency", "Space"],
@@ -238,6 +243,11 @@ export const data = {
       title: "Invisible",
       slug: "invisible",
       categories: [""],
+    },
+    {
+      title: "Latent Space",
+      slug: "latent-space",
+      categories: ["Space"],
     },
     {
       title: "Liminal Space",
