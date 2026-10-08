@@ -245,6 +245,11 @@ export const data = {
       categories: [""],
     },
     {
+      title: "Latent Space",
+      slug: "latent-space",
+      categories: ["Space"],
+    },
+    {
       title: "Liminal Space",
       slug: "liminal-space",
       categories: ["Space"],
