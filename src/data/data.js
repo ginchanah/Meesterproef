@@ -116,6 +116,16 @@ export const data = {
       ]
     },
     {
+      title: "Beyond Control",
+      slug: "beyond-control",
+      categories: ["Control", "Relation"],
+    },
+    {
+      title: "Control",
+      slug: "control",
+      categories: ["Control", "Relation"],
+    },
+    {
       title: "Ecology",
       slug: "ecology",
       categories: ["System"],
@@ -336,6 +346,11 @@ export const data = {
       }
     },
     {
+      title: "Out of Control",
+      slug: "out-of-control",
+      categories: ["Control", "Relation"],
+    },
+    {
       title: "Reinforcing Feedback",
       slug: "reinforcing-feedback",
       categories: ["System"],
@@ -389,6 +404,11 @@ export const data = {
         src: "/assets/media/reinforcing-feedback-title.png",
         alt: "A visual representation of an escalating feedback loop"
       }
+    },
+    {
+      title: "Remote Control",
+      slug: "remote-control",
+      categories: ["Control", "Relation"],
     },
     {
       title: "System",

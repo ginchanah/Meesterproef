@@ -1,0 +1,276 @@
+---
+
+---
+
+<div class="container">
+    <div class="animation-section active" id="anim-out-of-control">
+        <canvas id="atomismCanvas"></canvas>
+    </div>
+</div>
+
+<script>
+    // @ts-nocheck
+
+    const canvas = document.getElementById('atomismCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = canvas.closest('.animation-section');
+
+    // Haal CSS variabelen op voor gebruik in het canvas
+    const containerStyles = getComputedStyle(container);
+    const bgColor = containerStyles.getPropertyValue('--bg-color').trim();
+    const fgColor = containerStyles.getPropertyValue('--fg-color').trim();
+    const bgRgb = containerStyles.getPropertyValue('--bg-rgb').trim();
+    const fgRgb = containerStyles.getPropertyValue('--fg-rgb').trim();
+
+    // --- STATUS (STATE) ---
+    let width, height;
+    let time = 0;
+    let mouse = { x: -1000, y: -1000, isDown: false };
+
+    // Woord/Letter status
+    let word = [];          // Doelpunten voor de deeltjes
+    let wx, wy;             // Gerenderde posities (hergebruikt per frame voor prestaties)
+    let step = 8;           // Rasterafstand voor de woorddeeltjes
+    let mode = 'letters';   // 'letters' of 'witruimte'
+    let style = 'atoom';    // 'atoom', 'ruit', of 'pixel'
+    let progress = 0;       // 0 = chaos, 1 = woord volledig zichtbaar
+
+    // --- Helper: get position relative to canvas ---
+    function getCanvasPos(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    // --- INITIALISATIE ---
+    function buildWord() {
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = width; 
+        offCanvas.height = height;
+        const offCtx = offCanvas.getContext('2d');
+
+        const lines = ['OUT OF', 'CONTROL'];
+        const fontFamily = '"Arial Black", Impact, Arial, sans-serif';
+        
+        // Bereken responsieve lettergrootte
+        offCtx.font = `900 100px ${fontFamily}`;
+        const maxW = Math.max(...lines.map(l => offCtx.measureText(l).width));
+        const fontSize = Math.min((width * 0.86 / maxW) * 100, height * 0.36);
+
+        // Teken tekst naar offscreen canvas
+        offCtx.font = `900 ${fontSize}px ${fontFamily}`;
+        offCtx.textAlign = 'center';
+        offCtx.textBaseline = 'middle';
+        offCtx.fillStyle = fgColor;
+        lines.forEach((line, index) => {
+            offCtx.fillText(line, width / 2, height / 2 + (index - 0.5) * fontSize);
+        });
+
+        step = Math.max(6, Math.round(Math.min(width, height) / 110));
+        const data = offCtx.getImageData(0, 0, width, height).data;
+
+        word = [];
+        for (let y = step / 2; y < height; y += step) {
+            for (let x = step / 2; x < width; x += step) {
+                // Controleer het alpha-kanaal om te zien of de pixel bij de tekst hoort
+                if (data[((y | 0) * width + (x | 0)) * 4 + 3] > 128) {
+                    word.push({
+                        tx: x, 
+                        ty: y,
+                        ax: Math.random() - 0.5,
+                        ay: Math.random() - 0.5
+                    });
+                }
+            }
+        }
+        
+        wx = new Float32Array(word.length);
+        wy = new Float32Array(word.length);
+    }
+
+    function resize() {
+        width = container.clientWidth;
+        height = container.clientHeight;
+        canvas.width = width;
+        canvas.height = height;
+        buildWord();
+    }
+
+    // --- EVENT LISTENERS (scoped to canvas/container) ---
+    window.addEventListener('resize', resize);
+
+    canvas.addEventListener('mousemove', (e) => {
+        const pos = getCanvasPos(e.clientX, e.clientY);
+        mouse.x = pos.x; mouse.y = pos.y;
+    });
+    canvas.addEventListener('mousedown', () => { mouse.isDown = true; });
+    canvas.addEventListener('mouseup', () => { mouse.isDown = false; });
+    canvas.addEventListener('mouseleave', () => {
+        mouse.isDown = false;
+        mouse.x = -1000; mouse.y = -1000;
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+        const pos = getCanvasPos(e.touches[0].clientX, e.touches[0].clientY);
+        mouse.x = pos.x;
+        mouse.y = pos.y;
+    });
+    canvas.addEventListener('touchstart', (e) => {
+        const pos = getCanvasPos(e.touches[0].clientX, e.touches[0].clientY);
+        mouse.x = pos.x;
+        mouse.y = pos.y;
+        mouse.isDown = true;
+    });
+    canvas.addEventListener('touchend', () => {
+        mouse.isDown = false;
+        mouse.x = -1000;
+        mouse.y = -1000;
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'w') {
+            mode = mode === 'letters' ? 'witruimte' : 'letters';
+        }
+        if (e.key.toLowerCase() === 's') {
+            const stylesList = ['atoom', 'ruit', 'pixel'];
+            style = stylesList[(stylesList.indexOf(style) + 1) % stylesList.length];
+        }
+    });
+
+    // --- RENDER LOGICA ---
+    function drawWord() {
+        if (progress < 0.005) return;
+        
+        const ease = progress * progress * (3 - 2 * progress); // Vloeiende overgang (smoothstep)
+        const invEase = 1 - ease;
+
+        // Bereken posities door te interpoleren van chaos naar doel (het woord)
+        for (let i = 0; i < word.length; i++) {
+            const w = word[i];
+            wx[i] = w.tx + w.ax * invEase * width * 0.9 + (Math.random() - 0.5) * (invEase * 80 + 1.5);
+            wy[i] = w.ty + w.ay * invEase * height * 0.9 + (Math.random() - 0.5) * (invEase * 80 + 1.5);
+        }
+
+        // Pas 1: Donkere achtergrond maskering (creëert een halo/gat in de chaos)
+        const darkSize = mode === 'letters' ? step * 2.4 : step * 1.6;
+        ctx.fillStyle = `rgba(${bgRgb}, ${Math.min(1, ease * 1.3)})`;
+        for (let i = 0; i < word.length; i++) {
+            ctx.fillRect(wx[i] - darkSize / 2, wy[i] - darkSize / 2, darkSize, darkSize);
+        }
+
+        // Pas 2: Teken de letters (alleen in letter-modus)
+        if (mode === 'letters') {
+            ctx.globalAlpha = ease;
+            ctx.fillStyle = fgColor;
+            ctx.strokeStyle = fgColor;
+
+            if (style === 'atoom') {
+                // Holle vierkanten met een kern, afwisselend schaakbordpatroon
+                const s = step * 1.15;
+                const n = s * 0.4;
+                ctx.lineWidth = Math.max(1, step * 0.14);
+                ctx.beginPath();
+                for (let i = 0; i < word.length; i++) {
+                    ctx.rect(wx[i] - s / 2, wy[i] - s / 2, s, s);
+                }
+                ctx.stroke();
+                
+                for (let i = 0; i < word.length; i++) {
+                    const w = word[i];
+                    if (((w.tx / step | 0) + (w.ty / step | 0)) % 2 === 0) {
+                        ctx.fillRect(wx[i] - n / 2, wy[i] - n / 2, n, n);
+                    }
+                }
+            } else if (style === 'ruit') {
+                // Gedraaide vierkanten (ruiten)
+                const h = step * 0.7;
+                ctx.beginPath();
+                for (let i = 0; i < word.length; i++) {
+                    const x = wx[i], y = wy[i];
+                    ctx.moveTo(x, y - h);
+                    ctx.lineTo(x + h, y);
+                    ctx.lineTo(x, y + h);
+                    ctx.lineTo(x - h, y);
+                    ctx.closePath();
+                }
+                ctx.fill();
+            } else {
+                // Standaard losse pixelblokjes
+                const s = step * 0.7;
+                for (let i = 0; i < word.length; i++) {
+                    ctx.fillRect(wx[i] - s / 2, wy[i] - s / 2, s, s);
+                }
+            }
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    function draw() {
+        // Motion blur achtergrond: langere sporen als de muis is ingedrukt
+        const fadeAlpha = mouse.isDown ? 0.08 : 0.2;
+        ctx.fillStyle = `rgba(${bgRgb}, ${fadeAlpha})`;
+        ctx.fillRect(0, 0, width, height);
+
+        const cols = 24;
+        const rows = 16;
+        const spacingX = width / cols;
+        const spacingY = height / rows;
+
+        // Teken het achtergrond chaos raster
+        for (let i = 0; i < cols; i++) {
+            for (let j = 0; j < rows; j++) {
+                let baseX = spacingX * i + spacingX / 2;
+                let baseY = spacingY * j + spacingY / 2;
+
+                let wave = Math.sin(time + (i * 0.3) + (j * 0.3));
+                let cosWave = Math.cos(time * 0.5 - (i * 0.2) + (j * 0.2));
+
+                let size = Math.abs(wave) * (spacingX * 0.6);
+                let rotation = cosWave * Math.PI;
+
+                let dx = baseX - mouse.x;
+                let dy = baseY - mouse.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                let renderX = baseX;
+                let renderY = baseY;
+
+                if (mouse.isDown) {
+                    renderX += (Math.random() - 0.5) * 120;
+                    renderY += (Math.random() - 0.5) * 120;
+                    rotation += Math.random() * 20;
+                    size *= Math.random() * 2;
+                } else if (dist < 200) {
+                    let force = (200 - dist) / 200;
+                    renderX += (dx / dist) * force * 50;
+                    renderY += (dy / dist) * force * 50;
+                    rotation += force * 5;
+                }
+
+                ctx.save();
+                ctx.translate(renderX, renderY);
+                ctx.rotate(rotation);
+
+                ctx.strokeStyle = `rgba(${fgRgb}, ${mouse.isDown ? 1 : 0.85})`;
+                ctx.lineWidth = mouse.isDown ? 3 : 1.5;
+                ctx.strokeRect(-size / 2, -size / 2, size, size);
+
+                let innerSize = size * 0.4;
+                ctx.fillStyle = (i + j) % 2 === 0 ? `rgba(${fgRgb}, 0.9)` : `rgba(${bgRgb}, 0.9)`;
+                ctx.fillRect(-innerSize / 2, -innerSize / 2, innerSize, innerSize);
+
+                ctx.restore();
+            }
+        }
+
+        // Woord vormt zich tijdens het klikken, lost op bij loslaten
+        progress = Math.max(0, Math.min(1, progress + (mouse.isDown ? 0.05 : -0.08)));
+        drawWord();
+
+        time += mouse.isDown ? 0.08 : 0.025;
+        requestAnimationFrame(draw);
+    }
+
+    // Start
+    resize();
+    draw();
+</script>

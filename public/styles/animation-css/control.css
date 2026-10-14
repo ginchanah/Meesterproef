@@ -1,0 +1,50 @@
+@layer components, utilities;
+
+/* =====================================
+MARK: Control Animation
+===================================== */
+@layer components {
+
+    /* ---------- Layout ---------- */
+    .container {
+        height: 80vh;
+        position: relative;
+    }
+
+    .animation-section {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        --animation-height: 80vh;
+        background-color: var(--bg, #121212);
+        color: var(--text, #ece9e1);
+        overflow: hidden;
+    }
+
+    #anim-control {
+        height: 100%;
+
+        /* Basis kleuren */
+        --bg: #121212;
+        --text: #ece9e1;
+    }
+
+    @media (min-width: 1024px) {
+        .container {
+            height: 100vh;
+        }
+
+        .animation-section {
+            --animation-height: 100vh;
+        }
+    }
+
+    /* ---------- Canvas ---------- */
+    #anim-control canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+    }
+}
