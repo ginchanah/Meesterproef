@@ -1,0 +1,55 @@
+@layer components, utilities;
+
+/* =====================================
+MARK: Out of Control Animation
+===================================== */
+@layer components {
+
+    /* ---------- Layout ---------- */
+    .container {
+        height: 80vh;
+        position: relative;
+    }
+
+    .animation-section {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        --animation-height: 80vh;
+        overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    #anim-out-of-control {
+        height: 100%;
+        background: var(--bg-color);
+
+        /* Basis kleuren */
+        --bg-color: #0f0f0f;
+        --fg-color: #ffffff;
+
+        /* RGB waarden voor dynamische alpha transparantie in Canvas */
+        --bg-rgb: 15, 15, 15;
+        --fg-rgb: 255, 255, 255;
+    }
+
+    @media (min-width: 1024px) {
+        .container {
+            height: 100vh;
+        }
+
+        .animation-section {
+            --animation-height: 100vh;
+        }
+    }
+
+    /* ---------- Canvas ---------- */
+    #anim-out-of-control canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+    }
+}
