@@ -1,0 +1,36 @@
+/* JetBrains Mono has a true thin weight; the script falls back to system monospace fonts until it loads */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300&display=swap");
+
+/* =====================================
+MARK: Beyond Control Animation
+Scoped to .beyond-control-wrapper so it doesn't
+affect the rest of the page layout.
+===================================== */
+
+/* --- Ensure parent fills the animation-section height --- */
+.animation-section .hidden-section {
+    height: 100%;
+}
+
+/* --- WRAPPER (replaces old body styles) --- */
+/* the whole wrapper is the canvas: the flock turns back at its edges */
+.beyond-control-wrapper {
+    /* colours read by the script: background and letters */
+    --page: var(--color-background, #000000);
+    --ink: var(--color-text, #ffffff);
+
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--page);
+}
+
+#beyond-control-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+}
