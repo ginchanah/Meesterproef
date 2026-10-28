@@ -65,6 +65,11 @@ export const data = {
       }
     },
     {
+      title: "Affect",
+      slug: "affect",
+      categories: ["Relation"],
+    },
+    {
       title: "Balancing Feedback",
       slug: "balancing-feedback",
       categories: ["System"],

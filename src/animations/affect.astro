@@ -1,0 +1,339 @@
+---
+
+---
+
+<div class="affect-container" id="affect-container">
+    <canvas id="affect-canvas"></canvas>
+</div>
+
+<script>
+    // @ts-nocheck
+    const container = document.getElementById("affect-container");
+    const cv = document.getElementById("affect-canvas");
+    const ctx = cv.getContext("2d");
+    const FONT = '"Inter", "Helvetica Neue", Arial, sans-serif';
+
+    // Fixed number of rings that scale down with screen size
+    const NUM_RINGS = 50;
+    let n = NUM_RINGS;
+    let M = 200;
+    let totalPoints = 0;
+    let W = 0, H = 0, DPR = 1;
+
+    let bx = null, by = null, dx = null, dy = null, vx = null, vy = null;
+    let ringAlphas = null;
+    let insideSegs = null;
+
+    let agent = { x: 0, y: 0 };
+    let ptrX = 0, ptrY = 0, hasPtr = false, ptrAt = -99;
+    let animId = null;
+    let isVisible = true;
+    let isRunning = true;
+    let lastTime = 0;
+
+    // Check motion preference and hook up animation button
+    const animationButton =
+        container?.closest(".animation-section")?.querySelector(".animation-button") ||
+        document.querySelector(".animation-button");
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (animationButton) {
+        if (prefersReducedMotion) {
+            animationButton.classList.add("stop-animation");
+            isRunning = false;
+        } else {
+            animationButton.classList.add("play-animation");
+            isRunning = true;
+        }
+
+        animationButton.addEventListener("click", () => {
+            animationButton.classList.toggle("stop-animation");
+            animationButton.classList.toggle("play-animation");
+            isRunning = animationButton.classList.contains("play-animation");
+            if (isRunning && isVisible && !animId) {
+                lastTime = performance.now();
+                animId = requestAnimationFrame(frame);
+            }
+        });
+    }
+
+    function build() {
+        if (!container || !cv) return;
+
+        const rect = container.getBoundingClientRect();
+        W = Math.floor(container.clientWidth || rect.width || window.innerWidth);
+        H = Math.floor(container.clientHeight || rect.height || window.innerHeight);
+        if (W <= 0 || H <= 0) return;
+
+        const isMobile = W < 768;
+
+        // Capping DPR avoids fillrate bottlenecks on high-density phone screens while staying sharp
+        DPR = isMobile
+            ? Math.min(window.devicePixelRatio || 1, 1.25)
+            : Math.min(window.devicePixelRatio || 1, 1.75);
+
+        cv.width = Math.round(W * DPR);
+        cv.height = Math.round(H * DPR);
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+        // Fixed number of rings across all viewports, scaling down proportionally
+        n = NUM_RINGS;
+        M = isMobile ? 180 : 240;
+
+        const cx = W / 2;
+        const cy = H / 2;
+        const maxR = Math.hypot(W, H) / 2;
+        // Ring spacing scales down directly with screen size (smaller gap on mobile = dense, clear word)
+        const gap = (maxR - 10) / n;
+
+        // Render word mask off-screen to detect which segments intersect the word
+        const m = document.createElement("canvas");
+        m.width = W;
+        m.height = H;
+        const g = m.getContext("2d", { willReadFrequently: true });
+        let fs = 100;
+        g.font = `600 ${fs}px ${FONT}`;
+        fs = Math.min((fs * (W * 0.82)) / g.measureText("affect").width, H * 0.5);
+        g.font = `600 ${fs}px ${FONT}`;
+        g.textAlign = "center";
+        g.textBaseline = "middle";
+        g.fillStyle = "#fff";
+        g.fillText("affect", cx, cy + fs * 0.04);
+        const px = g.getImageData(0, 0, W, H).data;
+
+        // Precompute circle angle sin & cos
+        const cosAngles = new Float32Array(M);
+        const sinAngles = new Float32Array(M);
+        const TWO_PI = Math.PI * 2;
+        for (let k = 0; k < M; k++) {
+            const a = (k / M) * TWO_PI;
+            cosAngles[k] = Math.cos(a);
+            sinAngles[k] = Math.sin(a);
+        }
+
+        totalPoints = n * M;
+        bx = new Float32Array(totalPoints);
+        by = new Float32Array(totalPoints);
+        dx = new Float32Array(totalPoints);
+        dy = new Float32Array(totalPoints);
+        vx = new Float32Array(totalPoints);
+        vy = new Float32Array(totalPoints);
+        const isInside = new Uint8Array(totalPoints);
+
+        ringAlphas = new Float32Array(n);
+
+        const checkInside = (x, y) => {
+            const xi = Math.round(x);
+            const yi = Math.round(y);
+            return xi >= 0 && yi >= 0 && xi < W && yi < H && px[(yi * W + xi) * 4 + 3] > 80;
+        };
+
+        for (let i = 0; i < n; i++) {
+            ringAlphas[i] = (0.75 - (i / n) * 0.35) * 0.38;
+            const r = 10 + i * gap;
+            const start = i * M;
+            for (let k = 0; k < M; k++) {
+                const idx = start + k;
+                const x = cx + cosAngles[k] * r;
+                const y = cy + sinAngles[k] * r;
+                bx[idx] = x;
+                by[idx] = y;
+
+                if (checkInside(x, y)) {
+                    isInside[idx] = 1;
+                }
+            }
+        }
+
+        // Pre-index segments that form the word "affect"
+        // Midpoint sampling guarantees that even thin letter strokes are never missed
+        const segs = [];
+        for (let i = 0; i < n; i++) {
+            const start = i * M;
+            for (let k = 0; k < M; k++) {
+                const a = start + k;
+                const b = start + ((k + 1) % M);
+                const midX = (bx[a] + bx[b]) * 0.5;
+                const midY = (by[a] + by[b]) * 0.5;
+
+                if ((isInside[a] && isInside[b]) || checkInside(midX, midY)) {
+                    segs.push(a, b);
+                }
+            }
+        }
+        insideSegs = new Int32Array(segs);
+
+        agent.x = cx;
+        agent.y = cy;
+    }
+
+    function frame(now) {
+        if (!isRunning || !isVisible) {
+            animId = null;
+            return;
+        }
+
+        if (!lastTime) lastTime = now;
+        const dt = Math.min((now - lastTime) / 1000, 0.05);
+        lastTime = now;
+        const dtMultiplier = dt * 60; // normalized to 60fps
+
+        const t = now / 1000;
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, W, H);
+
+        const isInteracting = hasPtr && (t - ptrAt < 2.5);
+        let tx, ty;
+        if (isInteracting) {
+            tx = ptrX;
+            ty = ptrY;
+        } else {
+            tx = W / 2 + Math.sin(t * 0.23) * W * 0.3;
+            ty = H / 2 + Math.sin(t * 0.31 + 1) * H * 0.3;
+        }
+
+        const followRate = isInteracting ? 0.18 : 0.04;
+        const lerpFactor = 1 - Math.pow(1 - followRate, dtMultiplier);
+        agent.x += (tx - agent.x) * lerpFactor;
+        agent.y += (ty - agent.y) * lerpFactor;
+
+        const ambientAmp = 75 * Math.sin(t * 0.4);
+        const amp = isInteracting
+            ? (Math.abs(ambientAmp) < 45 ? (ambientAmp >= 0 ? 55 : -55) : ambientAmp)
+            : ambientAmp;
+
+        const isMobile = W < 768;
+        const R = Math.min(W, H) * (isMobile ? 0.32 : 0.28);
+        const R2 = R * R;
+        const invR2 = 1 / R2;
+        const maxDist2 = R2 * 6.25;
+
+        const ax = agent.x;
+        const ay = agent.y;
+        const springK = 0.06 * dtMultiplier;
+        const damping = Math.pow(0.82, dtMultiplier);
+
+        // 1. Fast contiguous TypedArray physics loop
+        for (let i = 0; i < totalPoints; i++) {
+            const ex = bx[i] - ax;
+            const ey = by[i] - ay;
+            const d2 = ex * ex + ey * ey;
+
+            if (d2 < maxDist2) {
+                const d = Math.sqrt(d2) || 1;
+                const f = Math.exp(-d2 * invR2) * amp;
+                vx[i] += ((ex / d) * f - dx[i]) * springK;
+                vy[i] += ((ey / d) * f - dy[i]) * springK;
+            } else {
+                vx[i] += (-dx[i]) * springK;
+                vy[i] += (-dy[i]) * springK;
+            }
+
+            vx[i] *= damping;
+            vy[i] *= damping;
+            dx[i] += vx[i];
+            dy[i] += vy[i];
+        }
+
+        // 2. Draw thin base rings
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 1;
+        ctx.lineCap = "round";
+        for (let i = 0; i < n; i++) {
+            const start = i * M;
+            ctx.globalAlpha = ringAlphas[i];
+            ctx.beginPath();
+            ctx.moveTo(bx[start] + dx[start], by[start] + dy[start]);
+            for (let k = 1; k < M; k++) {
+                const idx = start + k;
+                ctx.lineTo(bx[idx] + dx[idx], by[idx] + dy[idx]);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        // 3. Draw highlighted word segments in a single batched path
+        if (insideSegs && insideSegs.length > 0) {
+            ctx.lineWidth = isMobile ? 2.4 : 2.8;
+            ctx.globalAlpha = 1;
+            ctx.beginPath();
+            for (let s = 0; s < insideSegs.length; s += 2) {
+                const a = insideSegs[s];
+                const b = insideSegs[s + 1];
+                ctx.moveTo(bx[a] + dx[a], by[a] + dy[a]);
+                ctx.lineTo(bx[b] + dx[b], by[b] + dy[b]);
+            }
+            ctx.stroke();
+        }
+
+        // 4. Draw agent indicator
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(agent.x, agent.y, isMobile ? 3 : 4, 0, 6.2832);
+        ctx.fill();
+
+        animId = requestAnimationFrame(frame);
+    }
+
+    // Convert pointer to container coordinates without allocating garbage
+    function updatePointer(e) {
+        const rect = cv.getBoundingClientRect();
+        ptrX = e.clientX - rect.left;
+        ptrY = e.clientY - rect.top;
+        hasPtr = true;
+        ptrAt = performance.now() / 1000;
+    }
+
+    cv.addEventListener("pointermove", updatePointer, { passive: true });
+    cv.addEventListener("pointerdown", updatePointer, { passive: true });
+    cv.addEventListener("pointerup", () => { hasPtr = false; }, { passive: true });
+    cv.addEventListener("pointerleave", () => { hasPtr = false; }, { passive: true });
+
+    // Pause animation when off-screen to preserve battery and performance
+    if ("IntersectionObserver" in window && container) {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    isVisible = entry.isIntersecting;
+                    if (isVisible && isRunning && !animId) {
+                        lastTime = performance.now();
+                        animId = requestAnimationFrame(frame);
+                    }
+                }
+            },
+            { threshold: 0.05 }
+        );
+        observer.observe(container);
+    }
+
+    // Responsive container resize observer
+    let resizeTimer = null;
+    function onResize() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            build();
+        }, 120);
+    }
+
+    if ("ResizeObserver" in window && container) {
+        const ro = new ResizeObserver(onResize);
+        ro.observe(container);
+    } else {
+        window.addEventListener("resize", onResize);
+    }
+
+    const go = () => {
+        build();
+        if (isRunning && isVisible && !animId) {
+            lastTime = performance.now();
+            animId = requestAnimationFrame(frame);
+        }
+    };
+
+    if (document.fonts) {
+        document.fonts.ready.then(go);
+    } else {
+        go();
+    }
+</script>
