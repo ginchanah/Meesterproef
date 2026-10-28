@@ -1,0 +1,122 @@
+/* =====================================
+MARK: Interface Animation
+===================================== */
+
+/* ---------- Layout ---------- */
+.animation-section .hidden-section {
+    height: 100%;
+}
+
+.interface-wrapper {
+    --light: white;
+    --dark: black;
+
+    /* How much of each colour is used. Everything below is derived from these. */
+    --bg-mix: 87%;               /* background: this much light, the rest dark */
+    --knob-mix: 93%;             /* knob: slightly lighter than the background */
+    --shadow-opacity: 40%;       /* dark shadows */
+    --highlight-opacity: 100%;   /* light shadows */
+    --letter-opacity: 50%;       /* the letters spelling INTERFACE */
+
+    --bg: color-mix(in srgb, var(--light) var(--bg-mix), var(--dark));
+    --knob: color-mix(in srgb, var(--light) var(--knob-mix), var(--dark));
+    --shadow: color-mix(in srgb, var(--dark) var(--shadow-opacity), transparent);
+    --highlight: color-mix(in srgb, var(--light) var(--highlight-opacity), transparent);
+    --letter: color-mix(in srgb, var(--dark) var(--letter-opacity), transparent);
+
+    /* Sizes (the script sets these too, so change SWITCH_PX and GAP_PX there) */
+    --displacement-1: 10px;
+    --displacement-2: 4px;
+    --blur-1: 15px;
+    --blur-2: 10px;
+    --switch-size: 76px;
+    --gap: 20px;
+
+    color-scheme: light;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    overflow: hidden;
+}
+
+/* ---------- Grid ---------- */
+#interface-stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    gap: var(--gap);
+    overflow: hidden;
+}
+
+/* ---------- Switch ---------- */
+#interface-stage > label {
+    --knob-size: calc(0.75 * var(--switch-size));
+    --pad: calc((var(--switch-size) - var(--knob-size)) / 2);
+
+    display: inline-grid;
+    align-items: center;
+
+    input,
+    .letter,
+    .knob {
+        grid-area: 1 / 1;
+    }
+
+    input {
+        appearance: none;
+        -webkit-appearance: none;
+        font-size: inherit;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: var(--bg);
+        width: calc(2 * var(--switch-size));
+        height: var(--switch-size);
+        border-radius: var(--switch-size);
+        cursor: pointer;
+
+        box-shadow:
+            var(--shadow) var(--displacement-2) var(--displacement-2) var(--blur-2),
+            var(--highlight) calc(-1 * var(--displacement-2)) calc(-1 * var(--displacement-2)) var(--blur-2),
+            var(--shadow) var(--displacement-2) var(--displacement-2) var(--blur-2) inset,
+            var(--highlight) calc(-1 * var(--displacement-2)) calc(-1 * var(--displacement-2)) var(--blur-2) inset;
+    }
+
+    /* A letter sits in the left half of the track, underneath the knob. The knob
+       covers it while the switch is off and slides away to reveal it when on. */
+    .letter {
+        justify-self: start;
+        width: var(--switch-size);
+        text-align: center;
+        font: 500 calc(var(--switch-size) * 0.5) / var(--switch-size) system-ui, -apple-system, "Segoe UI", sans-serif;
+        color: var(--letter);
+        text-shadow: 1px 1px 1px var(--highlight);
+        pointer-events: none;
+        user-select: none;
+    }
+
+    /* The knob is a real element that comes after the input, so a plain sibling
+       selector moves it. Only `translate` animates, which the browser can do on
+       the GPU without repainting the shadows. */
+    .knob {
+        width: var(--knob-size);
+        height: var(--knob-size);
+        margin-left: var(--pad);
+        border-radius: 50%;
+        background: var(--knob);
+        pointer-events: none;
+        box-shadow:
+            var(--shadow) calc(var(--displacement-1) / 2) calc(var(--displacement-1) / 2) calc(var(--blur-1) / 2),
+            var(--shadow) calc(var(--displacement-2) / 2) calc(var(--displacement-2) / 2) calc(var(--blur-2) / 2) inset,
+            var(--highlight) calc(-1 * var(--displacement-2) / 2) calc(-1 * var(--displacement-2) / 2) calc(var(--blur-2) / 2) inset;
+        transition: translate 0.5s;
+        will-change: translate;
+    }
+
+    input:checked ~ .knob {
+        translate: var(--switch-size) 0;
+    }
+}
