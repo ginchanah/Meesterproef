@@ -38,3 +38,26 @@
 .animation-container canvas:active {
     cursor: grabbing;
 }
+
+/* ==========================================
+    3. RESPONSIVE AANPASSINGEN
+    ========================================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .animation-container {
+        height: var(--animation-height, 70vh);
+    }
+}
+
+/* Mobiel */
+@media (max-width: 768px) {
+    .animation-container {
+        height: var(--animation-height, 55vh);
+    }
+
+    .animation-container canvas {
+        /* Voorkom standaard browser touch-gedrag (scrollen, zoomen) zodat de canvas-interactie werkt */
+        touch-action: none;
+    }
+}

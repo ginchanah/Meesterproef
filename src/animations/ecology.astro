@@ -27,7 +27,10 @@
     const ctx = C.getContext("2d"); // De 2D tekencontext
     const container = C.closest(".animation-container"); // De container waarin het canvas zit
 
-    const N = 420; // Totaal aantal bolletjes (nodes)
+    // Pas het aantal bolletjes aan op basis van schermgrootte
+    const isMobile = window.innerWidth < 768;
+    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+    const N = isMobile ? 180 : isTablet ? 300 : 420; // Minder bolletjes op kleinere schermen
 
     // Het woord bepaalt de groepen (clusters). 7 letters = 7 clusters bolletjes.
     const word = "ECOLOGY";
@@ -61,7 +64,8 @@
         ctx.setTransform(d, 0, 0, d, 0, 0); // Schaal de context mee
         cx = W / 2; // X-midden
         cy = H / 2; // Y-midden
-        R = Math.min(W, H) * 0.38; // Radius waarop de letters ongeveer verdeeld worden
+        // Kleinere radius op mobiel zodat letters dichter bij het midden staan en er meer witruimte overblijft
+        R = isMobile ? Math.min(W, H) * 0.28 : isTablet ? Math.min(W, H) * 0.33 : Math.min(W, H) * 0.38;
     }
     resize();
     window.addEventListener("resize", resize); // Pas aan als het venster van grootte verandert
@@ -80,13 +84,16 @@
     // ==========================================
 
     // Bepaal de doellocaties (clusters) voor elke letter in een cirkelpatroon
+    // Spreidingsgrootte per cluster kleiner op mobiel voor compactere letters
+    const clusterSpread = isMobile ? 15 + Math.random() * 30 : 30 + Math.random() * 60;
+
     const clusters = Array.from({ length: CLUSTERS }, (_, i) => {
         const a = (i / CLUSTERS) * Math.PI * 2; // Hoek in de cirkel
         const d = R * (0.3 + Math.random() * 0.7); // Afstand vanuit het centrum
         return {
             x: cx + Math.cos(a) * d,
             y: cy + Math.sin(a) * d,
-            s: 30 + Math.random() * 60, // Spreidingsgrootte van de letter
+            s: isMobile ? 15 + Math.random() * 30 : 30 + Math.random() * 60, // Kleinere spreiding op mobiel
             char: word[i], // Sla de specifieke letter op ("E", "C", "O", etc.)
         };
     });
@@ -101,7 +108,7 @@
             y: c.y + Math.sin(a) * r,
             vx: 0, // Snelheid X
             vy: 0, // Snelheid Y
-            r: 2.2 + Math.random() * 1.8, // Radius (visuele grootte) van het bolletje
+            r: isMobile ? 1.6 + Math.random() * 1.2 : 2.2 + Math.random() * 1.8, // Kleinere bolletjes op mobiel
             ci: clusters.indexOf(c), // Cluster index waartoe deze node behoort
         };
     });
@@ -219,6 +226,37 @@
     }; // Laat los
 
     // ==========================================
+    // TOUCH EVENT HANDLERS (MOBIEL)
+    // ==========================================
+    C.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        const t = e.touches[0];
+        const i = findNode(t.clientX, t.clientY);
+        i >= 0 ? (drag = i) : (pan = { x: t.clientX, y: t.clientY });
+    }, { passive: false });
+
+    C.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+        const t = e.touches[0];
+        if (drag !== null) {
+            const p = s2w(t.clientX, t.clientY);
+            nodes[drag].x = p.x;
+            nodes[drag].y = p.y;
+            nodes[drag].vx = nodes[drag].vy = 0;
+        } else if (pan) {
+            panX += (t.clientX - pan.x) / zoom;
+            panY += (t.clientY - pan.y) / zoom;
+            pan.x = t.clientX;
+            pan.y = t.clientY;
+        }
+    }, { passive: false });
+
+    C.addEventListener("touchend", () => {
+        drag = null;
+        pan = null;
+    });
+
+    // ==========================================
     // 8. NATUURKUNDE EN WEERGAVE LUS (ANIMATION LOOP)
     // ==========================================
     requestAnimationFrame(function loop() {
@@ -241,7 +279,8 @@
             const dx = nodes[b].x - nodes[a].x;
             const dy = nodes[b].y - nodes[a].y;
             const d = Math.sqrt(dx * dx + dy * dy) || 1;
-            const f = (d - 50) * 0.0004; // Veer-constante
+            const restLen = isMobile ? 25 : 50; // Kortere rustlengte op mobiel voor compacter netwerk
+            const f = (d - restLen) * 0.0004; // Veer-constante
             const fx = (dx / d) * f;
             const fy = (dy / d) * f;
             if (a !== drag) {
@@ -258,9 +297,10 @@
         for (let i = 0; i < N; i++) {
             if (i === drag) continue; // Genegeerde node als de gebruiker deze vasthoudt
 
-            // Lichte aantrekkingskracht naar het absolute midden van het scherm
-            nodes[i].vx += (cx - nodes[i].x) * 0.00008;
-            nodes[i].vy += (cy - nodes[i].y) * 0.00008;
+            // Sterkere aantrekkingskracht op mobiel zodat het netwerk meer in het midden blijft
+            const centerForce = isMobile ? 0.00025 : 0.00008;
+            nodes[i].vx += (cx - nodes[i].x) * centerForce;
+            nodes[i].vy += (cy - nodes[i].y) * centerForce;
 
             // Bolletjes duwen elkaar lichtjes weg als ze te dichtbij komen
             for (let k = 0; k < 5; k++) {
@@ -269,7 +309,7 @@
                 const dx = nodes[i].x - nodes[j].x,
                     dy = nodes[i].y - nodes[j].y,
                     d2 = dx * dx + dy * dy;
-                if (d2 < 2500 && d2 > 0.1) {
+                if (d2 < (isMobile ? 1200 : 2500) && d2 > 0.1) {
                     const f = 80 / d2;
                     nodes[i].vx += dx * f;
                     nodes[i].vy += dy * f;
@@ -318,7 +358,9 @@
         ctx.translate(-cx + panX, -cy + panY);
 
         // --- 9A. TEKEN DE LETTERS ACHTER DE ZWERM ---
-        ctx.font = 'bold 160px "Inter", sans-serif';
+        // Dynamische lettergrootte op basis van scherm
+        const fontSize = isMobile ? 60 : isTablet ? 100 : 160;
+        ctx.font = `bold ${fontSize}px "Inter", sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
@@ -337,7 +379,7 @@
         // --- 9B. TEKEN DE VERBINDINGSLIJNEN ---
         ctx.beginPath();
         ctx.strokeStyle = colorEdges; // Kleur uit CSS variabelen
-        ctx.lineWidth = 0.5;
+        ctx.lineWidth = isMobile ? 0.3 : 0.5;
         for (const [a, b] of edges) {
             ctx.moveTo(nodes[a].x, nodes[a].y);
             ctx.lineTo(nodes[b].x, nodes[b].y);
