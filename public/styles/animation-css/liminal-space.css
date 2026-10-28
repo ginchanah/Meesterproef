@@ -1,13 +1,7 @@
-@property --mouse-x {
-  syntax: "<number>";
+@property --delay {
+  syntax: "<time>";
   inherits: true;
-  initial-value: 0;
-}
-
-@property --mouse-y {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
+  initial-value: 0s;
 }
 
 /* --- Ensure parent fills the animation-section height --- */
@@ -21,13 +15,10 @@
   height: 100%;
   display: grid;
   place-items: center;
+  place-content: center;
   overflow: clip;
-    --look: 20;                 /* how far the vanishing point swings */
   perspective: 10em;
-  perspective-origin:
-    calc(50% - var(--mouse-x) * var(--look) * 1%)
-    calc(50% + var(--mouse-y) * var(--look) * 1%);
-  transition: --mouse-x 0.5s ease-out, --mouse-y 0.5s ease-out;
+  perspective-origin: 50% 50%; /* updated from the script */
 }
 
 .tunnel_slice {
@@ -36,13 +27,23 @@
   --sides: 4;
   --duration: 10s;
   --repeat-span: 1;
+
+  --count: 18;
+  --depth: 90em;
+  --near: 8em;
+  --speed: 24s;
+  --i: calc(sibling-index() - 1);
+  --delay: calc(var(--speed) / var(--count) * var(--i) * -1);
+
   width: var(--size-slice);
   aspect-ratio: 1 / 1;
   display: grid;
   place-items: center;
   transform-style: preserve-3d;
   grid-area: 1 / 1;
-  transform: translateZ(calc(var(--font-size)*sibling-index()*-0.8 + 2em + var(--font-size)));
+
+  animation: walk var(--speed) linear infinite;
+  animation-delay: var(--delay);
 }
 
 .tunnel_slice > div {
@@ -54,7 +55,7 @@
   position: relative;
   transform:
     rotateZ(calc(360deg / var(--sides) * sibling-index()))
-    translateY(calc((var(--size-slice) - 0.05em)/ 2))
+    translateY(calc((var(--size-slice) - 0.05em) / 2))
     rotateX(90deg);
 }
 
@@ -67,22 +68,26 @@
 }
 
 .track p {
-flex: 0 0 calc(100cqw * var(--repeat-span));
-margin: 0;
-font-family: var(--inter-regular);
-font-weight: 500;
-font-size: var(--font-size);
-line-height: 1;
-text-transform: uppercase;
-white-space: nowrap;
+  flex: 0 0 calc(100cqw * var(--repeat-span));
+  margin: 0;
+  font-family: var(--inter-regular);
+  font-weight: 500;
+  font-size: var(--font-size);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.tunnel_slice:nth-child(2n) .track{
-animation-direction: normal;
+.tunnel_slice:nth-child(2n) .track {
+  animation-direction: normal;
+}
+
+@keyframes walk {
+  from { transform: translateZ(calc(var(--depth) * -1)); }
+  to   { transform: translateZ(var(--near)); }
 }
 
 @keyframes slide {
   from { translate: 0; }
   to   { translate: calc(-100cqw * var(--repeat-span)); }
 }
-
