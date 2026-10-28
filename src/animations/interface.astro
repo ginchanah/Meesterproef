@@ -1,0 +1,193 @@
+---
+
+---
+
+<div class="interface-wrapper">
+    <div id="interface-stage"></div>
+</div>
+
+<script>
+    // @ts-nocheck
+    const DELAY = 150;         // ms between each automatic switch (higher = fewer switching)
+    const GROUP_COUNT = 50;    // roughly how many switches are on at once
+    const TOP_WORD = "INTER";
+    const BOTTOM_WORD = "FACE";
+
+    const SWITCH_PX = 76;      // fixed switch size, never scaled to the window
+    const GAP_PX = 20;         // fixed gap between switches
+
+    const stage = document.getElementById("interface-stage");
+    const wrapper = stage.closest(".interface-wrapper");
+    const section = stage.closest(".animation-section");
+
+    let timer = null;
+
+    function setSizes() {
+        const scale = SWITCH_PX / 80;
+        wrapper.style.setProperty("--switch-size", SWITCH_PX + "px");
+        wrapper.style.setProperty("--gap", GAP_PX + "px");
+        wrapper.style.setProperty("--displacement-1", 10 * scale + "px");
+        wrapper.style.setProperty("--displacement-2", 4 * scale + "px");
+        wrapper.style.setProperty("--blur-1", 15 * scale + "px");
+        wrapper.style.setProperty("--blur-2", 10 * scale + "px");
+    }
+
+    function buildGrid() {
+        const W = stage.clientWidth;
+        const H = stage.clientHeight;
+
+        const cellWidth = SWITCH_PX * 2 + GAP_PX;
+        const cellHeight = SWITCH_PX + GAP_PX;
+
+        // Width needed to show the longest word horizontally, one letter per switch.
+        const wordWidth = TOP_WORD.length * SWITCH_PX * 2 + (TOP_WORD.length - 1) * GAP_PX;
+        const vertical = W < wordWidth;
+
+        let columns = Math.ceil((W + GAP_PX) / cellWidth) + 1;
+        let rows = Math.ceil((H + GAP_PX) / cellHeight) + 1;
+
+        let letterAt;
+
+        if (!vertical) {
+            // Horizontal: an odd number of columns so INTER sits exactly in the centre,
+            // and an even number of rows so there are two middle rows.
+            columns = Math.max(columns, TOP_WORD.length);
+            if (columns % 2 === 0) columns++;
+            if (rows % 2 !== 0) rows++;
+
+            const topRow = rows / 2 - 1;
+            const bottomRow = rows / 2;
+            const startC = (columns - TOP_WORD.length) / 2;
+
+            letterAt = (r, c) => {
+                const k = c - startC;
+                if (r === topRow && k >= 0 && k < TOP_WORD.length) return TOP_WORD[k];
+                if (r === bottomRow && k >= 0 && k < BOTTOM_WORD.length) return BOTTOM_WORD[k];
+                return null;
+            };
+        } else {
+            // Vertical (narrow screens): an even number of columns so there are two
+            // middle columns, and an odd number of rows so INTER is centred vertically.
+            // INTER runs down the left middle column, FACE down the right one.
+            columns = Math.max(columns, 2);
+            if (columns % 2 !== 0) columns++;
+            rows = Math.max(rows, TOP_WORD.length);
+            if (rows % 2 === 0) rows++;
+
+            const leftCol = columns / 2 - 1;
+            const rightCol = columns / 2;
+            const startR = (rows - TOP_WORD.length) / 2;
+
+            letterAt = (r, c) => {
+                const k = r - startR;
+                if (c === leftCol && k >= 0 && k < TOP_WORD.length) return TOP_WORD[k];
+                if (c === rightCol && k >= 0 && k < BOTTOM_WORD.length) return BOTTOM_WORD[k];
+                return null;
+            };
+        }
+
+        stage.style.gridTemplateColumns = "repeat(" + columns + ", calc(2 * var(--switch-size)))";
+
+        // Build everything off-screen and add it in one go, so the page lays out once.
+        const fragment = document.createDocumentFragment();
+        const inputs = [];
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < columns; c++) {
+                const letter = letterAt(r, c);
+
+                const label = document.createElement("label");
+                const input = document.createElement("input");
+                input.type = "checkbox";
+                input.tabIndex = -1;
+                label.appendChild(input);
+
+                if (letter) {
+                    const span = document.createElement("span");
+                    span.className = "letter";
+                    span.textContent = letter;
+                    label.appendChild(span);
+                }
+
+                const knob = document.createElement("span");
+                knob.className = "knob";
+                label.appendChild(knob);
+
+                fragment.appendChild(label);
+                inputs.push(input);
+            }
+        }
+
+        stage.replaceChildren(fragment);
+        return inputs;
+    }
+
+    // One listener for the whole grid instead of one per switch.
+    // Hovering with a mouse flips the switch; clicking/tapping flips it again
+    // (that part is the checkbox's normal behaviour).
+    stage.addEventListener("pointerover", (e) => {
+        if (e.pointerType !== "mouse") return;
+        const label = e.target.closest("label");
+        if (!label || label.contains(e.relatedTarget)) return;
+        const input = label.firstElementChild;
+        input.checked = !input.checked;
+    });
+
+    // The play/stop button of the detail page adds .stop-animation when paused.
+    const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
+
+    function startSwitching(inputs) {
+        clearInterval(timer);
+
+        // Switches are split into groups, and each group keeps one switch on.
+        const groups = Array.from({ length: GROUP_COUNT }, () => []);
+        inputs.forEach((input) => {
+            const g = Math.floor(Math.random() * GROUP_COUNT);
+            input.dataset.group = g;
+            groups[g].push(input);
+        });
+
+        // Start with one switch on per group, so it isn't empty at first.
+        const activeByGroup = new Map();
+        groups.forEach((members, g) => {
+            if (!members.length) return;
+            const first = members[Math.floor(Math.random() * members.length)];
+            first.checked = true;
+            activeByGroup.set(g, first);
+        });
+
+        // A single timer: each tick moves one group's "on" switch to a new one.
+        timer = setInterval(() => {
+            if (isPaused()) return;
+            const input = inputs[Math.floor(Math.random() * inputs.length)];
+            const g = Number(input.dataset.group);
+            const previous = activeByGroup.get(g);
+            if (previous === input) return;
+            if (previous) previous.checked = false;
+            input.checked = true;
+            activeByGroup.set(g, input);
+        }, DELAY);
+    }
+
+    function start() {
+        setSizes();
+        startSwitching(buildGrid());
+    }
+
+    // Rebuild whenever the stage changes size (window resize, rotation), since the
+    // layout (horizontal vs vertical) depends on the available width.
+    let resizeTimer;
+    let lastWidth = 0;
+    let lastHeight = 0;
+    new ResizeObserver(() => {
+        const W = stage.clientWidth;
+        const H = stage.clientHeight;
+        if (!W || !H || (W === lastWidth && H === lastHeight)) return;
+        const first = !lastWidth;
+        lastWidth = W;
+        lastHeight = H;
+        clearTimeout(resizeTimer);
+        if (first) start();
+        else resizeTimer = setTimeout(start, 200);
+    }).observe(stage);
+</script>
