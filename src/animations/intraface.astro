@@ -164,23 +164,35 @@
         });
     });
 
-    setInterval(() => {
-        faceData.forEach((data) => {
-            // Verschuif en voeg nieuw woord toe (voor de basis laag)
-            data.words.shift();
-            data.words.push(generateFragment(data.type));
+    // Pre-compute de glitch-2 "intraface" tekst (deze verandert nooit)
+    const intrafaceText = new Array(100).fill("intraface").join("  ");
+    faceData.forEach((data) => {
+        data.glitch2Layer.textContent = intrafaceText;
+    });
 
-            // Basis en Glitch-1 (niet-inverted) tonen de normale matrix-achtige code
-            data.baseLayer.textContent = data.words.join("  ");
-            data.glitch1Layer.textContent = generateTypingGlitchLayer(
-                data.words,
-            );
+    // Gebruik requestAnimationFrame in plaats van setInterval voor vloeiendere animatie
+    let lastUpdate = 0;
+    const UPDATE_INTERVAL = 120; // ms tussen tekstupdates
 
-            // Glitch-2 (de inverterende witte vlakken) toont uitsluitend 'intraface'
-            const intrafaceArray = new Array(data.words.length).fill(
-                "intraface",
-            );
-            data.glitch2Layer.textContent = intrafaceArray.join("  ");
-        });
-    }, 150);
+    function animateIntraface(timestamp) {
+        if (timestamp - lastUpdate >= UPDATE_INTERVAL) {
+            lastUpdate = timestamp;
+
+            faceData.forEach((data) => {
+                // Verschuif en voeg nieuw woord toe (voor de basis laag)
+                data.words.shift();
+                data.words.push(generateFragment(data.type));
+
+                // Basis en Glitch-1 (niet-inverted) tonen de normale matrix-achtige code
+                data.baseLayer.textContent = data.words.join("  ");
+                data.glitch1Layer.textContent = generateTypingGlitchLayer(
+                    data.words,
+                );
+            });
+        }
+
+        requestAnimationFrame(animateIntraface);
+    }
+
+    requestAnimationFrame(animateIntraface);
 </script>
