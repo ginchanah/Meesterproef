@@ -1,0 +1,72 @@
+---
+
+---
+
+<div class="object-container" id="object-container">
+    <div class="scene">
+        <!-- 750px Outer Cube -->
+        <div class="cube-4">
+            <div class="face front"></div>
+            <div class="face back"></div>
+            <div class="face right"></div>
+            <div class="face left"></div>
+            <div class="face top"></div>
+            <div class="face bottom"></div>
+
+            <!-- 500px Mid-Outer Cube -->
+            <div class="cube-3">
+                <div class="face front"></div>
+                <div class="face back"></div>
+                <div class="face right"></div>
+                <div class="face left"></div>
+                <div class="face top"></div>
+                <div class="face bottom"></div>
+
+                <!-- 300px Mid-Inner Cube -->
+                <div class="cube-2">
+                    <div class="face front"></div>
+                    <div class="face back"></div>
+                    <div class="face right"></div>
+                    <div class="face left"></div>
+                    <div class="face top"></div>
+                    <div class="face bottom"></div>
+
+                    <!-- 120px White Inner Cube -->
+                    <div class="cube-1">
+                        <div class="face front"></div>
+                        <div class="face back"></div>
+                        <div class="face right"></div>
+                        <div class="face left"></div>
+                        <div class="face top"></div>
+                        <div class="face bottom"></div>
+
+                        <!-- Central Black Text -->
+                        <div class="object-core">OBJECT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //@ts-nocheck
+    const container = document.getElementById("object-container");
+    const animationButton =
+        container?.closest(".animation-section")?.querySelector(".animation-button") ||
+        document.querySelector(".animation-button");
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (animationButton) {
+        if (prefersReducedMotion) {
+            animationButton.classList.add("stop-animation");
+        } else {
+            animationButton.classList.add("play-animation");
+        }
+
+        animationButton.addEventListener("click", () => {
+            animationButton.classList.toggle("stop-animation");
+            animationButton.classList.toggle("play-animation");
+        });
+    }
+</script>

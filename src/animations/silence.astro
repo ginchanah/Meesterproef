@@ -1,0 +1,63 @@
+---
+
+---
+
+<div class="silence-container" id="silence-container">
+    <!-- Container gets 'is-visible' by default so it shows on load -->
+    <div id="silence-word" class="word-container is-visible">
+        <span class="letter">s</span>
+        <span class="letter">i</span>
+        <span class="letter">l</span>
+        <span class="letter">e</span>
+        <span class="letter">n</span>
+        <span class="letter">c</span>
+        <span class="letter">e</span>
+    </div>
+</div>
+
+<script>
+    //@ts-nocheck
+    const container = document.getElementById("silence-container");
+    const wordEl = document.getElementById("silence-word");
+
+    if (container && wordEl) {
+        let timeoutId;
+        const stillnessDelay = 600; // ms to wait before the word comes back
+
+        function handleMovement() {
+            wordEl.classList.remove("is-visible");
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                wordEl.classList.add("is-visible");
+            }, stillnessDelay);
+        }
+
+        // Listen to movement ONLY within the animation container
+        container.addEventListener("pointermove", handleMovement, { passive: true });
+        container.addEventListener("pointerdown", handleMovement, { passive: true });
+        container.addEventListener("pointerleave", () => {
+            clearTimeout(timeoutId);
+            wordEl.classList.add("is-visible");
+        }, { passive: true });
+
+        // Connect animation pause button and reduced motion
+        const animationButton =
+            container.closest(".animation-section")?.querySelector(".animation-button") ||
+            document.querySelector(".animation-button");
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (animationButton) {
+            if (prefersReducedMotion) {
+                animationButton.classList.add("stop-animation");
+                wordEl.classList.add("is-visible");
+            } else {
+                animationButton.classList.add("play-animation");
+            }
+
+            animationButton.addEventListener("click", () => {
+                animationButton.classList.toggle("stop-animation");
+                animationButton.classList.toggle("play-animation");
+            });
+        }
+    }
+</script>
