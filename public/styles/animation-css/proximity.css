@@ -1,0 +1,21 @@
+.proximity-container {
+    position: relative;
+    width: 100%;
+    height: var(--animation-height, 80vh);
+    background-color: #000;
+    overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+    .proximity-container {
+        height: var(--animation-height, 90vh);
+    }
+}
+
+.proximity-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: none;
+}

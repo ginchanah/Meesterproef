@@ -1,0 +1,254 @@
+.object-container {
+    position: relative;
+    width: 100%;
+    height: var(--animation-height, 80vh);
+    background-color: #000;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (min-width: 1024px) {
+    .object-container {
+        height: var(--animation-height, 90vh);
+    }
+}
+
+.object-container .scene {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    perspective: 1200px;
+}
+
+@media (max-width: 768px) {
+    .object-container .scene {
+        transform: scale(0.65);
+    }
+}
+
+@media (max-width: 480px) {
+    .object-container .scene {
+        transform: scale(0.5);
+    }
+}
+
+/* Base styles for all cubes */
+.object-container [class^="cube-"] {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-style: preserve-3d;
+}
+
+/* Cube sizing & animation timings */
+.object-container .cube-4 {
+    width: 750px;
+    height: 750px;
+    animation: trippy-4 20s infinite linear;
+}
+
+.object-container .cube-3 {
+    width: 500px;
+    height: 500px;
+    animation: trippy-3 15s infinite linear;
+}
+
+.object-container .cube-2 {
+    width: 300px;
+    height: 300px;
+    animation: trippy-2 10s infinite linear;
+}
+
+.object-container .cube-1 {
+    width: 120px;
+    height: 120px;
+    animation: trippy-1 6s infinite linear;
+}
+
+/* Outer transparent wireframe faces */
+.object-container .face {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    background: transparent;
+}
+
+.object-container .cube-4 > .face {
+    width: 750px;
+    height: 750px;
+}
+
+.object-container .cube-3 > .face {
+    width: 500px;
+    height: 500px;
+}
+
+.object-container .cube-2 > .face {
+    width: 300px;
+    height: 300px;
+}
+
+/* Inner solid white cube faces */
+.object-container .cube-1 > .face {
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid #000000;
+}
+
+/* 3D offsets (translateZ = width / 2) */
+.object-container .cube-4 > .front {
+    transform: translateZ(375px);
+}
+
+.object-container .cube-4 > .back {
+    transform: rotateY(180deg) translateZ(375px);
+}
+
+.object-container .cube-4 > .right {
+    transform: rotateY(90deg) translateZ(375px);
+}
+
+.object-container .cube-4 > .left {
+    transform: rotateY(-90deg) translateZ(375px);
+}
+
+.object-container .cube-4 > .top {
+    transform: rotateX(90deg) translateZ(375px);
+}
+
+.object-container .cube-4 > .bottom {
+    transform: rotateX(-90deg) translateZ(375px);
+}
+
+.object-container .cube-3 > .front {
+    transform: translateZ(250px);
+}
+
+.object-container .cube-3 > .back {
+    transform: rotateY(180deg) translateZ(250px);
+}
+
+.object-container .cube-3 > .right {
+    transform: rotateY(90deg) translateZ(250px);
+}
+
+.object-container .cube-3 > .left {
+    transform: rotateY(-90deg) translateZ(250px);
+}
+
+.object-container .cube-3 > .top {
+    transform: rotateX(90deg) translateZ(250px);
+}
+
+.object-container .cube-3 > .bottom {
+    transform: rotateX(-90deg) translateZ(250px);
+}
+
+.object-container .cube-2 > .front {
+    transform: translateZ(150px);
+}
+
+.object-container .cube-2 > .back {
+    transform: rotateY(180deg) translateZ(150px);
+}
+
+.object-container .cube-2 > .right {
+    transform: rotateY(90deg) translateZ(150px);
+}
+
+.object-container .cube-2 > .left {
+    transform: rotateY(-90deg) translateZ(150px);
+}
+
+.object-container .cube-2 > .top {
+    transform: rotateX(90deg) translateZ(150px);
+}
+
+.object-container .cube-2 > .bottom {
+    transform: rotateX(-90deg) translateZ(150px);
+}
+
+.object-container .cube-1 > .front {
+    transform: translateZ(60px);
+}
+
+.object-container .cube-1 > .back {
+    transform: rotateY(180deg) translateZ(60px);
+}
+
+.object-container .cube-1 > .right {
+    transform: rotateY(90deg) translateZ(60px);
+}
+
+.object-container .cube-1 > .left {
+    transform: rotateY(-90deg) translateZ(60px);
+}
+
+.object-container .cube-1 > .top {
+    transform: rotateX(90deg) translateZ(60px);
+}
+
+.object-container .cube-1 > .bottom {
+    transform: rotateX(-90deg) translateZ(60px);
+}
+
+/* Keyframe Animations */
+@keyframes trippy-4 {
+    from {
+        transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotateX(360deg) rotateY(720deg) rotateZ(180deg);
+    }
+}
+
+@keyframes trippy-3 {
+    from {
+        transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotateX(-720deg) rotateY(-360deg) rotateZ(360deg);
+    }
+}
+
+@keyframes trippy-2 {
+    from {
+        transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotateX(360deg) rotateY(-360deg) rotateZ(-360deg);
+    }
+}
+
+@keyframes trippy-1 {
+    from {
+        transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotateX(-360deg) rotateY(360deg) rotateZ(720deg);
+    }
+}
+
+/* Central Black Text inside White Cube */
+.object-container .object-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #000000;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+    z-index: 10;
+}
