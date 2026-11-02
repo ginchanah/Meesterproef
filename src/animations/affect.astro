@@ -11,31 +11,43 @@
     const container = document.getElementById("affect-container");
     const cv = document.getElementById("affect-canvas");
     const ctx = cv.getContext("2d");
-    const FONT = '"Inter", "Helvetica Neue", Arial, sans-serif';
+    const FONT_FAMILY = '"Inter", "Helvetica Neue", Arial, sans-serif';
 
-    // Fixed number of rings that scale down with screen size
     const NUM_RINGS = 50;
     let n = NUM_RINGS;
     let M = 200;
     let totalPoints = 0;
-    let W = 0, H = 0, DPR = 1;
+    let W = 0,
+        H = 0,
+        DPR = 1;
 
-    let bx = null, by = null, dx = null, dy = null, vx = null, vy = null;
+    let bx = null,
+        by = null,
+        dx = null,
+        dy = null,
+        vx = null,
+        vy = null;
     let ringAlphas = null;
     let insideSegs = null;
 
     let agent = { x: 0, y: 0 };
-    let ptrX = 0, ptrY = 0, hasPtr = false, ptrAt = -99;
+    let ptrX = 0,
+        ptrY = 0,
+        hasPtr = false,
+        ptrAt = -99;
     let animId = null;
     let isVisible = true;
     let isRunning = true;
     let lastTime = 0;
 
-    // Check motion preference and hook up animation button
     const animationButton =
-        container?.closest(".animation-section")?.querySelector(".animation-button") ||
+        container
+            ?.closest(".animation-section")
+            ?.querySelector(".animation-button") ||
         document.querySelector(".animation-button");
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     if (animationButton) {
         if (prefersReducedMotion) {
@@ -58,16 +70,20 @@
     }
 
     function build() {
-        if (!container || !cv) return;
+        if (!container || !cv) return false;
 
         const rect = container.getBoundingClientRect();
-        W = Math.floor(container.clientWidth || rect.width || window.innerWidth);
-        H = Math.floor(container.clientHeight || rect.height || window.innerHeight);
-        if (W <= 0 || H <= 0) return;
+        W = Math.floor(
+            container.clientWidth || rect.width || window.innerWidth,
+        );
+        H = Math.floor(
+            container.clientHeight || rect.height || window.innerHeight,
+        );
+
+        // Abort if container has no layout size yet
+        if (W <= 0 || H <= 0) return false;
 
         const isMobile = W < 768;
-
-        // Capping DPR avoids fillrate bottlenecks on high-density phone screens while staying sharp
         DPR = isMobile
             ? Math.min(window.devicePixelRatio || 1, 1.25)
             : Math.min(window.devicePixelRatio || 1, 1.75);
@@ -76,32 +92,31 @@
         cv.height = Math.round(H * DPR);
         ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-        // Fixed number of rings across all viewports, scaling down proportionally
         n = NUM_RINGS;
         M = isMobile ? 180 : 240;
 
         const cx = W / 2;
         const cy = H / 2;
         const maxR = Math.hypot(W, H) / 2;
-        // Ring spacing scales down directly with screen size (smaller gap on mobile = dense, clear word)
         const gap = (maxR - 10) / n;
 
-        // Render word mask off-screen to detect which segments intersect the word
+        // Render word mask off-screen
         const m = document.createElement("canvas");
         m.width = W;
         m.height = H;
         const g = m.getContext("2d", { willReadFrequently: true });
         let fs = 100;
-        g.font = `600 ${fs}px ${FONT}`;
-        fs = Math.min((fs * (W * 0.82)) / g.measureText("affect").width, H * 0.5);
-        g.font = `600 ${fs}px ${FONT}`;
+        g.font = `600 ${fs}px ${FONT_FAMILY}`;
+        const measuredWidth = g.measureText("affect").width || 1;
+        fs = Math.min((fs * W * 0.82) / measuredWidth, H * 0.5);
+
+        g.font = `600 ${fs}px ${FONT_FAMILY}`;
         g.textAlign = "center";
         g.textBaseline = "middle";
         g.fillStyle = "#fff";
         g.fillText("affect", cx, cy + fs * 0.04);
         const px = g.getImageData(0, 0, W, H).data;
 
-        // Precompute circle angle sin & cos
         const cosAngles = new Float32Array(M);
         const sinAngles = new Float32Array(M);
         const TWO_PI = Math.PI * 2;
@@ -119,13 +134,18 @@
         vx = new Float32Array(totalPoints);
         vy = new Float32Array(totalPoints);
         const isInside = new Uint8Array(totalPoints);
-
         ringAlphas = new Float32Array(n);
 
         const checkInside = (x, y) => {
             const xi = Math.round(x);
             const yi = Math.round(y);
-            return xi >= 0 && yi >= 0 && xi < W && yi < H && px[(yi * W + xi) * 4 + 3] > 80;
+            return (
+                xi >= 0 &&
+                yi >= 0 &&
+                xi < W &&
+                yi < H &&
+                px[(yi * W + xi) * 4 + 3] > 80
+            );
         };
 
         for (let i = 0; i < n; i++) {
@@ -145,8 +165,6 @@
             }
         }
 
-        // Pre-index segments that form the word "affect"
-        // Midpoint sampling guarantees that even thin letter strokes are never missed
         const segs = [];
         for (let i = 0; i < n; i++) {
             const start = i * M;
@@ -165,6 +183,7 @@
 
         agent.x = cx;
         agent.y = cy;
+        return true;
     }
 
     function frame(now) {
@@ -173,16 +192,22 @@
             return;
         }
 
+        // GUARD: Do not execute physics if build() has not successfully initialized arrays
+        if (!bx || !insideSegs || totalPoints === 0) {
+            animId = requestAnimationFrame(frame);
+            return;
+        }
+
         if (!lastTime) lastTime = now;
         const dt = Math.min((now - lastTime) / 1000, 0.05);
         lastTime = now;
-        const dtMultiplier = dt * 60; // normalized to 60fps
+        const dtMultiplier = dt * 60;
 
         const t = now / 1000;
         ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, W, H);
 
-        const isInteracting = hasPtr && (t - ptrAt < 2.5);
+        const isInteracting = hasPtr && t - ptrAt < 2.5;
         let tx, ty;
         if (isInteracting) {
             tx = ptrX;
@@ -199,7 +224,11 @@
 
         const ambientAmp = 75 * Math.sin(t * 0.4);
         const amp = isInteracting
-            ? (Math.abs(ambientAmp) < 45 ? (ambientAmp >= 0 ? 55 : -55) : ambientAmp)
+            ? Math.abs(ambientAmp) < 45
+                ? ambientAmp >= 0
+                    ? 55
+                    : -55
+                : ambientAmp
             : ambientAmp;
 
         const isMobile = W < 768;
@@ -213,7 +242,7 @@
         const springK = 0.06 * dtMultiplier;
         const damping = Math.pow(0.82, dtMultiplier);
 
-        // 1. Fast contiguous TypedArray physics loop
+        // 1. Physics update
         for (let i = 0; i < totalPoints; i++) {
             const ex = bx[i] - ax;
             const ey = by[i] - ay;
@@ -225,8 +254,8 @@
                 vx[i] += ((ex / d) * f - dx[i]) * springK;
                 vy[i] += ((ey / d) * f - dy[i]) * springK;
             } else {
-                vx[i] += (-dx[i]) * springK;
-                vy[i] += (-dy[i]) * springK;
+                vx[i] += -dx[i] * springK;
+                vy[i] += -dy[i] * springK;
             }
 
             vx[i] *= damping;
@@ -235,7 +264,7 @@
             dy[i] += vy[i];
         }
 
-        // 2. Draw thin base rings
+        // 2. Draw base rings
         ctx.strokeStyle = "#fff";
         ctx.lineWidth = 1;
         ctx.lineCap = "round";
@@ -252,8 +281,8 @@
             ctx.stroke();
         }
 
-        // 3. Draw highlighted word segments in a single batched path
-        if (insideSegs && insideSegs.length > 0) {
+        // 3. Draw text segments
+        if (insideSegs.length > 0) {
             ctx.lineWidth = isMobile ? 2.4 : 2.8;
             ctx.globalAlpha = 1;
             ctx.beginPath();
@@ -266,18 +295,18 @@
             ctx.stroke();
         }
 
-        // 4. Draw agent indicator
+        // 4. Draw agent
         ctx.globalAlpha = 1;
         ctx.fillStyle = "#fff";
         ctx.beginPath();
-        ctx.arc(agent.x, agent.y, isMobile ? 3 : 4, 0, 6.2832);
+        ctx.arc(agent.x, agent.y, isMobile ? 3 : 4, 0, Math.PI * 2);
         ctx.fill();
 
         animId = requestAnimationFrame(frame);
     }
 
-    // Convert pointer to container coordinates without allocating garbage
     function updatePointer(e) {
+        if (!cv) return;
         const rect = cv.getBoundingClientRect();
         ptrX = e.clientX - rect.left;
         ptrY = e.clientY - rect.top;
@@ -287,10 +316,21 @@
 
     cv.addEventListener("pointermove", updatePointer, { passive: true });
     cv.addEventListener("pointerdown", updatePointer, { passive: true });
-    cv.addEventListener("pointerup", () => { hasPtr = false; }, { passive: true });
-    cv.addEventListener("pointerleave", () => { hasPtr = false; }, { passive: true });
+    cv.addEventListener(
+        "pointerup",
+        () => {
+            hasPtr = false;
+        },
+        { passive: true },
+    );
+    cv.addEventListener(
+        "pointerleave",
+        () => {
+            hasPtr = false;
+        },
+        { passive: true },
+    );
 
-    // Pause animation when off-screen to preserve battery and performance
     if ("IntersectionObserver" in window && container) {
         const observer = new IntersectionObserver(
             (entries) => {
@@ -302,17 +342,19 @@
                     }
                 }
             },
-            { threshold: 0.05 }
+            { threshold: 0.05 },
         );
         observer.observe(container);
     }
 
-    // Responsive container resize observer
     let resizeTimer = null;
     function onResize() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            build();
+            if (build() && isRunning && isVisible && !animId) {
+                lastTime = performance.now();
+                animId = requestAnimationFrame(frame);
+            }
         }, 120);
     }
 
@@ -323,17 +365,33 @@
         window.addEventListener("resize", onResize);
     }
 
-    const go = () => {
-        build();
+    const startAnimation = () => {
+        const built = build();
+        if (!built) {
+            // Retry once layout resolves if dimensions were 0 on initial pass
+            requestAnimationFrame(() => {
+                build();
+                if (isRunning && isVisible && !animId) {
+                    lastTime = performance.now();
+                    animId = requestAnimationFrame(frame);
+                }
+            });
+            return;
+        }
+
         if (isRunning && isVisible && !animId) {
             lastTime = performance.now();
             animId = requestAnimationFrame(frame);
         }
     };
 
-    if (document.fonts) {
-        document.fonts.ready.then(go);
+    // Ensure custom font is fully loaded before calculating text metrics
+    if (document.fonts && document.fonts.load) {
+        document.fonts
+            .load(`600 100px ${FONT_FAMILY}`)
+            .then(startAnimation)
+            .catch(startAnimation);
     } else {
-        go();
+        window.addEventListener("load", startAnimation);
     }
 </script>
