@@ -25,9 +25,8 @@
             maxRx = 1,
             rings = [],
             timer = null,
-            t0 = 0,
-            lastDraw = 0,
-            minGap = 0;
+            t0 = 0;
+        let atlas = null;
         const seqs = []; // [0] crisp glyphs, [1] glyphs with a baked-in soft glow
         const PAD = 6; // extra sprite margin so the glow isn't clipped
         let animId = null;
@@ -91,29 +90,57 @@
             observer.observe(container);
         }
 
-        // Each letter is rendered once to a tiny sprite; frames just stamp them along the ridges.
+        // Bake characters into a single GPU atlas to avoid thousands of texture re-binds per frame
         function buildSprites() {
             const m = document.createElement("canvas").getContext("2d");
             m.font = FONT;
+            const charWidths = [...WORD].map((ch) => m.measureText(ch).width + 0.5);
+
+            const rowH = Math.ceil(16 + PAD * 2);
+            let totalW = 0;
+            for (let i = 0; i < WORD.length; i++) {
+                totalW += Math.ceil(charWidths[i]) + 4 + PAD * 2 + 4;
+            }
+
+            atlas = document.createElement("canvas");
+            atlas.width = Math.ceil(totalW * dpr);
+            atlas.height = Math.ceil(rowH * 2 * dpr);
+            const g = atlas.getContext("2d");
+            g.scale(dpr, dpr);
+            g.font = FONT;
+
             [false, true].forEach((glow, si) => {
                 const pad = glow ? PAD : 0;
-                seqs[si] = [...WORD].map((ch) => {
-                    const a = m.measureText(ch).width + 0.5;
-                    const w = Math.ceil(a) + 4 + pad * 2,
-                        h = 16 + pad * 2;
-                    const c = document.createElement("canvas");
-                    c.width = w * dpr;
-                    c.height = h * dpr;
-                    const g = c.getContext("2d");
-                    g.scale(dpr, dpr);
-                    g.font = FONT;
+                const yOffset = si * rowH;
+                let currentX = 0;
+
+                seqs[si] = [...WORD].map((ch, idx) => {
+                    const a = charWidths[idx];
+                    const w = Math.ceil(a) + 4 + pad * 2;
+                    const h = 16 + pad * 2;
+
+                    g.save();
                     g.fillStyle = COLOR;
                     if (glow) {
                         g.shadowColor = "rgba(255,255,255,0.9)";
                         g.shadowBlur = 5;
                     }
-                    g.fillText(ch, 2 + pad, 12 + pad);
-                    return { c, w, h, a, pad, blank: ch === " " };
+                    g.fillText(ch, currentX + 2 + pad, yOffset + 12 + pad);
+                    g.restore();
+
+                    const info = {
+                        sx: Math.round(currentX * dpr),
+                        sy: Math.round(yOffset * dpr),
+                        sw: Math.round(w * dpr),
+                        sh: Math.round(h * dpr),
+                        w,
+                        h,
+                        a,
+                        pad,
+                        blank: ch === " ",
+                    };
+                    currentX += w + 4;
+                    return info;
                 });
             });
         }
@@ -126,7 +153,9 @@
             if (W <= 0 || H <= 0) return false;
 
             const isMobile = W < 768;
-            dpr = isMobile ? Math.min(window.devicePixelRatio || 1, 1.5) : Math.min(window.devicePixelRatio || 1, 2);
+            dpr = isMobile
+                ? Math.min(window.devicePixelRatio || 1, 1.25)
+                : Math.min(window.devicePixelRatio || 1, 1.75);
             cv.width = Math.round(W * dpr);
             cv.height = Math.round(H * dpr);
             cx = W / 2;
@@ -142,10 +171,8 @@
         const ripples = [];
         let act = [],
             ox = 0,
-            oy = 0,
-            ob = 0;
+            oy = 0;
 
-        // work out each live ripple's current radius, width and strength once per frame
         function prepRipples(now) {
             act = [];
             for (let i = ripples.length - 1; i >= 0; i--) {
@@ -166,9 +193,8 @@
             }
         }
 
-        // displacement (ox, oy) and brightness boost (ob) at a point from all live ripples
         function rippleAt(x, y) {
-            ox = oy = ob = 0;
+            ox = oy = 0;
             for (let i = 0; i < act.length; i++) {
                 const r = act[i],
                     dx = x - r.x,
@@ -176,22 +202,37 @@
                     d2 = dx * dx + dy * dy;
                 const lo = r.front - r.w * 3,
                     hi = r.front + r.w * 3;
-                if (d2 > hi * hi || (lo > 0 && d2 < lo * lo)) continue; // cheap reject, no sqrt
+                if (d2 > hi * hi || (lo > 0 && d2 < lo * lo)) continue;
                 const d = Math.sqrt(d2) || 1,
                     u = (d - r.front) / r.w;
                 const env = Math.exp(-u * u * 0.5) * r.fade;
                 const disp = r.amp * env * Math.cos(u * 2.2);
                 ox += (dx / d) * disp;
                 oy += (dy / d) * disp;
-                ob += env;
             }
+        }
+
+        function rippleGlowAt(x, y) {
+            let ob = 0;
+            for (let i = 0; i < act.length; i++) {
+                const r = act[i],
+                    dx = x - r.x,
+                    dy = y - r.y,
+                    d2 = dx * dx + dy * dy;
+                const lo = r.front - r.w * 3,
+                    hi = r.front + r.w * 3;
+                if (d2 > hi * hi || (lo > 0 && d2 < lo * lo)) continue;
+                const d = Math.sqrt(d2) || 1,
+                    u = (d - r.front) / r.w;
+                ob += Math.exp(-u * u * 0.5) * r.fade;
+            }
+            return ob;
         }
 
         function draw(t) {
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, cv.width, cv.height);
 
-            // phases drift over time so the whole displacement field flows (computed once per frame)
             const p1 = s.p1 + t * 0.35,
                 p2 = s.p2 + t * 0.28,
                 p3 = s.p3 - t * 0.31,
@@ -208,29 +249,29 @@
             prepRipples(performance.now());
             const hasRipples = act.length > 0;
 
-            // farthest screen corner from the current centre (used to skip off-screen rings)
             const farX = Math.max(cx, W - cx) + 130,
                 farY = Math.max(cy, H - cy) + 130;
+            let currentAlpha = -1;
 
-            for (const ring of rings) {
-                // skip rings that lie entirely off-screen from the current centre
+            for (let rIdx = 0; rIdx < rings.length; rIdx++) {
+                const ring = rings[rIdx];
                 if ((farX / ring.rx) ** 2 + (farY / ring.ry) ** 2 < 1) continue;
 
                 const { n, cos, sin, xs, ys, lens } = ring;
 
-                // depth: a brightness wave travels outward (plus a slow second wave), so rings rise and recede
                 let d =
                     0.5 +
                     0.35 * Math.sin(ring.i * 0.4 - t * 1.1) +
                     0.15 * Math.sin(ring.i * 0.13 + t * 0.5);
                 d = d < 0 ? 0 : d > 1 ? 1 : d;
                 const ringAlpha = 0.16 + 0.84 * Math.pow(d, 1.6);
-                const gs = (0.78 + 0.5 * d) * (1 - (0.22 * ring.rx) / maxRx); // near = big, far = small
-                const seq = d > 0.78 ? seqs[1] : seqs[0]; // brightest rings glow
+                const gs = (0.78 + 0.5 * d) * (1 - (0.22 * ring.rx) / maxRx);
+                const seq = d > 0.78 ? seqs[1] : seqs[0];
                 const wW = ring.wordW * gs;
-                const w = Math.sin(ring.i * 0.22 - t * 1.6) * 4; // ripple travelling outward
+                const w = Math.sin(ring.i * 0.22 - t * 1.6) * 4;
                 const rx = ring.rx + w,
                     ry = ring.ry + w * 1.35;
+
                 for (let j = 0; j < n; j++) {
                     const bx = cx + cos[j] * rx,
                         by = cy + sin[j] * ry;
@@ -251,14 +292,13 @@
                 xs[n] = xs[0];
                 ys[n] = ys[0];
 
-                // walk the polyline, stamping one glyph per character
                 let L = 0;
                 for (let j = 0; j < n; j++) {
                     const l = Math.hypot(xs[j + 1] - xs[j], ys[j + 1] - ys[j]);
                     lens[j] = l;
                     L += l;
                 }
-                // stretch spacing slightly so a whole number of words fits: the text wraps with no seam
+
                 const scale = L / (Math.max(1, Math.round(L / wW)) * wW);
                 let k = 0,
                     sp = seq[0],
@@ -266,20 +306,43 @@
                     pos = -ring.phase * wW * scale,
                     mid = pos + ad / 2,
                     L0 = 0;
+
                 for (let j = 0; j < n; j++) {
                     const x0 = xs[j],
                         y0 = ys[j],
-                        dx = xs[j + 1] - x0,
-                        dy = ys[j + 1] - y0;
+                        x1 = xs[j + 1],
+                        y1 = ys[j + 1];
+
                     const len = lens[j];
                     if (len < 1e-6) continue;
-                    const ca = dx / len,
-                        sa = dy / len,
-                        L1 = L0 + len;
+                    const L1 = L0 + len;
+
+                    // Fast reject if the whole segment is off-screen
+                    if (
+                        (x0 < -35 && x1 < -35) ||
+                        (x0 > W + 35 && x1 > W + 35) ||
+                        (y0 < -35 && y1 < -35) ||
+                        (y0 > H + 35 && y1 > H + 35)
+                    ) {
+                        while (mid <= L1) {
+                            pos += ad;
+                            k++;
+                            sp = seq[k % seq.length];
+                            ad = sp.a * gs * scale;
+                            mid = pos + ad / 2;
+                        }
+                        L0 = L1;
+                        continue;
+                    }
+
+                    const ca = (x1 - x0) / len,
+                        sa = (y1 - y0) / len;
+
                     while (mid <= L1) {
                         const f = mid - L0,
                             mx = x0 + ca * f,
                             my = y0 + sa * f;
+
                         if (
                             mid >= 0 &&
                             !sp.blank &&
@@ -289,17 +352,22 @@
                             my < H + 20
                         ) {
                             const h = (sp.a * gs) / 2;
-                            // vignette: glyphs fade toward the screen edges for a sense of distance
                             const vx = (mx - W / 2) / (W / 2),
                                 vy = (my - H / 2) / (H / 2);
                             const v =
                                 1 - 0.55 * Math.min(1, (vx * vx + vy * vy) / 1.6);
                             let alpha = ringAlpha * v;
+
                             if (hasRipples) {
-                                rippleAt(mx, my);
+                                const ob = rippleGlowAt(mx, my);
                                 alpha = Math.min(1, alpha + ob * 0.22);
                             }
-                            ctx.globalAlpha = alpha;
+
+                            const roundedAlpha = Math.round(alpha * 100) / 100;
+                            if (roundedAlpha !== currentAlpha) {
+                                ctx.globalAlpha = currentAlpha = roundedAlpha;
+                            }
+
                             const gx = ca * dpr * gs,
                                 gy = sa * dpr * gs;
                             ctx.setTransform(
@@ -311,7 +379,11 @@
                                 (my - sa * h) * dpr,
                             );
                             ctx.drawImage(
-                                sp.c,
+                                atlas,
+                                sp.sx,
+                                sp.sy,
+                                sp.sw,
+                                sp.sh,
                                 -2 - sp.pad,
                                 -12 - sp.pad,
                                 sp.w,
@@ -350,14 +422,19 @@
                 amp2: 10 + Math.random() * 15,
             };
 
-            // generate enough rings to cover the screen from any centre position
-            const maxRadius = Math.hypot(W, H) * 1.1;
-            const numRings = Math.floor(maxRadius / spacing);
-            maxRx = numRings * spacing;
+            // Full diagonal reference preserved so depth scale (gs) is pixel-identical
+            maxRx = Math.hypot(W, H) * 1.1;
+
+            // Generate rings to cover visible canvas from center past corners
+            const cornerDist = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
+            const maxRadius = cornerDist + spacing * 4;
+            const numRings = Math.max(8, Math.floor(maxRadius / spacing));
+
             for (let i = 1; i <= numRings; i++) {
                 const rx = i * spacing,
                     ry = i * spacing * 1.35;
-                const n = Math.max(60, i * 5);
+                // Cap vertex density to prevent outer rings from lagging while keeping curves smooth
+                const n = Math.min(180, Math.max(60, i * 4));
                 const cos = new Float32Array(n),
                     sin = new Float32Array(n);
                 for (let j = 0; j < n; j++) {
@@ -389,14 +466,7 @@
                 return;
             }
             animId = requestAnimationFrame(loop);
-            if (now - lastDraw < minGap) return;
-            lastDraw = now;
-            const start = performance.now();
             draw((now - t0) / 1000);
-            const cost = performance.now() - start;
-            // adapt: if a frame is expensive, run at ~30fps instead of fighting for 60
-            if (cost > 14) minGap = 33;
-            else if (cost < 8) minGap = 0;
         }
 
         function restart() {
@@ -420,31 +490,38 @@
             new Promise((r) => setTimeout(r, 1500)),
         ]).then(init, init);
 
-        // Hover (or touch-move) over the canvas to send out ripples.
         let last = null;
-        cv.addEventListener("pointermove", (e) => {
-            const rect = cv.getBoundingClientRect();
-            const px = e.clientX - rect.left;
-            const py = e.clientY - rect.top;
-            const now = performance.now();
-            if (
-                last &&
-                Math.hypot(px - last.x, py - last.y) < 60 &&
-                now - last.t < 180
-            )
-                return;
-            last = { x: px, y: py, t: now };
-            ripples.push({ x: px, y: py, born: now });
-            if (ripples.length > MAX_RIPPLES) ripples.shift();
-        }, { passive: true });
+        cv.addEventListener(
+            "pointermove",
+            (e) => {
+                const rect = cv.getBoundingClientRect();
+                const px = e.clientX - rect.left;
+                const py = e.clientY - rect.top;
+                const now = performance.now();
+                if (
+                    last &&
+                    Math.hypot(px - last.x, py - last.y) < 60 &&
+                    now - last.t < 180
+                )
+                    return;
+                last = { x: px, y: py, t: now };
+                ripples.push({ x: px, y: py, born: now });
+                if (ripples.length > MAX_RIPPLES) ripples.shift();
+            },
+            { passive: true }
+        );
 
-        cv.addEventListener("pointerdown", (e) => {
-            const rect = cv.getBoundingClientRect();
-            const px = e.clientX - rect.left;
-            const py = e.clientY - rect.top;
-            ripples.push({ x: px, y: py, born: performance.now() });
-            if (ripples.length > MAX_RIPPLES) ripples.shift();
-        }, { passive: true });
+        cv.addEventListener(
+            "pointerdown",
+            (e) => {
+                const rect = cv.getBoundingClientRect();
+                const px = e.clientX - rect.left;
+                const py = e.clientY - rect.top;
+                ripples.push({ x: px, y: py, born: performance.now() });
+                if (ripples.length > MAX_RIPPLES) ripples.shift();
+            },
+            { passive: true }
+        );
 
         let resizeTimer = null;
         function onResize() {
