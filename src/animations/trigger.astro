@@ -1,0 +1,173 @@
+---
+
+---
+
+<canvas id="c"></canvas>
+<script>
+    // @ts-nocheck
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d");
+
+    let width,
+        height,
+        scale = 1;
+    let particles = [];
+    let textPoints = [];
+    let spelled = false;
+    const mouse = { x: -1000, y: -1000 };
+
+    class Particle {
+        constructor(radius, angle) {
+            this.radius = radius;
+            this.baseAngle = angle;
+            this.x = width / 2 + Math.cos(angle) * radius * scale;
+            this.y = height / 2 + Math.sin(angle) * radius * scale;
+            this.vx = 0;
+            this.vy = 0;
+            this.tx = this.x;
+            this.ty = this.y;
+        }
+        update() {
+            this.baseAngle += 0.001 + (300 - this.radius) * 0.00002;
+
+            let targetX, targetY;
+            if (spelled) {
+                targetX = this.tx;
+                targetY = this.ty;
+            } else {
+                targetX =
+                    width / 2 + Math.cos(this.baseAngle) * this.radius * scale;
+                targetY =
+                    height / 2 + Math.sin(this.baseAngle) * this.radius * scale;
+            }
+
+            const dx = mouse.x - this.x,
+                dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120 && dist > 0.01) {
+                const force = (120 - dist) / 120;
+                this.vx -= (dx / dist) * force * 5;
+                this.vy -= (dy / dist) * force * 5;
+            }
+
+            this.vx += (targetX - this.x) * 0.05;
+            this.vy += (targetY - this.y) * 0.05;
+            this.vx *= 0.85;
+            this.vy *= 0.85;
+            this.x += this.vx;
+            this.y += this.vy;
+        }
+        draw() {
+            ctx.fillRect(this.x, this.y, 1.5, 1.5);
+        }
+    }
+
+    function buildTextPoints() {
+        const off = document.createElement("canvas");
+        off.width = width;
+        off.height = height;
+        const o = off.getContext("2d");
+        let size = Math.min(width * 0.2, 260);
+        const font = (s) =>
+            `900 ${s}px system-ui, -apple-system, "Segoe UI", Arial, sans-serif`;
+        o.font = font(size);
+        const maxW = width * 0.86;
+        const w = o.measureText("TRIGGER").width;
+        if (w > maxW) {
+            size *= maxW / w;
+            o.font = font(size);
+        }
+        o.fillStyle = "#fff";
+        o.textAlign = "center";
+        o.textBaseline = "middle";
+        o.fillText("TRIGGER", width / 2, height / 2);
+
+        const data = o.getImageData(0, 0, width, height).data;
+        const step = Math.max(2, Math.round(size / 40));
+        const pts = [];
+        for (let y = 0; y < height; y += step)
+            for (let x = 0; x < width; x += step)
+                if (data[(y * width + x) * 4 + 3] > 128) pts.push([x, y]);
+
+        // shuffle zodat de deeltjes willekeurig naar letters vliegen
+        for (let i = pts.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pts[i], pts[j]] = [pts[j], pts[i]];
+        }
+        textPoints = pts;
+    }
+
+    function assignTargets() {
+        if (!textPoints.length) return;
+        for (let i = 0; i < particles.length; i++) {
+            const p = textPoints[i % textPoints.length];
+            particles[i].tx = p[0] + (Math.random() - 0.5) * 1.5;
+            particles[i].ty = p[1] + (Math.random() - 0.5) * 1.5;
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        for (let radius = 10; radius < 300; radius += 6) {
+            const n = Math.floor((2 * Math.PI * radius) / 5);
+            for (let i = 0; i < n; i++)
+                particles.push(new Particle(radius, (i / n) * Math.PI * 2));
+        }
+        buildTextPoints();
+        assignTargets();
+    }
+
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        scale = Math.min(1, Math.min(width, height) / 660);
+        initParticles();
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    // --- INTERACTIE: klik/tik wisselt tussen schijf en woord ---
+    function toggle() {
+        spelled = !spelled;
+        if (spelled) assignTargets(); // nieuwe willekeurige verdeling bij elke trigger
+    }
+    window.addEventListener("mousemove", (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+    document.addEventListener("click", toggle); // werkt voor muis en tik
+    window.addEventListener(
+        "touchstart",
+        (e) => {
+            mouse.x = e.touches[0].clientX;
+            mouse.y = e.touches[0].clientY;
+        },
+        { passive: true },
+    );
+    window.addEventListener(
+        "touchmove",
+        (e) => {
+            mouse.x = e.touches[0].clientX;
+            mouse.y = e.touches[0].clientY;
+        },
+        { passive: true },
+    );
+    window.addEventListener("touchend", () => {
+        mouse.x = -1000;
+        mouse.y = -1000;
+    });
+
+    function animate() {
+        ctx.fillStyle = "rgba(0,0,0,0.3)";
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = "white";
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>

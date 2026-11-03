@@ -1,0 +1,81 @@
+  :root {
+    color-scheme: dark;
+    box-sizing: border-box;
+    --bg: #000;
+    --face: rgba(0, 0, 0, .7);
+    --edge: rgba(196, 196, 210, .85);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  html {
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  body {
+    touch-action: none;
+    cursor: grab;
+  }
+
+  body.dragging {
+    cursor: grabbing;
+  }
+
+  #scene {
+    --u: calc(min(100vw, 100vh) / 100);
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    perspective: calc(var(--u) * 150);
+  }
+
+  #rig {
+    position: relative;
+    width: 0;
+    height: 0;
+    transform-style: preserve-3d;
+  }
+
+  .cube {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-style: preserve-3d;
+  }
+
+  .face {
+    position: absolute;
+    width: calc(var(--s) * var(--u));
+    height: calc(var(--s) * var(--u));
+    left: calc(var(--s) * var(--u) / -2);
+    top: calc(var(--s) * var(--u) / -2);
+    background: var(--face);
+    border: 1px solid var(--edge);
+    box-sizing: border-box;
+    backface-visibility: visible;
+  }
+
+  #word {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%);
+    transform-origin: 0 0;
+    margin: 0;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    font: 300 calc(min(100vw, 100vh) / 100 * 5) / 1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    letter-spacing: .08em;
+    color: #f2f2f7;
+    text-shadow: 0 0 12px rgba(0, 0, 0, .9), 0 0 2px rgba(0, 0, 0, 1);
+  }

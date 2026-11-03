@@ -2,5 +2,390 @@
 
 ---
 
-<!-- TODO: add the animation -->
-<p>Coming soon</p>
+<canvas id="c"></canvas>
+<script>
+    // @ts-nocheck
+    const cv = document.getElementById("c");
+    const ctx = cv.getContext("2d");
+    const E = (50 * Math.PI) / 180,
+        cE = Math.cos(E),
+        sE = Math.sin(E);
+    const C = 0.22,
+        KB = Math.acosh(1 / C);
+    const TOPR = 1.12; // top rim radius (was 0.8) -> bigger top circle
+    const KT = Math.acosh(TOPR / C);
+    const DS = 0.05;
+    let UB = 1.5; // bottom flare; recomputed so letters reach every screen edge
+
+    function profile(v, ub) {
+        if (v < 0) {
+            const u = -v * ub;
+            return [C * Math.cosh(KB * u), -1.3 * C * KB * u];
+        }
+        return [C * Math.cosh(KT * v), 3.2 * C * KT * v];
+    }
+
+    // framing bounds: top rim fully + bottom up to r = 1
+    let fMinY = 1e9,
+        fMaxY = -1e9,
+        fMaxX = 0;
+    for (let i = 0; i <= 400; i++) {
+        const [r, h] = profile(-1 + (2 * i) / 400, 1);
+        fMaxX = Math.max(fMaxX, r);
+        fMaxY = Math.max(fMaxY, h * cE + r * sE);
+        fMinY = Math.min(fMinY, h * cE - r * sE);
+    }
+
+    const Lt = [-0.6, 0.5, 0.7],
+        ll = Math.hypot(...Lt),
+        LX = Lt[0] / ll,
+        LY = Lt[1] / ll,
+        LZ = Lt[2] / ll;
+    const WORD = "in-between",
+        UNIQ = [...new Set(WORD)];
+
+    // ---------- glyph atlas ----------
+    const G = 64,
+        LV = 10;
+    const atlas = document.createElement("canvas");
+    atlas.width = G * UNIQ.length;
+    atlas.height = G * LV;
+    const ax = atlas.getContext("2d");
+    const FONT = (fs) => "700 " + fs + "px Inter, Helvetica, Arial, sans-serif";
+    function buildAtlas() {
+        ax.fillStyle = "#fff";
+        ax.fillRect(0, 0, atlas.width, atlas.height);
+        ax.textAlign = "center";
+        ax.textBaseline = "middle";
+        for (let l = 0; l < LV; l++) {
+            const sd = l / (LV - 1);
+            const size = 0.62 + 0.55 * sd,
+                ink = Math.round(255 * (1 - (0.5 + 0.5 * sd)));
+            ax.fillStyle = "rgb(" + ink + "," + ink + "," + ink + ")";
+            ax.font = FONT(G * 0.875 * size);
+            UNIQ.forEach((ch, c) =>
+                ax.fillText(ch, c * G + G / 2, l * G + G / 2 + 2),
+            );
+        }
+    }
+    buildAtlas();
+    document.fonts
+        .load(FONT(56))
+        .then(buildAtlas)
+        .catch(() => {});
+
+    // ---------- geometry (rebuilt on resize so the bottom disc always bleeds off-screen) ----------
+    let rings,
+        M,
+        CB,
+        SB,
+        RING,
+        LET,
+        SX,
+        SY,
+        CA,
+        SA,
+        SCL,
+        KEY,
+        LVL,
+        order,
+        cnt,
+        dmin,
+        dmax,
+        dScale;
+    const NB = 4096;
+    let W = 0,
+        H = 0,
+        sc = 1,
+        ox = 0,
+        oy = 0;
+
+    function build() {
+        const rNeed = Math.min(
+            5,
+            1.15 * Math.hypot(W / 2 / sc, (H / 2 / sc + 0.6) / sE),
+        );
+        UB = Math.max(1, Math.acosh(rNeed / C) / KB);
+        const N = 6000,
+            P = [],
+            S = [0];
+        for (let i = 0; i <= N; i++) P.push(profile(-1 + (2 * i) / N, UB));
+        for (let i = 1; i <= N; i++)
+            S.push(
+                S[i - 1] +
+                    Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]),
+            );
+        const total = S[N];
+        rings = [];
+        M = 0;
+        let idx = 0;
+        for (let k = 0, s = 0; s <= total; k++, s = k * DS) {
+            while (idx < N - 1 && S[idx + 1] < s) idx++;
+            const [r, h] = P[idx];
+            const dr = P[idx + 1][0] - P[idx][0],
+                dh = P[idx + 1][1] - P[idx][1],
+                dl = Math.hypot(dr, dh) || 1;
+            const n = Math.max(6, Math.round((2 * Math.PI * r) / DS));
+            rings.push({
+                r,
+                h,
+                tr: dr / dl,
+                th: dh / dl,
+                v: -1 + (2 * idx) / N,
+                s,
+                k,
+                n,
+                dth: (2 * Math.PI) / n,
+                start: M,
+            });
+            M += n;
+        }
+        CB = new Float32Array(M);
+        SB = new Float32Array(M);
+        RING = new Uint16Array(M);
+        LET = new Uint8Array(M);
+        for (const R of rings)
+            for (let j = 0; j < R.n; j++) {
+                const i = R.start + j,
+                    a = j * R.dth + R.k * 0.35 * R.dth;
+                CB[i] = Math.cos(a);
+                SB[i] = Math.sin(a);
+                RING[i] = R.k;
+                LET[i] = UNIQ.indexOf(WORD[(j + R.k) % WORD.length]);
+            }
+        SX = new Float32Array(M);
+        SY = new Float32Array(M);
+        CA = new Float32Array(M);
+        SA = new Float32Array(M);
+        SCL = new Float32Array(M);
+        KEY = new Int16Array(M);
+        LVL = new Uint8Array(M);
+        order = new Uint32Array(M);
+        cnt = new Int32Array(NB + 1);
+        dmin = 1e9;
+        dmax = -1e9;
+        for (const R of rings) {
+            dmin = Math.min(dmin, R.h * sE - R.r * cE);
+            dmax = Math.max(dmax, R.h * sE + R.r * cE);
+        }
+        dScale = (NB - 1) / (dmax - dmin);
+    }
+
+    function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        W = cv.width = Math.round(cv.clientWidth * dpr);
+        H = cv.height = Math.round(cv.clientHeight * dpr);
+        ctx.imageSmoothingQuality = "medium";
+        const pad = 0.015 * Math.min(W, H);
+        sc = Math.min(
+            (W - 2 * pad) / (2 * fMaxX),
+            (H - 2 * pad) / (fMaxY - fMinY),
+        );
+        ox = W / 2;
+        oy = H / 2 + (sc * (fMinY + fMaxY)) / 2;
+        build();
+    }
+
+    // ---------- interaction state ----------
+    let rot = 0,
+        vel = 0.35;
+    let px = 0,
+        py = 0,
+        pa = 0,
+        paT = 0,
+        drag = false,
+        lastCX = 0,
+        moved = 0;
+    const rip = [];
+    function pos(e) {
+        const r = cv.getBoundingClientRect(),
+            k = W / r.width;
+        return [(e.clientX - r.left) * k, (e.clientY - r.top) * k];
+    }
+
+    cv.addEventListener("pointerdown", (e) => {
+        cv.setPointerCapture(e.pointerId);
+        [px, py] = pos(e);
+        drag = true;
+        moved = 0;
+        lastCX = e.clientX;
+        cv.classList.add("drag");
+    });
+    cv.addEventListener("pointermove", (e) => {
+        [px, py] = pos(e);
+        if (drag) {
+            const dx = e.clientX - lastCX;
+            lastCX = e.clientX;
+            moved += Math.abs(dx);
+            rot += dx * 0.012;
+            vel = Math.max(-8, Math.min(8, vel * 0.8 + dx * 0.012 * 60 * 0.2));
+        }
+    });
+    function up(e, tap) {
+        if (!drag) return;
+        drag = false;
+        cv.classList.remove("drag");
+        if (e.pointerType !== "mouse") paT = 0;
+    }
+    cv.addEventListener("pointerup", (e) => up(e, true));
+    cv.addEventListener("pointercancel", (e) => up(e, false));
+    cv.addEventListener("pointerleave", (e) => {
+        if (e.pointerType === "mouse") paT = 0;
+    });
+    cv.addEventListener(
+        "wheel",
+        (e) => {
+            e.preventDefault();
+            vel += e.deltaY * 0.004;
+        },
+        { passive: false },
+    );
+
+    // ---------- per-frame ----------
+    let V = 0;
+    function update(t, dt) {
+        pa += (paT - pa) * Math.min(1, dt * 10);
+        if (!drag) {
+            vel += (0.35 - vel) * Math.min(1, dt * 1.2);
+            rot += vel * dt;
+        }
+        for (let k = rip.length - 1; k >= 0; k--) {
+            rip[k].age += dt;
+            if (rip[k].age > 1.8) rip.splice(k, 1);
+        }
+        const mn = Math.min(W, H),
+            pr = 0.2 * mn,
+            pr2 = pr * pr,
+            rw = 0.1 * mn,
+            ramp = 0.045 * mn,
+            rspeed = 0.9 * Math.max(W, H);
+        const usePtr = pa > 0.01,
+            nr = rip.length;
+        cnt.fill(0);
+        const m = DS * sc * 3;
+        for (const R of rings) {
+            const off = rot + 0.22 * Math.sin(t * 0.9 - R.s * 5);
+            const co = Math.cos(off),
+                so = Math.sin(off);
+            const r = R.r,
+                h = R.h,
+                tr = R.tr,
+                th = R.th,
+                hc = h * cE,
+                hs = h * sE;
+            const end = R.start + R.n;
+            for (let i = R.start; i < end; i++) {
+                const ca = CB[i] * co - SB[i] * so,
+                    sa = SB[i] * co + CB[i] * so;
+                const pz = r * sa;
+                let sx = ox + r * ca * sc,
+                    sy = oy - (hc - pz * sE) * sc;
+                if (sx < -m || sx > W + m || sy < -m || sy > H + m) {
+                    KEY[i] = -1;
+                    continue;
+                }
+                let ny = tr,
+                    nl = -th * (ca * LX + sa * LZ);
+                let lam = nl + ny * LY;
+                if (ny * sE - sa * th * cE < 0) lam = -nl - ny * LY;
+                if (lam < 0) lam = 0;
+                let dark = 0.8 * (1 - lam);
+                if (R.v > 0) dark += 0.55 * (1 - R.v);
+                dark = dark < 0 ? 0 : dark > 1 ? 1 : dark;
+                let lv = Math.sqrt(dark) * LV,
+                    s2 = 1;
+                if (usePtr) {
+                    const dx = sx - px,
+                        dy = sy - py,
+                        d2 = dx * dx + dy * dy;
+                    if (d2 < pr2) {
+                        const d = Math.sqrt(d2) + 0.001;
+                        let f = 1 - d / pr;
+                        f = f * f * pa;
+                        const push = f * pr * 0.3;
+                        sx += (dx / d) * push;
+                        sy += (dy / d) * push;
+                        s2 += 1.5 * f;
+                        lv += 4 * f;
+                    }
+                }
+                for (let k = 0; k < nr; k++) {
+                    const rp = rip[k],
+                        dx = sx - rp.x,
+                        dy = sy - rp.y,
+                        d = Math.sqrt(dx * dx + dy * dy) + 0.001;
+                    const w = (d - rp.age * rspeed) / rw;
+                    if (w > -1 && w < 1) {
+                        let e = Math.cos((w * Math.PI) / 2);
+                        e = e * e * (1 - rp.age / 1.8);
+                        sx += (dx / d) * e * ramp;
+                        sy += (dy / d) * e * ramp;
+                        s2 += 1.2 * e;
+                        lv += 4 * e;
+                    }
+                }
+                SX[i] = sx;
+                SY[i] = sy;
+                CA[i] = ca;
+                SA[i] = sa;
+                SCL[i] = s2;
+                LVL[i] = Math.min(LV - 1, lv | 0);
+                const key = ((pz * cE + hs - dmin) * dScale) | 0;
+                KEY[i] = key;
+                cnt[key + 1]++;
+            }
+        }
+        for (let b = 0; b < NB; b++) cnt[b + 1] += cnt[b];
+        V = cnt[NB];
+        for (let i = 0; i < M; i++) {
+            const k = KEY[i];
+            if (k >= 0) order[cnt[k]++] = i;
+        }
+    }
+
+    function draw() {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, W, H);
+        const h2 = DS / 2;
+        for (let q = 0; q < V; q++) {
+            const i = order[q],
+                R = rings[RING[i]],
+                ca = CA[i],
+                sa = SA[i],
+                k = sc * SCL[i];
+            ctx.setTransform(
+                -sa * k,
+                ca * sE * k,
+                -R.tr * ca * k,
+                (R.th * cE - R.tr * sa * sE) * k,
+                SX[i],
+                SY[i],
+            );
+            ctx.drawImage(
+                atlas,
+                LET[i] * G,
+                LVL[i] * G,
+                G,
+                G,
+                -h2,
+                -h2,
+                DS,
+                DS,
+            );
+        }
+    }
+
+    let t0 = performance.now(),
+        last = t0;
+    function frame(now) {
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        update((now - t0) / 1000, dt);
+        draw();
+        requestAnimationFrame(frame);
+    }
+    resize();
+    addEventListener("resize", resize);
+    requestAnimationFrame(frame);
+</script>
