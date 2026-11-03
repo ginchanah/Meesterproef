@@ -7,14 +7,17 @@
 </div>
 
 <script>
-    //@ts-nocheck
+    // @ts-nocheck
+    // =====================================
+    // MARK: Proximity Animation
+    // =====================================
     (function () {
         var container = document.getElementById("proximity-container");
         var canvas = document.getElementById("proximity-canvas");
         if (!container || !canvas) return;
         var ctx = canvas.getContext("2d");
 
-        // ---- Settings you can tweak ----
+        // ---------- Settings you can tweak ----------
         var WORD = "PROXIMITY";
         var CELL_W = 40; // horizontal spacing (px)
         var CELL_H = 46; // vertical spacing (px)
@@ -26,7 +29,6 @@
         var TURN = 0; // 0 = no rotation, 1 = letters fully point at the pointer
         var SMOOTH = 0.16; // lower = softer, laggier
         var FONT = "Inter, sans-serif";
-        // --------------------------------
 
         var dpr, w = 0, h = 0, cols = 0, rows = 0, ox = 0, oy = 0, state;
         var pointer = {
@@ -63,12 +65,12 @@
                 animationButton.classList.toggle("play-animation");
                 isRunning = animationButton.classList.contains("play-animation");
                 if (isRunning && isVisible && !animId) {
-                    animId = requestAnimationFrame(frame);
+                    animId = requestAnimationFrame(drawFrame);
                 }
             });
         }
 
-        function resize() {
+        function resizeCanvas() {
             if (!container || !canvas) return;
             var rect = container.getBoundingClientRect();
             w = Math.floor(container.clientWidth || rect.width || window.innerWidth);
@@ -94,18 +96,18 @@
         }
 
         var resizeTimer = null;
-        function onResize() {
+        function handleResize() {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(resize, 100);
+            resizeTimer = setTimeout(resizeCanvas, 100);
         }
 
         if ("ResizeObserver" in window && container) {
-            var ro = new ResizeObserver(onResize);
+            var ro = new ResizeObserver(handleResize);
             ro.observe(container);
         } else {
-            window.addEventListener("resize", onResize);
+            window.addEventListener("resize", handleResize);
         }
-        resize();
+        resizeCanvas();
 
         function setTarget(e) {
             var rect = canvas.getBoundingClientRect();
@@ -136,7 +138,7 @@
                     for (var k = 0; k < entries.length; k++) {
                         isVisible = entries[k].isIntersecting;
                         if (isVisible && isRunning && !animId) {
-                            animId = requestAnimationFrame(frame);
+                            animId = requestAnimationFrame(drawFrame);
                         }
                     }
                 },
@@ -145,12 +147,12 @@
             observer.observe(container);
         }
 
-        function ease(x) {
+        function applyEase(x) {
             return x * x * (3 - 2 * x);
         }
         var TAU = Math.PI * 2;
 
-        function frame(now) {
+        function drawFrame(now) {
             if (!isRunning || !isVisible) {
                 animId = null;
                 return;
@@ -198,7 +200,7 @@
                         dy = cy - pointer.y;
                     var d = Math.sqrt(dx * dx + dy * dy) || 0.001;
 
-                    var target = ease(Math.max(0, 1 - d / reach));
+                    var target = applyEase(Math.max(0, 1 - d / reach));
 
                     // click / tap shockwaves
                     for (var q = 0; q < pulses.length; q++) {
@@ -240,25 +242,25 @@
                 }
             }
             ctx.globalAlpha = 1;
-            animId = requestAnimationFrame(frame);
+            animId = requestAnimationFrame(drawFrame);
         }
 
         // Start once the font is ready (or after a short timeout)
         var started = false;
-        function start() {
+        function startAnimation() {
             if (!started) {
                 started = true;
-                resize();
+                resizeCanvas();
                 if (isRunning && isVisible && !animId) {
-                    animId = requestAnimationFrame(frame);
+                    animId = requestAnimationFrame(drawFrame);
                 }
             }
         }
-        setTimeout(start, 1500);
+        setTimeout(startAnimation, 1500);
         if (document.fonts && document.fonts.load) {
-            document.fonts.load(WEIGHT + " 20px Inter").then(start, start);
+            document.fonts.load(WEIGHT + " 20px Inter").then(startAnimation, startAnimation);
         } else {
-            start();
+            startAnimation();
         }
     })();
 </script>

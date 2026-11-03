@@ -2,25 +2,24 @@
 
 ---
 
-<div class="latent-space-container" id="latentSpaceContainer">
-    <canvas id="spaceCanvas"></canvas>
+<div class="latent-space-container" id="latent-space-container">
+    <canvas id="space-canvas"></canvas>
 </div>
 
 <script>
     // @ts-nocheck
-    const container = document.getElementById("latentSpaceContainer");
-    const canvas = document.getElementById("spaceCanvas");
+    const container = document.getElementById("latent-space-container");
+    const canvas = document.getElementById("space-canvas");
     const ctx = canvas.getContext("2d");
 
-    // ==========================================
-    // KLEUR VARIABELEN (uit CSS custom properties)
-    // ==========================================
+    // =====================================
+    // MARK: COLOUR VARIABLES (from CSS custom properties)
+    // =====================================
     const containerStyles = getComputedStyle(container);
     const COLOR_BACKGROUND =
         containerStyles.getPropertyValue("--color-background").trim() || "#000";
     const COLOR_PARTICLES =
         containerStyles.getPropertyValue("--color-particles").trim() || "#fff";
-    // ==========================================
 
     let width, height;
     let particles = [];
@@ -47,8 +46,8 @@
         offCanvas.width = container.clientWidth;
         offCanvas.height = container.clientHeight;
 
-        // Deze kleuren bepalen alleen het onzichtbare masker voor de tekstvorm,
-        // deze hoeven niet aangepast te worden als je het uiterlijk verandert.
+        // These colours only define the invisible mask for the text shape,
+        // they don't need to change when you change the look.
         offCtx.fillStyle = "black";
         offCtx.fillRect(0, 0, offCanvas.width, offCanvas.height);
 
@@ -109,7 +108,7 @@
             this.vx = 0;
             this.vy = 0;
 
-            // Gebruikt de variabele voor de deeltjeskleur
+            // Uses the variable for the particle colour
             this.color = COLOR_PARTICLES;
 
             this.baseSize = Math.random() * 1.2 + 0.5;
@@ -211,8 +210,8 @@
     }
 
     function init() {
-        window.addEventListener("resize", onResize);
-        onResize();
+        window.addEventListener("resize", handleResize);
+        handleResize();
 
         container.addEventListener("mousemove", (e) => {
             const rect = container.getBoundingClientRect();
@@ -243,7 +242,7 @@
         requestAnimationFrame(animate);
     }
 
-    function onResize() {
+    function handleResize() {
         width = container.clientWidth;
         height = container.clientHeight;
         canvas.width = width;
@@ -258,7 +257,7 @@
         lastTime = timestamp;
         time += deltaTime;
 
-        // Gebruikt de variabele voor de achtergrondkleur
+        // Uses the variable for the background colour
         ctx.fillStyle = COLOR_BACKGROUND;
         ctx.fillRect(0, 0, width, height);
 

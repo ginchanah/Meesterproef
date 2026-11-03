@@ -28,26 +28,26 @@
     (() => {
         // HTML owns the letters and the structure, CSS owns colours and line widths.
         // This script only runs the rope physics and writes each rope's path and each letter's position.
-        const stage = document.getElementById('remote-control-stage');
-        const section = stage.closest('.animation-section');
-        const ropes = Array.from(stage.querySelectorAll('.rope'));
-        const letters = Array.from(stage.querySelectorAll('.letter'));
+        const stage = document.getElementById("remote-control-stage");
+        const section = stage.closest(".animation-section");
+        const ropes = Array.from(stage.querySelectorAll(".rope"));
+        const letters = Array.from(stage.querySelectorAll(".letter"));
         const N = Math.min(ropes.length, letters.length);
 
         let W = 1, H = 1;
-        function fit() { W = Math.max(1, stage.clientWidth); H = Math.max(1, stage.clientHeight); }
-        new ResizeObserver(fit).observe(stage);
-        fit();
+        function fitStage() { W = Math.max(1, stage.clientWidth); H = Math.max(1, stage.clientHeight); }
+        new ResizeObserver(fitStage).observe(stage);
+        fitStage();
 
-        function pos(e) { const r = stage.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+        function getPointerPosition(e) { const r = stage.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
 
         const NS = 48;   // points per rope
         const RR = 16;   // balloon radius used for collisions
         const LF = Array.from({ length: N }, (_, i) => .97 - i * (.76 / Math.max(1, N - 1)) - (i >= (N - 1) / 2 ? .04 : 0));
         let balloons = null, base = { x: 0, y: 0, vx: 0, sx: 0 }, tgt = null, mouseX = null, t = 0, acc = 0, lastMX = null, lastMove = 0, iw = 0;
 
-        stage.addEventListener('pointermove', e => { mouseX = pos(e).x; });
-        stage.addEventListener('pointerdown', e => { mouseX = pos(e).x; });
+        stage.addEventListener("pointermove", e => { mouseX = getPointerPosition(e).x; });
+        stage.addEventListener("pointerdown", e => { mouseX = getPointerPosition(e).x; });
 
         function init() {
             base.x = W / 2; base.sx = base.x; base.y = H;
@@ -97,15 +97,15 @@
             for (const b of balloons) { const q = b.p[NS]; q.x = Math.max(b.r, Math.min(W - b.r, q.x)); q.y = Math.max(b.r + 4, q.y); }
         }
 
-        const f = v => v.toFixed(1);
+        const formatNumber = v => v.toFixed(1);
 
         // the play/stop button of the detail page adds .stop-animation when paused
-        const isPaused = () => document.hidden || (section && section.querySelector('.stop-animation'));
+        const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
 
         let last = performance.now();
-        function frame(ts) {
+        function drawFrame(ts) {
             const dt = Math.min(0.05, (ts - last) / 1000); last = ts;
-            if (isPaused()) { requestAnimationFrame(frame); return; }
+            if (isPaused()) { requestAnimationFrame(drawFrame); return; }
             t += dt;
             if (!balloons && W > 50) init();
             if (balloons) {
@@ -126,25 +126,25 @@
                 for (let m = 1; m <= ns; m++) { base.sx = from + (base.x - from) * (m / ns); step(); }
                 acc -= ns / 120;
                 if (acc > 1 / 120) acc = 0;
-                const al = Math.min(1, acc * 120), ip = (q, k) => q['o' + k] + (q[k] - q['o' + k]) * al;
+                const al = Math.min(1, acc * 120), interpolatePoint = (q, k) => q["o" + k] + (q[k] - q["o" + k]) * al;
 
                 // ropes: a smooth curve through the points; letters: at the free end
                 for (const b of balloons) {
                     const p = b.p;
-                    let d = 'M' + f(ip(p[0], 'x')) + ' ' + f(ip(p[0], 'y'));
+                    let d = "M" + formatNumber(interpolatePoint(p[0], "x")) + " " + formatNumber(interpolatePoint(p[0], "y"));
                     for (let i = 1; i < NS; i++) {
-                        const x1 = ip(p[i], 'x'), y1 = ip(p[i], 'y'), x2 = ip(p[i + 1], 'x'), y2 = ip(p[i + 1], 'y');
-                        d += 'Q' + f(x1) + ' ' + f(y1) + ' ' + f((x1 + x2) / 2) + ' ' + f((y1 + y2) / 2);
+                        const x1 = interpolatePoint(p[i], "x"), y1 = interpolatePoint(p[i], "y"), x2 = interpolatePoint(p[i + 1], "x"), y2 = interpolatePoint(p[i + 1], "y");
+                        d += "Q" + formatNumber(x1) + " " + formatNumber(y1) + " " + formatNumber((x1 + x2) / 2) + " " + formatNumber((y1 + y2) / 2);
                     }
-                    const ex = ip(p[NS], 'x'), ey = ip(p[NS], 'y');
-                    d += 'L' + f(ex) + ' ' + f(ey);
-                    b.rope.setAttribute('d', d);
-                    b.letter.setAttribute('x', f(ex));
-                    b.letter.setAttribute('y', f(ey));
+                    const ex = interpolatePoint(p[NS], "x"), ey = interpolatePoint(p[NS], "y");
+                    d += "L" + formatNumber(ex) + " " + formatNumber(ey);
+                    b.rope.setAttribute("d", d);
+                    b.letter.setAttribute("x", formatNumber(ex));
+                    b.letter.setAttribute("y", formatNumber(ey));
                 }
             }
-            requestAnimationFrame(frame);
+            requestAnimationFrame(drawFrame);
         }
-        requestAnimationFrame(frame);
+        requestAnimationFrame(drawFrame);
     })();
 </script>

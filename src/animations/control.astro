@@ -3,13 +3,16 @@
 ---
 
 <div class="container">
-    <div class="animation-section active" id="anim-control">
+    <div class="animation-section active anim-control">
         <canvas id="c"></canvas>
     </div>
 </div>
 
 <script>
     // @ts-nocheck
+    // =====================================
+    // MARK: Control Animation
+    // =====================================
     
     const cv = document.getElementById("c");
     const ctx = cv.getContext("2d");
@@ -18,13 +21,13 @@
     const G = 5;
     const PI = Math.PI;
 
-    // ---- Geometry Helper Functions ----
-    const lin = (a, b, c, d) => {
+    // ---------- Geometry Helper Functions ----------
+    const makeLine = (a, b, c, d) => {
         const n = Math.max(2, Math.ceil(Math.hypot(c - a, d - b) / SP));
         return Array.from({ length: n + 1 }, (_, i) => [a + (c - a) * i / n, b + (d - b) * i / n]);
     };
 
-    const arc = (cx, cy, r, a0, a1, closed) => {
+    const makeArc = (cx, cy, r, a0, a1, closed) => {
         const n = Math.max(4, Math.ceil(Math.abs(a1 - a0) * r / SP));
         const m = closed ? n : n + 1;
         return Array.from({ length: m }, (_, i) => {
@@ -33,7 +36,7 @@
         });
     };
 
-    const quad = (p0, c, p1) => Array.from({ length: 11 }, (_, i) => {
+    const makeCurve = (p0, c, p1) => Array.from({ length: 11 }, (_, i) => {
         const t = i / 10;
         const u = 1 - t;
         return [
@@ -43,43 +46,43 @@
     });
 
     const S = [];
-    const add = (pts, closed, X) => S.push({
+    const addString = (pts, closed, X) => S.push({
         closed: !!closed,
         home: pts.map(p => [p[0] + X, p[1]]),
         o: pts.map(() => [0, 0]),
         v: pts.map(() => [0, 0])
     });
 
-    // ---- Letter Shape Definitions ----
-    function buildC(X) { for (let i = 0; i < 4; i++) add(arc(50, 50, 50 - i * G, PI / 4, 7 * PI / 4), 0, X); }
+    // ---------- Letter Shape Definitions ----------
+    function buildC(X) { for (let i = 0; i < 4; i++) addString(makeArc(50, 50, 50 - i * G, PI / 4, 7 * PI / 4), 0, X); }
     function buildO(X) {
         for (let i = 0; i < 8; i++) {
         const r = 50 - i * 4.5;
-        add(Array.from({ length: 36 }, (_, k) => [50 + r * Math.cos(k * PI / 18), 50 + r * Math.sin(k * PI / 18)]), true, X);
+        addString(Array.from({ length: 36 }, (_, k) => [50 + r * Math.cos(k * PI / 18), 50 + r * Math.sin(k * PI / 18)]), true, X);
         }
     }
     function buildN(X) {
         for (let i = 0; i < 4; i++) {
         const r = 40 - i * G;
-        add(lin(50 - r, 0, 50 - r, 100), 0, X);
-        add(arc(50, 50, r, PI, 2 * PI).concat(lin(50 + r, 50, 50 + r, 100).slice(1)), 0, X);
+        addString(makeLine(50 - r, 0, 50 - r, 100), 0, X);
+        addString(makeArc(50, 50, r, PI, 2 * PI).concat(makeLine(50 + r, 50, 50 + r, 100).slice(1)), 0, X);
         }
     }
     function buildT(X) {
         for (let i = 0; i < 3; i++) {
-        add(lin(30 + i * G, -35, 30 + i * G, 100), 0, X);
-        add(lin(5, 5 + i * G, 75, 5 + i * G), 0, X);
+        addString(makeLine(30 + i * G, -35, 30 + i * G, 100), 0, X);
+        addString(makeLine(5, 5 + i * G, 75, 5 + i * G), 0, X);
         }
     }
     function buildR(X) {
         for (let i = 0; i < 4; i++) {
         const x = 10 + i * G;
-        add(lin(x, 0, x, 100), 0, X);
-        add(quad([x, 50], [x, i * G], [62, i * G]), 0, X);
+        addString(makeLine(x, 0, x, 100), 0, X);
+        addString(makeCurve([x, 50], [x, i * G], [62, i * G]), 0, X);
         }
     }
     function buildL(X) {
-        for (let i = 0; i < 4; i++) add(lin(5 + i * G, -40, 5 + i * G, 100), 0, X);
+        for (let i = 0; i < 4; i++) addString(makeLine(5 + i * G, -40, 5 + i * G, 100), 0, X);
     }
 
     const LS = [];
@@ -127,24 +130,24 @@
         tie([3, 2 * i, (40 + i * 5) / 135], [3, 2 * i + 1, (25 + i * 5) / 70]);
     }
 
-    const ATT = (k, j, f) => {
+    const getAttachment = (k, j, f) => {
         const s = S[LS[k] + j];
         const n = s.home.length;
         return { s, i: Math.min(n - 1, Math.round(f * (s.closed ? n : n - 1))) % n };
     };
 
-    const cur = a => [a.s.home[a.i][0] + a.s.o[a.i][0], a.s.home[a.i][1] + a.s.o[a.i][1]];
-    const edgePt = (e, h) => [e.includes("L") ? EL : e.includes("R") ? ER : h[0], e.includes("T") ? ET : e.includes("B") ? EB : h[1]];
+    const getCurrentPoint = a => [a.s.home[a.i][0] + a.s.o[a.i][0], a.s.home[a.i][1] + a.s.o[a.i][1]];
+    const getEdgePoint = (e, h) => [e.includes("L") ? EL : e.includes("R") ? ER : h[0], e.includes("T") ? ET : e.includes("B") ? EB : h[1]];
 
     function buildTethers() {
         T = LINKS.concat(TIES).map(([A, B, w]) => {
-        const a = ATT(...A);
-        const b = typeof B === "string" ? { edge: B } : ATT(...B);
+        const a = getAttachment(...A);
+        const b = typeof B === "string" ? { edge: B } : getAttachment(...B);
         const p = a.s.home[a.i];
-        const q = b.edge ? edgePt(b.edge, p) : b.s.home[b.i];
+        const q = b.edge ? getEdgePoint(b.edge, p) : b.s.home[b.i];
         const n = Math.max(6, Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / 9));
-        const z = () => Array.from({ length: n }, () => [0, 0]);
-        return { a, b, kt: w ? .03 : .006, tie: !!w, closed: false, home: z(), o: z(), v: z() };
+        const makeZeros = () => Array.from({ length: n }, () => [0, 0]);
+        return { a, b, kt: w ? .03 : .006, tie: !!w, closed: false, home: makeZeros(), o: makeZeros(), v: makeZeros() };
         });
         all = S.concat(T);
         grab = null;
@@ -152,14 +155,14 @@
 
     const W_U = 683, TOP = -40, BOT = 100;
 
-    // ---- Layout State ----
+    // ---------- Layout State ----------
     let sc = 1, ox = 0, oy = 0, ink = "#ece9e1", bg = "#121212";
     let hot = null, grab = null, mx = 0, my = 0;
     let EL = 0, ER = 0, ET = 0, EB = 0;
     let RW = 0, RH = 0;
-    let idleTime = 0; // Toegevoegd voor de idle animatie
+    let idleTime = 0; // Time for the idle animation
 
-    function resize() {
+    function resizeCanvas() {
         const d = devicePixelRatio || 1;
         const w = container.clientWidth || cv.clientWidth;
         const h = container.clientHeight || cv.clientHeight;
@@ -177,8 +180,8 @@
         
         // Read the CSS variables directly
         const rootStyles = getComputedStyle(document.documentElement);
-        ink = rootStyles.getPropertyValue('--text').trim() || rootStyles.getPropertyValue('--color-text').trim() || "#ece9e1";
-        bg = rootStyles.getPropertyValue('--bg').trim() || rootStyles.getPropertyValue('--color-background').trim() || "#121212";
+        ink = rootStyles.getPropertyValue("--text").trim() || rootStyles.getPropertyValue("--color-text").trim() || "#ece9e1";
+        bg = rootStyles.getPropertyValue("--bg").trim() || rootStyles.getPropertyValue("--color-background").trim() || "#121212";
         
         EL = -ox / sc;
         ER = (w - ox) / sc;
@@ -188,16 +191,16 @@
         buildTethers();
     }
 
-    addEventListener("resize", resize);
-    resize();
+    addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
-    // ---- Interaction Handling ----
-    const pos = e => {
+    // ---------- Interaction Handling ----------
+    const getPointerPosition = e => {
         const r = cv.getBoundingClientRect();
         return [e.clientX - r.left, e.clientY - r.top];
     };
 
-    function nearest(px, py, rad) {
+    function findNearest(px, py, rad) {
         let best = null, bd = rad * rad;
         for (const s of all) {
         for (let i = 0; i < s.home.length; i++) {
@@ -214,8 +217,8 @@
     }
 
     cv.addEventListener("pointerdown", e => {
-        [mx, my] = pos(e);
-        grab = nearest(mx, my, 30);
+        [mx, my] = getPointerPosition(e);
+        grab = findNearest(mx, my, 30);
         if (grab) {
         hot = grab.s;
         cv.setPointerCapture(e.pointerId);
@@ -224,30 +227,30 @@
     });
 
     cv.addEventListener("pointermove", e => {
-        [mx, my] = pos(e);
+        [mx, my] = getPointerPosition(e);
         if (!grab) {
-        const q = nearest(mx, my, 30);
+        const q = findNearest(mx, my, 30);
         hot = q && q.s;
         cv.style.cursor = q ? "grab" : "default";
         }
     });
 
-    const release = () => {
+    const releaseGrab = () => {
         grab = null;
         hot = null;
         cv.style.cursor = "default";
     };
-    cv.addEventListener("pointerup", release);
-    cv.addEventListener("pointercancel", release);
+    cv.addEventListener("pointerup", releaseGrab);
+    cv.addEventListener("pointercancel", releaseGrab);
 
-    // ---- Physics: Spring-to-Home + Neighbor Coupling ----
+    // ---------- Physics: Spring-to-Home + Neighbor Coupling ----------
     const K = .012, C = .45, D = .03;
     function step() {
-        idleTime += 0.02; // Update de animatietijd per frame
+        idleTime += 0.02; // Advance the animation time every frame
 
         for (const t of T) {
-        const p = cur(t.a);
-        const q = t.b.edge ? edgePt(t.b.edge, t.a.s.home[t.a.i]) : cur(t.b);
+        const p = getCurrentPoint(t.a);
+        const q = t.b.edge ? getEdgePoint(t.b.edge, t.a.s.home[t.a.i]) : getCurrentPoint(t.b);
         const n = t.home.length;
         for (let j = 0; j < n; j++) {
             const u = j / (n - 1);
@@ -262,7 +265,7 @@
             const a = s.closed ? o[(i + n - 1) % n] : o[Math.max(i - 1, 0)];
             const b = s.closed ? o[(i + 1) % n] : o[Math.min(i + 1, n - 1)];
 
-            // Veilige golfbeweging door het rustpunt (target) subtiel te verschuiven
+            // Safe wave motion: subtly shift the rest point (target) instead of pushing the points
             const targetX = Math.sin(idleTime + s.home[i][1] * 0.05) * 4;
             const targetY = Math.cos(idleTime * 0.8 + s.home[i][0] * 0.05) * 4;
 
@@ -301,7 +304,7 @@
         }
     }
 
-    // ---- Rendering ----
+    // ---------- Rendering ----------
     function draw() {
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, RW, RH);
@@ -322,25 +325,25 @@
         ctx.globalAlpha = al;
         
         const n = s.home.length;
-        const P = i => [ox + (s.home[i][0] + s.o[i][0]) * sc, oy + (s.home[i][1] + s.o[i][1]) * sc];
+        const getPoint = i => [ox + (s.home[i][0] + s.o[i][0]) * sc, oy + (s.home[i][1] + s.o[i][1]) * sc];
         
         ctx.beginPath();
         if (s.closed) {
-            let a = P(n - 1), b = P(0);
+            let a = getPoint(n - 1), b = getPoint(0);
             ctx.moveTo((a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
             for (let i = 0; i < n; i++) {
-            const p = P(i), q = P((i + 1) % n);
+            const p = getPoint(i), q = getPoint((i + 1) % n);
             ctx.quadraticCurveTo(p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2);
             }
             ctx.closePath();
         } else {
-            let p = P(0);
+            let p = getPoint(0);
             ctx.moveTo(p[0], p[1]);
             for (let i = 1; i < n - 1; i++) {
-            const a = P(i), b = P(i + 1);
+            const a = getPoint(i), b = getPoint(i + 1);
             ctx.quadraticCurveTo(a[0], a[1], (a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
             }
-            p = P(n - 1);
+            p = getPoint(n - 1);
             ctx.lineTo(p[0], p[1]);
         }
         ctx.stroke();
@@ -354,7 +357,7 @@
         if (!t.tie) {
             for (const e of [t.a, t.b]) {
             if (e.s) {
-                const p = cur(e);
+                const p = getCurrentPoint(e);
                 ctx.beginPath();
                 ctx.arc(ox + p[0] * sc, oy + p[1] * sc, Math.max(2, sc * .8), 0, 6.2832);
                 ctx.fill();
@@ -365,17 +368,17 @@
         }
     }
 
-    function frame() {
-        if ((container.clientWidth && container.clientWidth !== RW) || (container.clientHeight && container.clientHeight !== RH) || !RW) resize();
+    function drawFrame() {
+        if ((container.clientWidth && container.clientWidth !== RW) || (container.clientHeight && container.clientHeight !== RH) || !RW) resizeCanvas();
         if (!RW) {
-        requestAnimationFrame(frame);
+        requestAnimationFrame(drawFrame);
         return;
         }
         step();
         step();
         draw();
-        requestAnimationFrame(frame);
+        requestAnimationFrame(drawFrame);
     }
     
-    frame();
+    drawFrame();
 </script>

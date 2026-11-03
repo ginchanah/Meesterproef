@@ -3,7 +3,7 @@
 ---
 
 <div class="beyond-control-wrapper">
-    <canvas id="beyond-control-canvas"></canvas>
+    <canvas class="beyond-control-canvas" id="beyond-control-canvas"></canvas>
 </div>
 
 <script>
@@ -12,14 +12,15 @@
     // =====================================
     // @ts-nocheck
     (() => {
-        const cv = document.getElementById('beyond-control-canvas');
-        const ctx = cv.getContext('2d');
-        const wrapper = cv.closest('.beyond-control-wrapper');
-        const section = cv.closest('.animation-section');
+        const cv = document.getElementById("beyond-control-canvas");
+        const ctx = cv.getContext("2d");
+        const wrapper = cv.closest(".beyond-control-wrapper");
+        const section = cv.closest(".animation-section");
 
-        // ---- Tunable parameters (distances/speeds are defined for a 600px screen height and scale with the screen)
+        // ---------- Tunable parameters ----------
+        // distances/speeds are defined for a 600px screen height and scale with the screen
         const P = {
-            words: ['BEYOND', 'CONTROL'],   // every line spells ONE of these words (the lines take turns)
+            words: ["BEYOND", "CONTROL"],   // every line spells ONE of these words (the lines take turns)
             repeat: 1,                // how many times the word is spelled on one line
             tracking: 1.3,            // space between letters along a line (1 = letters touch, higher = more air)
             lines: 400,               // how many lines (snakes) there are
@@ -57,17 +58,17 @@
             trail: 1                  // 1 = crisp frames, lower = smear
         };
 
-        const TEXTS = P.words.map(w => Array(P.repeat).fill(w.toUpperCase()).join(' '));
+        const TEXTS = P.words.map(w => Array(P.repeat).fill(w.toUpperCase()).join(" "));
         const L = Math.max(...TEXTS.map(t => t.length));   // longest line (array size)
         const M = P.lines;
 
         let W = 600, H = 600, u = 1, dpr = 1;
         const mouse = { x: 0, y: 0, active: false };
-        let sqColor = '#000', birdColor = '#fff';   // background / letter colour
+        let sqColor = "#000", birdColor = "#fff";   // background / letter colour
         let sized = false;
-        let sheet = null, gw = 1, gh = 1, spacing = 6, fontPx = 10, atlasKey = '';
-        const CHARS = Array.from(new Set(TEXTS.join('').replace(/ /g, '').split('')));
-        const GLYPHS = TEXTS.map(t => t.split('').map(ch => CHARS.indexOf(ch)));   // sprite index per position (-1 = space)
+        let sheet = null, gw = 1, gh = 1, spacing = 6, fontPx = 10, atlasKey = "";
+        const CHARS = Array.from(new Set(TEXTS.join("").replace(/ /g, "").split("")));
+        const GLYPHS = TEXTS.map(t => t.split("").map(ch => CHARS.indexOf(ch)));   // sprite index per position (-1 = space)
         const lead = { x: 300, y: 300, h: Math.random() * 6.28, hv: 0 };
 
         // Each line: node positions (node 0 is the head), the head's recorded path (px, py),
@@ -89,30 +90,30 @@
             });
         }
 
-        // JetBrains Mono (loaded from Google Fonts in beyond-control.css) has a true thin weight; the system fonts after it are the fallback
-        const FONT = P.fontWeight + ' {px}px "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace';
+        // Inter (loaded in general.css) is a variable font with a true thin weight; the system fonts after it are the fallback
+        const FONT = P.fontWeight + ' {px}px "Inter", Helvetica, sans-serif';
 
         // all letters live side by side on ONE sprite sheet: fewer texture switches than one canvas per letter
         function buildAtlas() {
             fontPx = Math.max(6, P.size * u);
-            const key = fontPx + '|' + dpr + '|' + birdColor;
+            const key = fontPx + "|" + dpr + "|" + birdColor;
             if (key === atlasKey && sheet) return;           // nothing that affects the letters changed
             atlasKey = key;
-            const font = FONT.replace('{px}', fontPx);
+            const font = FONT.replace("{px}", fontPx);
             ctx.save();
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.font = font;
-            const advance = ctx.measureText('M').width || fontPx * 0.6;   // monospace: every letter has the same advance
+            const advance = ctx.measureText("M").width || fontPx * 0.6;   // every letter gets the same advance (the width of an M)
             spacing = advance * P.tracking;                               // distance between neighbouring letters on a line
             ctx.restore();
             gw = Math.ceil(advance * 1.3); gh = Math.ceil(fontPx * 1.3);
-            sheet = document.createElement('canvas');
+            sheet = document.createElement("canvas");
             sheet.width = Math.ceil(gw * dpr) * CHARS.length; sheet.height = Math.ceil(gh * dpr);
-            const g = sheet.getContext('2d');
+            const g = sheet.getContext("2d");
             g.fillStyle = birdColor;
             g.font = font;
-            g.textAlign = 'center';
-            g.textBaseline = 'middle';
+            g.textAlign = "center";
+            g.textBaseline = "middle";
             const cw = Math.ceil(gw * dpr);
             CHARS.forEach((ch, k) => {
                 g.setTransform(dpr, 0, 0, dpr, k * cw, 0);
@@ -123,11 +124,11 @@
         // the colours are set as --page and --ink on the wrapper in beyond-control.css
         function readColors() {
             const cs = getComputedStyle(wrapper);
-            sqColor = cs.getPropertyValue('--page').trim() || '#000';
-            birdColor = cs.getPropertyValue('--ink').trim() || '#fff';
+            sqColor = cs.getPropertyValue("--page").trim() || "#000";
+            birdColor = cs.getPropertyValue("--ink").trim() || "#fff";
         }
 
-        function resize() {
+        function resizeCanvas() {
             const r = cv.getBoundingClientRect();
             if (!(r.width > 2 && r.height > 2)) return;          // ignore hidden / zero-size layouts
             const oW = W, oH = H, oU = u;
@@ -147,15 +148,15 @@
                     a.vx *= fv; a.vy *= fv;
                 }
                 lead.x *= fx; lead.y *= fy;
-                for (const a of lines) layout(a);   // letter spacing may have changed with the size
+                for (const a of lines) layoutLine(a);   // letter spacing may have changed with the size
             }
             ctx.fillStyle = sqColor;
             ctx.fillRect(0, 0, W, H);
-            if (!sized) { sized = true; spawn(); }
+            if (!sized) { sized = true; spawnLines(); }
         }
 
         // place every node on the recorded path, one letter-width apart (measured along the path)
-        function layout(a) {
+        function layoutLine(a) {
             const px = a.px, py = a.py;
             let ax = a.x[0], ay = a.y[0];
             let need = spacing;
@@ -189,7 +190,7 @@
         }
 
         const REC2 = 0.8 * 0.8;
-        function record(a) {
+        function recordHead(a) {
             const n = a.px.length;
             const ddx = n ? a.x[0] - a.px[n - 1] : 0, ddy = n ? a.y[0] - a.py[n - 1] : 0;
             if (n === 0 || ddx * ddx + ddy * ddy >= REC2 * u * u) {
@@ -208,10 +209,10 @@
             }
             a.x[0] = hx; a.y[0] = hy;
             a.ax = 0; a.ay = 0;
-            layout(a);
+            layoutLine(a);
         }
 
-        function spawn() {
+        function spawnLines() {
             lead.x = W / 2; lead.y = H / 2;
             const heading = lead.h;
             lines.forEach((a) => {
@@ -237,7 +238,7 @@
         // limit undoes that), so a head would drive straight into whatever it is avoiding. Turn that
         // push into a sideways steer instead: the head curves away, like a snake would.
         let tx = 0, ty = 0;                       // asTurn's result (scratch, so nothing is allocated per call)
-        function asTurn(fx, fy, a) {
+        function turnSideways(fx, fy, a) {
             const sp = Math.sqrt(a.vx * a.vx + a.vy * a.vy) || 1;
             const vx = a.vx / sp, vy = a.vy / sp;
             const along = fx * vx + fy * vy;
@@ -345,7 +346,7 @@
                         }
                     }
                 }
-                if (avoidQ > 0) { asTurn(ux, uy, a); ux = tx; uy = ty; }
+                if (avoidQ > 0) { turnSideways(ux, uy, a); ux = tx; uy = ty; }
                 fx = fx * (1 - 0.7 * avoidQ) + ux; fy = fy * (1 - 0.7 * avoidQ) + uy;
 
                 // walls: the head looks ahead and the push grows smoothly, so it curves away early.
@@ -360,7 +361,7 @@
                 fx *= 1 - wallQ; fy *= 1 - wallQ;
                 let wfx = P.edgeW * u * Math.sign(qx) * qx * qx * 3;
                 let wfy = P.edgeW * u * Math.sign(qy) * qy * qy * 3;
-                if (wallQ > 0) { asTurn(wfx, wfy, a); wfx = tx; wfy = ty; }
+                if (wallQ > 0) { turnSideways(wfx, wfy, a); wfx = tx; wfy = ty; }
                 fx += wfx; fy += wfy;
 
                 // limit how sharply the head can turn, then smooth the steering over time
@@ -381,7 +382,7 @@
                         const d = Math.sqrt(d2);
                         const f = (1 - d / mR) * P.cursorW * u;         // same range and falloff as always: only the strength changed
                         // a push against the direction of travel would only slow the head, so turn it into a sideways bend
-                        asTurn(dx / d * f, dy / d * f, a);
+                        turnSideways(dx / d * f, dy / d * f, a);
                         let bx = tx, by = ty;
                         const bm = Math.sqrt(bx * bx + by * by), cap = P.cursorMax * u;
                         if (bm > cap) { bx *= cap / bm; by *= cap / bm; }   // limit the bend per frame so the line curves, never kinks
@@ -406,8 +407,8 @@
                 else if (a.y[0] > H) { a.y[0] = H; a.vy = Math.min(a.vy, -0.3 * minS); }
 
                 // the body is the head's own past: record the new position, then re-lay the letters along it
-                record(a);
-                layout(a);
+                recordHead(a);
+                layoutLine(a);
                 if (!(a.x[0] === a.x[0] && a.y[0] === a.y[0] && a.x[a.n - 1] === a.x[a.n - 1] && a.y[a.n - 1] === a.y[a.n - 1] && a.vx === a.vx && a.vy === a.vy)) respawnLine(a);
             }
         }
@@ -439,15 +440,15 @@
         }
 
         // the play/stop button of the detail page adds .stop-animation when paused
-        const isPaused = () => document.hidden || (section && section.querySelector('.stop-animation'));
+        const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
 
         let last = performance.now();
-        function loop(now) {
+        function runLoop(now) {
             // the first frame's timestamp can come out slightly earlier than `last`: never let the step go negative or zero
             const k = Math.min(2, Math.max(0.25, (now - last) / 16.667 || 1));
             last = now;
             if (sized && !isPaused()) { step(k, now); draw(); }
-            requestAnimationFrame(loop);
+            requestAnimationFrame(runLoop);
         }
 
         function setPointer(e) {
@@ -456,19 +457,19 @@
             mouse.y = e.clientY - r.top;
             mouse.active = true;
         }
-        cv.addEventListener('pointermove', setPointer);
-        cv.addEventListener('pointerdown', setPointer);
-        cv.addEventListener('pointerleave', () => { mouse.active = false; });
-        cv.addEventListener('pointerup', e => { if (e.pointerType === 'touch') mouse.active = false; });
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { readColors(); buildAtlas(); });
+        cv.addEventListener("pointermove", setPointer);
+        cv.addEventListener("pointerdown", setPointer);
+        cv.addEventListener("pointerleave", () => { mouse.active = false; });
+        cv.addEventListener("pointerup", e => { if (e.pointerType === "touch") mouse.active = false; });
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { readColors(); buildAtlas(); });
 
         // the thin font loads after the page: once it is ready, redraw the letters with it
         if (document.fonts && document.fonts.load) {
-            document.fonts.load(P.fontWeight + ' 16px "JetBrains Mono"').then(() => { if (sized) { atlasKey = ''; buildAtlas(); } }).catch(() => {});
+            document.fonts.load(P.fontWeight + ' 16px "Inter"').then(() => { if (sized) { atlasKey = ""; buildAtlas(); } }).catch(() => {});
         }
 
-        new ResizeObserver(resize).observe(cv);
-        resize();
-        requestAnimationFrame(loop);
+        new ResizeObserver(resizeCanvas).observe(cv);
+        resizeCanvas();
+        requestAnimationFrame(runLoop);
     })();
 </script>

@@ -4,12 +4,12 @@ Scoped to .neutrum-wrapper so it doesn't
 affect the rest of the page layout.
 ===================================== */
 
-/* --- Ensure parent fills the animation-section height --- */
+/* ---------- Ensure parent fills the animation-section height ---------- */
 .animation-section .hidden-section {
     height: 100%;
 }
 
-/* --- WRAPPER (replaces old :root and body styles) --- */
+/* ---------- WRAPPER (replaces old :root and body styles) ---------- */
 .neutrum-wrapper {
     /* look */
     --bg: var(--color-background, #000000);
@@ -64,7 +64,7 @@ affect the rest of the page layout.
     }
 }
 
-/* ---- one ripple: a tilted plane at the pointer ------------------------- */
+/* ---------- one ripple: a tilted plane at the pointer ---------- */
 .neutrum-wrapper .ripple {
     position: absolute;
     left: 0;
@@ -77,7 +77,7 @@ affect the rest of the page layout.
     pointer-events: none;
 }
 
-/* ---- one ring of text: it moves up and down through the plane ---------- */
+/* ---------- one ring of text: it moves up and down through the plane ---------- */
 .neutrum-wrapper .ring {
     /* radius, arrival time, swing size and brightness, all from the ring's number --i */
     --r: calc(var(--first-ring) + var(--i) * var(--ring-gap));
@@ -108,7 +108,7 @@ affect the rest of the page layout.
     animation-direction: normal, normal, reverse;
 }
 
-/* ---- the ring's text, painted once into an image by the script --------- */
+/* ---------- the ring's text, painted once into an image by the script ---------- */
 .neutrum-wrapper .ring img {
     position: absolute;
     display: block;
@@ -116,7 +116,7 @@ affect the rest of the page layout.
     pointer-events: none;
 }
 
-/* ---- keyframes ---------------------------------------------------------
+/* ---------- Keyframes ----------
    bounce: a damped up-and-down, one stop per peak, eased in between.
    fade:   opacity hits the same peaks at the same moments as bounce, scaled
            to the ring's brightness, so brightness tracks the wiggle size.

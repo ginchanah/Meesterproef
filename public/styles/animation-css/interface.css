@@ -41,7 +41,7 @@ MARK: Interface Animation
 }
 
 /* ---------- Grid ---------- */
-#interface-stage {
+.interface-stage {
     position: absolute;
     inset: 0;
     display: grid;
@@ -52,7 +52,7 @@ MARK: Interface Animation
 }
 
 /* ---------- Switch ---------- */
-#interface-stage > label {
+.interface-stage > label {
     --knob-size: calc(0.75 * var(--switch-size));
     --pad: calc((var(--switch-size) - var(--knob-size)) / 2);
 

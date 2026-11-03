@@ -5,7 +5,7 @@ const pPerSection = 22;
 <!-- generate three sections with each 22 p's inside -->
 <div class="animation-container">
 	{sections.map((section) => (
-		<div class="set-sibling-index intra-section" id={`intra-section-${section}`}>
+		<div class={`set-sibling-index intra-section intra-section-${section}`} id={`intra-section-${section}`}>
 			{Array.from({ length: pPerSection }).map(() => (
 				<p class="blend" draggable="true">intra-action</p>
 			))}
@@ -20,7 +20,7 @@ const pPerSection = 22;
 	// MARK: Section 1
 	// =====================================
 	// define section to do drag & drop in
-	const section = document.getElementById('intra-section-1');
+	const section = document.getElementById("intra-section-1");
 	// define the element that is being dragged
 	let draggedEl = null;
 	// define the offset where the element is being dropped
@@ -29,9 +29,9 @@ const pPerSection = 22;
 
 
 	// Make a .blend elements draggable
-	document.querySelectorAll('.blend').forEach(el => {
+	document.querySelectorAll(".blend").forEach(el => {
 		// what happens when dragging is initiated
-		el.addEventListener('dragstart', e => {
+		el.addEventListener("dragstart", e => {
 			// which element is being dragged
 			draggedEl = e.target;
 
@@ -43,15 +43,15 @@ const pPerSection = 22;
 			offsetY = e.clientY - rect.top;
 
 			// For some browsers, required to start drag
-			e.dataTransfer.setData('text/plain', '');
+			e.dataTransfer.setData("text/plain", "");
 			// add dragging class for styling
-			draggedEl.classList.add('dragging');
+			draggedEl.classList.add("dragging");
 		});
 
 		// remove dragging class when ending the drag
-		el.addEventListener('dragend', () => {
+		el.addEventListener("dragend", () => {
 				if (draggedEl) {
-					draggedEl.classList.remove('dragging');
+					draggedEl.classList.remove("dragging");
 					draggedEl = null;
 				}
 			});
@@ -59,14 +59,14 @@ const pPerSection = 22;
 
 
 		// Make drop possible inside the section
-		section.addEventListener('dragover', e => {
+		section.addEventListener("dragover", e => {
 			e.preventDefault();
 		});
 
 		
 
 		// Define the what happens on drop, making sure it's dropped inside the container
-		section.addEventListener('drop', e => {
+		section.addEventListener("drop", e => {
 			e.preventDefault();
 			if (!draggedEl) return;
 
@@ -90,13 +90,13 @@ const pPerSection = 22;
 			x = Math.max(0, Math.min(x, maxX));
 			y = Math.max(0, Math.min(y, maxY));
 
-			draggedEl.style.position = 'absolute';
-			draggedEl.style.left = x + 'px';
-			draggedEl.style.top = y + 'px';
+			draggedEl.style.position = "absolute";
+			draggedEl.style.left = x + "px";
+			draggedEl.style.top = y + "px";
 
 
-			draggedEl.classList.remove('dragging');
-			draggedEl.classList.add('dragged');
+			draggedEl.classList.remove("dragging");
+			draggedEl.classList.add("dragged");
 
 			draggedEl = null;
 		});
@@ -105,29 +105,29 @@ const pPerSection = 22;
 	// =====================================
 	// MARK: Section 2
 	// =====================================
-	const section2 = document.getElementById('intra-section-2');
+	const section2 = document.getElementById("intra-section-2");
 	let draggedEl2 = null;
 	let offsetX2 = 0;
 	let offsetY2 = 0;
 
 
-	document.querySelectorAll('.blend').forEach(el => {
-		el.addEventListener('dragstart', e => {
+	document.querySelectorAll(".blend").forEach(el => {
+		el.addEventListener("dragstart", e => {
 			draggedEl2 = e.target;
 
 			const rect = draggedEl2.getBoundingClientRect();
 			offsetX2 = e.clientX - rect.left;
 			offsetY2 = e.clientY - rect.top;
 
-			e.dataTransfer.setData('text/plain', '');
+			e.dataTransfer.setData("text/plain", "");
 
-			draggedEl2.classList.add('dragging');
+			draggedEl2.classList.add("dragging");
 		});
 
 
-		el.addEventListener('dragend', () => {
+		el.addEventListener("dragend", () => {
 			if (draggedEl2) {
-				draggedEl2.classList.remove('dragging');
+				draggedEl2.classList.remove("dragging");
 				draggedEl2 = null;
 			}
 		});
@@ -135,12 +135,12 @@ const pPerSection = 22;
 	});
 
 
-	section2.addEventListener('dragover', e => {
+	section2.addEventListener("dragover", e => {
 		e.preventDefault();
 	});
 
 
-	section2.addEventListener('drop', e => {
+	section2.addEventListener("drop", e => {
 		e.preventDefault();
 		if (!draggedEl2) return;
 
@@ -158,12 +158,12 @@ const pPerSection = 22;
 		x = Math.max(0, Math.min(x, maxX));
 		y = Math.max(0, Math.min(y, maxY));
 
-		draggedEl2.style.position = 'absolute';
-		draggedEl2.style.left = x + 'px';
-		draggedEl2.style.top = y + 'px';
+		draggedEl2.style.position = "absolute";
+		draggedEl2.style.left = x + "px";
+		draggedEl2.style.top = y + "px";
 
-		draggedEl2.classList.remove('dragging');
-		draggedEl2.classList.add('dragged');
+		draggedEl2.classList.remove("dragging");
+		draggedEl2.classList.add("dragged");
 		draggedEl2 = null;
 	});
 
@@ -172,28 +172,28 @@ const pPerSection = 22;
 	// MARK: Section 3
 	// =====================================
 
-	const section3 = document.getElementById('intra-section-3');
+	const section3 = document.getElementById("intra-section-3");
 	let draggedEl3 = null;
 	let offsetX3 = 0;
 	let offsetY3 = 0;
 
-	document.querySelectorAll('.blend').forEach(el => {
-		el.addEventListener('dragstart', e => {
+	document.querySelectorAll(".blend").forEach(el => {
+		el.addEventListener("dragstart", e => {
 			draggedEl3 = e.target;
 
 			const rect = draggedEl3.getBoundingClientRect();
 			offsetX3 = e.clientX - rect.left;
 			offsetY3 = e.clientY - rect.top;
 
-			e.dataTransfer.setData('text/plain', '');
+			e.dataTransfer.setData("text/plain", "");
 
-			draggedEl3.classList.add('dragging');
+			draggedEl3.classList.add("dragging");
 
 		});
 
-		el.addEventListener('dragend', () => {
+		el.addEventListener("dragend", () => {
 		if (draggedEl3) {
-				draggedEl3.classList.remove('dragging');
+				draggedEl3.classList.remove("dragging");
 				draggedEl3 = null;
 			}
 		});
@@ -201,11 +201,11 @@ const pPerSection = 22;
 	});
 
 
-	section3.addEventListener('dragover', e => {
+	section3.addEventListener("dragover", e => {
 		e.preventDefault();
 	});
 
-	section3.addEventListener('drop', e => {
+	section3.addEventListener("drop", e => {
 		e.preventDefault();
 		if (!draggedEl3) return;
 
@@ -223,11 +223,11 @@ const pPerSection = 22;
 		y = Math.max(0, Math.min(y, maxY));
 
 
-		draggedEl3.style.position = 'absolute';
-		draggedEl3.style.left = x + 'px';
-		draggedEl3.style.top = y + 'px';
-		draggedEl3.classList.remove('dragging');
-		draggedEl3.classList.add('dragged');
+		draggedEl3.style.position = "absolute";
+		draggedEl3.style.left = x + "px";
+		draggedEl3.style.top = y + "px";
+		draggedEl3.classList.remove("dragging");
+		draggedEl3.classList.add("dragged");
 		draggedEl3 = null;
 	});
 </script>

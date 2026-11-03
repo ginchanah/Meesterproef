@@ -1,29 +1,30 @@
-/* ==========================================
-    1. CSS VARIABELEN (KLEUREN)
-    ==========================================
-    Hier definiëren we de kleuren op het hoogste niveau (:root).
-    JavaScript leest deze uit, zodat je kleuren alleen hier in CSS hoeft aan te passen.
+/* =====================================
+MARK: 1. CSS VARIABLES (COLOURS)
+===================================== */
+
+/* The colours are defined at the highest level (:root).
+    JavaScript reads them, so you only need to change colours here in CSS.
 */
 :root {
     --bg-color: #000000;
-    /* Achtergrondkleur (donkergrijs/zwart) */
+    /* Background colour (dark grey/black) */
     --text-color: rgba(255, 255, 255, 1);
-    /* Kleur van de letters (bijv. ECOLOGY) */
+    /* Colour of the letters (e.g. ECOLOGY) */
     --edges-color: rgba(255, 255, 255, 0.8);
-    /* Kleur van de lijnen tussen bolletjes */
+    /* Colour of the lines between the dots */
     --nodes-color: #ffffff;
-    /* Kleur van de bolletjes (nodes) zelf */
+    /* Colour of the dots (nodes) themselves */
 }
 
-/* ==========================================
-    2. BASIS OPMAAK
-    ========================================== */
+/* =====================================
+MARK: 2. BASE LAYOUT
+===================================== */
 .animation-container {
     margin: 0;
     overflow: clip;
-    /* Voorkom scrollbalken zonder scroll te blokkeren */
+    /* Prevent scrollbars without blocking scrolling */
     background-color: var(--bg-color);
-    /* Gebruik de CSS variabele voor de achtergrond */
+    /* Use the CSS variable for the background */
     width: 100%;
     height: var(--animation-height, 90vh);
 }
@@ -31,17 +32,17 @@
 .animation-container canvas {
     display: block;
     cursor: grab;
-    /* Geef aan dat je het canvas kunt vastpakken en slepen */
+    /* Show that the canvas can be grabbed and dragged */
 }
 
-/* Verander de cursor als de gebruiker de muisknop ingedrukt houdt */
+/* Change the cursor while the user holds the mouse button down */
 .animation-container canvas:active {
     cursor: grabbing;
 }
 
-/* ==========================================
-    3. RESPONSIVE AANPASSINGEN
-    ========================================== */
+/* =====================================
+MARK: 3. RESPONSIVE ADJUSTMENTS
+===================================== */
 
 /* Tablet */
 @media (max-width: 1024px) {
@@ -50,14 +51,14 @@
     }
 }
 
-/* Mobiel */
+/* Mobile */
 @media (max-width: 768px) {
     .animation-container {
         height: var(--animation-height, 55vh);
     }
 
     .animation-container canvas {
-        /* Voorkom standaard browser touch-gedrag (scrollen, zoomen) zodat de canvas-interactie werkt */
+        /* Prevent default browser touch behaviour (scrolling, zooming) so the canvas interaction works */
         touch-action: none;
     }
-}
+}

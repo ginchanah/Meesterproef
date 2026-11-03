@@ -4,12 +4,12 @@ Scoped to .remote-control-wrapper so it doesn't
 affect the rest of the page layout.
 ===================================== */
 
-/* --- Ensure parent fills the animation-section height --- */
+/* ---------- Ensure parent fills the animation-section height ---------- */
 .animation-section .hidden-section {
     height: 100%;
 }
 
-/* --- WRAPPER (replaces old body styles) --- */
+/* ---------- WRAPPER (replaces old body styles) ---------- */
 .remote-control-wrapper {
     /* colours: background and ropes/letters */
     --bg: var(--color-background, #000000);
