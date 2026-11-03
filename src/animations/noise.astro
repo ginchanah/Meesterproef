@@ -1,0 +1,239 @@
+---
+
+---
+
+<div class="noise-wrapper">
+    <canvas class="noise-canvas" id="noise-canvas"></canvas>
+</div>
+
+<script>
+    // =====================================
+    // MARK: Script noise
+    // =====================================
+    // @ts-nocheck
+
+    // The streaky noise texture runs everywhere. Moving the pointer makes the noise inside the
+    // letters hold still and travel with the pointer, so the word fades in. Stopping lets it dissolve again.
+    (function () {
+        "use strict";
+
+        const WORD = "NOISE";
+        const STOP_DELAY = 250;     // ms without movement before the fade-out starts
+        const FADE_IN = 1200;       // ms for the letters to appear
+        const FADE_OUT = 2200;      // ms for the letters to dissolve
+        const FOLLOW = 1;           // how far the noise in the letters travels per px of pointer movement (1 = same distance)
+        const INVERT = false;       // false = the noise moves the same way as the pointer, true = the opposite way
+        const TEXTURE_MS = 33;      // the texture itself updates about 30 times a second
+        const GRAIN_TOP = 0.8;      // how much random grain sits on top of the texture at the very top (the original texture had 0.05)
+        const GRAIN = 0.4;          // the same from about 60% of the screen height downwards; it eases between the two
+        const SPLIT = 1;            // where the dark grey area meets the light grey area, as a fraction of the screen height. 1 = dark grey everywhere, 0.5 = split through the word
+        const LIGHT_TOP = 0.35;     // share of the streaks that are light grey at the top of the screen (0 = none, 1 = all)
+        const LIGHT_BOTTOM = 0.6;   // the same at the bottom; the share changes smoothly in between
+        const BLOCKS = 0.1;         // share of the screen covered by flickering black and white blocks (the original texture only had them along its contours)
+        const BLACK_COLUMNS = 0.05; // share of columns that are a black streak (the original had 0.015)
+        const WHITE_COLUMNS = 0.16; // share of columns with white streaks (the original had 0.08)
+
+        const cv = document.getElementById("noise-canvas");
+        const ctx = cv.getContext("2d");
+        const section = cv.closest(".animation-section");
+        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        let W, H, cell, img, px, live, frozen, mask, thresh;
+        let ch, seg, vel, ctone, dk, wl;           // per-column texture settings
+        let moving = false, reveal = 0, stopTimer = null;
+        let ox = 0, oy = 0;                        // how far the noise inside the letters has travelled, in grains
+        let lastX = null, lastY = null;
+        let t = 0, lastT = 0, lastTex = 0;
+        let ready = false;
+
+        // the play/stop button of the detail page adds .stop-animation when paused
+        const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
+
+        // grey value (0-255) to packed pixel
+        const GRAY = new Uint32Array(256);
+        for (let v = 0; v < 256; v++) GRAY[v] = (255 << 24) | (v << 16) | (v << 8) | v;
+
+        function hashNumber(n) {
+            n = Math.imul(n ^ (n >>> 15), 2246822507);
+            n = Math.imul(n ^ (n >>> 13), 3266489909);
+            return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
+        }
+
+        function buildMask() {
+            if (!ready) return;
+            const m = document.createElement("canvas");
+            m.width = W; m.height = H;
+            const g = m.getContext("2d");
+            g.fillStyle = "#fff";
+            g.textAlign = "center";
+            g.textBaseline = "middle";
+            const family = '"Inter", sans-serif';   // Inter is loaded in general.css
+            g.font = "900 100px " + family;
+            const base = g.measureText(WORD).width;
+            const size = Math.min(100 * (W * 0.85) / base, H * 0.6);
+            g.font = "900 " + size + "px " + family;
+            g.fillText(WORD, W / 2, H / 2);
+            const d = g.getImageData(0, 0, W, H).data;
+            mask = new Uint8Array(W * H);
+            for (let i = 0; i < W * H; i++) mask[i] = d[i * 4 + 3] > 127 ? 1 : 0;
+        }
+
+        function init() {
+            // sized to the animation area, not the window
+            const r = cv.getBoundingClientRect();
+            if (!(r.width > 2 && r.height > 2)) return;     // ignore hidden / zero-size layouts
+            cell = Math.max(1.5, Math.sqrt(r.width * r.height / 180000));   // screen px per grain
+            W = Math.ceil(r.width / cell);
+            H = Math.ceil(r.height / cell);
+            cv.width = W; cv.height = H;
+            img = ctx.createImageData(W, H);
+            px = new Uint32Array(img.data.buffer);
+            live = new Uint8Array(W * H);
+            frozen = new Uint8Array(W * H);
+            thresh = new Float32Array(W * H);
+            for (let i = 0; i < W * H; i++) thresh[i] = Math.random();
+
+            ch = new Float32Array(W); seg = new Float32Array(W); vel = new Float32Array(W);
+            ctone = new Float32Array(W); dk = new Uint8Array(W); wl = new Uint8Array(W);
+            for (let x = 0; x < W; x++) {
+                ch[x] = hashNumber(x * 7 + 1);
+                const r = hashNumber(x * 11 + 3);
+                seg[x] = 3 + Math.floor(r * r * 150);
+                vel[x] = (hashNumber(x * 13 + 5) - 0.5) * 70;
+                ctone[x] = hashNumber(x * 3 + 11) - 0.5;
+                dk[x] = hashNumber(x * 17 + 2) > 1 - BLACK_COLUMNS ? 1 : 0;
+                wl[x] = hashNumber(x * 23 + 7) > 1 - WHITE_COLUMNS ? 1 : 0;
+            }
+            ready = true;
+            buildMask();
+            drawTexture();
+            frozen.set(live);
+        }
+
+        // the streaky noise texture: fills `live` with grey values
+        function drawTexture() {
+            const c1x = W * (0.35 + 0.25 * Math.sin(t * 0.5)), c1y = H * (0.2 + 0.05 * Math.sin(t * 0.7)), a1 = W * 0.6, b1 = H * 0.055;
+            const c2x = W * (0.6 + 0.3 * Math.sin(t * 0.35 + 2)), c2y = H * (0.42 + 0.04 * Math.sin(t * 0.5 + 1)), a2 = W * 0.45, b2 = H * 0.045;
+            const c3x = W * (0.5 + 0.35 * Math.sin(t * 0.3 + 4)), c3y = H * 0.74, a3 = W * 0.9, b3 = H * 0.2;
+
+            const rh = Math.max(2, Math.round(H / 150)), tk = Math.floor(t * 4);
+            for (let y = 0; y < H; y++) {
+                const lower = y > H * SPLIT, by = Math.floor(y / rh);
+                const lightShare = LIGHT_TOP + (LIGHT_BOTTOM - LIGHT_TOP) * (y / H);
+                const grain = GRAIN_TOP + (GRAIN - GRAIN_TOP) * Math.min(1, y / (H * 0.6));
+                const rl = 3 + Math.floor(hashNumber(by * 5 + 1) * 11), ro = Math.floor(hashNumber(by * 3 + 2) * 40);
+                const blob = y > H * 0.9 ? (y - H * 0.9) / (H * 0.1) * 0.65 : 0;
+                for (let x = 0; x < W; x++) {
+                    const s = seg[x], shift = ch[x] * 100 + vel[x] * t;
+                    const cl = Math.floor((y + shift) / s), ys = cl * s - shift;
+
+                    const dx = x + ys * 0.25;
+                    const e1 = Math.hypot((dx - c1x) / a1, (ys - c1y) / b1);
+                    const e2 = Math.hypot((dx - c2x) / a2, (ys - c2y) / b2);
+                    const e3 = Math.hypot((dx - c3x) / a3, (ys - c3y) / b3);
+                    const f = Math.min(e1, e2, e3 * 0.8) * 3.5;
+                    const lv = Math.floor(f), fr = f - lv;
+
+                    // smooth region: soft vertical streaks
+                    // each streak segment is either light grey or dark grey; light ones become more common towards the bottom
+                    const light = hashNumber((x * 29 + cl * 613 + 5) | 0) < lightShare;
+                    let g = (light ? 0.84 : 0.58) + ctone[x] * (light ? 0.16 : 0.2) + (hashNumber((x * 31 + cl * 977) | 0) - 0.5) * 0.08;
+                    if (wl[x] && hashNumber(cl * 53 + x) > 0.3) g = 0.97;
+                    if (dk[x]) g = 0.04;
+
+                    // blocky detail around contour edges and bottom blobs
+                    const det = lower ? (fr < 0.1 || fr > 0.93) : (lv >= 1 && lv <= 3 && fr < 0.6);
+                    const bl = blob > 0 && hashNumber(Math.floor(x / 5) * 17 + by * 31 + tk) < blob;
+                    const extra = hashNumber(Math.floor(x / 5) * 29 + by * 41 + tk * 11 + 3) < BLOCKS;   // blocks scattered over the whole screen
+                    if (det || bl || extra) {
+                        const cx = Math.floor((x + ro) / rl), hv = hashNumber(cx * 131 + by * 977 + tk * 13);
+                        g = bl || hv > 0.55 ? 0.04 : (hv > 0.2 ? 0.88 : 0.97);
+                        if (y % rh === 0 || (x + (by & 1)) % 6 === 0) g = 0.97;
+                    }
+                    if (fr < 0.03) g = 0.97;
+
+                    // random grain on everything except the light lines, which stay crisp
+                    if (g < 0.9) g += (Math.random() - 0.5) * grain;
+
+                    g = g < 0 ? 0 : g > 1 ? 1 : g;
+                    live[y * W + x] = (g * 255) | 0;
+                }
+            }
+        }
+
+        // the noise inside the letters travels by exactly as much as the pointer moved
+        function trackPointer(x, y) {
+            if (lastX !== null) {
+                const k = (INVERT ? -1 : 1) * FOLLOW / cell;
+                ox += (x - lastX) * k;
+                oy += (y - lastY) * k;
+            }
+            lastX = x; lastY = y;
+            handleMove();
+        }
+
+        function forgetPointer() { lastX = lastY = null; }
+
+        function handleMove() {
+            // capture a new frozen frame only when the letters are fully gone,
+            // so moving again mid-fade doesn't make the image jump
+            if (!moving && reveal < 0.01) frozen.set(live);
+            moving = true;
+            clearTimeout(stopTimer);
+            stopTimer = setTimeout(() => { moving = false; }, STOP_DELAY);
+        }
+
+        function drawFrame(now) {
+            requestAnimationFrame(drawFrame);
+            const dt = Math.min(100, now - lastT);
+            lastT = now;
+            if (!ready || isPaused()) { lastTex = now; return; }
+
+            reveal += moving ? dt / FADE_IN : -dt / FADE_OUT;
+            reveal = Math.min(1, Math.max(0, reveal));
+            const r = reveal * reveal * (3 - 2 * reveal); // smoothstep easing
+
+            if (now - lastTex >= TEXTURE_MS) {
+                t += Math.min((now - lastTex) / 1000, 0.1) * (reduce ? 0.15 : 1);
+                lastTex = now;
+                drawTexture();
+            }
+
+            // grains inside the letters switch to the travelling frozen texture one by one as r rises
+            const ix = Math.floor(ox), iy = Math.floor(oy);
+            for (let y = 0; y < H; y++) {
+                for (let x = 0; x < W; x++) {
+                    const i = y * W + x;
+                    let v = live[i];
+                    if (r > 0 && mask[i] && r > thresh[i]) {
+                        const sx = (((x - ix) % W) + W) % W, sy = (((y - iy) % H) + H) % H;
+                        v = frozen[sy * W + sx];
+                    }
+                    px[i] = GRAY[v];
+                }
+            }
+            ctx.putImageData(img, 0, 0);
+        }
+
+        // rebuild whenever the animation area changes size (window resize, rotation)
+        let resizeTimer;
+        new ResizeObserver(() => {
+            clearTimeout(resizeTimer);
+            if (!ready) init();
+            else resizeTimer = setTimeout(init, 150);
+        }).observe(cv);
+
+        // only the animation reacts, not the rest of the page
+        cv.addEventListener("pointermove", e => trackPointer(e.clientX, e.clientY));
+        cv.addEventListener("pointerdown", forgetPointer);
+        cv.addEventListener("pointercancel", forgetPointer);
+        cv.addEventListener("pointerleave", forgetPointer);
+
+        init();
+        // the letter mask needs Inter: rebuild it once the font has loaded
+        if (document.fonts && document.fonts.load) {
+            document.fonts.load('900 100px "Inter"', WORD).then(buildMask).catch(() => {});
+        }
+        requestAnimationFrame(drawFrame);
+    })();
+</script>

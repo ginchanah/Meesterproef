@@ -177,7 +177,7 @@
         for (let i = 0; i < totalLetters; i++) {
             let letter = letterStates[i];
 
-            // --- Step 1: Which neighbor does this letter follow? ---
+            // ---------- Step 1: Which neighbor does this letter follow? ----------
             // Letters form a chain: each one follows the letter next to it that is closer to the center.
             let neighborY = letter.y;
 
@@ -190,7 +190,7 @@
                 neighborY = letterStates[i - 1].y;
             }
 
-            // --- Step 2: Calculate all the forces acting on this letter ---
+            // ---------- Step 2: Calculate all the forces acting on this letter ----------
 
             // Force 1: Pull toward the neighbor (25% of the gap between them)
             // This is what makes the letters move as a connected chain
@@ -213,7 +213,7 @@
                 pullToMouse = (targetY - letter.y) * 0.08;
             }
 
-            // --- Step 3: Apply all forces to move the letter ---
+            // ---------- Step 3: Apply all forces to move the letter ----------
 
             // Combine all four forces into the letter's speed
             letter.speedY +=
@@ -225,7 +225,7 @@
             // Move the letter by its current speed
             letter.y += letter.speedY;
 
-            // --- Step 4: Tilt the letter ---
+            // ---------- Step 4: Tilt the letter ----------
             // Letters tilt based on the difference between their position and their neighbor.
             // This makes the chain look like it's bending, not just moving up and down.
             if (i < middleIndex) {
@@ -237,7 +237,7 @@
             }
         }
 
-        // --- Step 5: Update the screen ---
+        // ---------- Step 5: Update the screen ----------
         // Move and rotate each letter element to its new position
         for (let i = 0; i < totalLetters; i++) {
             letters[i].style.transform =

@@ -1,0 +1,91 @@
+---
+
+---
+
+<div class="friction-wrapper" id="friction-stage">
+    <!-- circle A: a plain disc -->
+    <div class="disc a"></div>
+    <!-- circle B: a disc. Inside it sits a copy of A in the background colour; B clips that copy, so what is left is the overlap of A and B.
+         The word sits inside that copy and is clipped by it as well, so it only shows in the overlap. -->
+    <div class="disc b">
+        <div class="disc lens">
+            <span class="word">Friction</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // =====================================
+    // MARK: Script friction
+    // =====================================
+    // @ts-nocheck
+    (() => {
+        // The only thing HTML and CSS cannot do: the physics. This moves circle A and writes its offset into --x / --y; CSS does the rest.
+        const stage = document.getElementById("friction-stage");
+        const section = stage.closest(".animation-section");
+        const q = { x: 0, y: 0, vx: 0, vy: 0 }, P = { x: 0, y: 0 }, T = { x: 0, y: 0 };   // q: A's offset from the centre, P: smoothed pointer, T: pointer
+        let R = 1, still = 99, clock = 0;
+
+        // feel (accelerations in px/s², everything scales with the radius)
+        const KS = 60,        // spring between pointer and circle A
+              CA = 14,        // damping
+              PUSH = 2.2,     // peak push, in units of KS·R: the closer the circles, the harder they push apart
+              SOFT = 0.15,    // the push is at full strength from SOFT radii of offset on
+              IDLE_AFTER = 2.5,   // seconds without pointer movement before the idle mode takes over
+              RANGE = 5.0;    // the push starts when the two centres are RANGE radii apart
+
+        // the play/stop button of the detail page adds .stop-animation when paused
+        const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
+
+        function updateLayout() {
+            const r = stage.querySelector(".a").offsetWidth / 2;   // the radius is decided in the CSS
+            if (!r) return;                                         // ignore hidden / zero-size layouts
+            const k = r / R; R = r;
+            q.x *= k; q.y *= k; P.x *= k; P.y *= k; T.x *= k; T.y *= k;
+        }
+        new ResizeObserver(updateLayout).observe(stage);
+
+        // pointer position measured from the centre of the animation, since it sits inside the page
+        function setPointer(e) {
+            const r = stage.getBoundingClientRect();
+            T.x = e.clientX - r.left - r.width / 2;
+            T.y = e.clientY - r.top - r.height / 2;
+            still = 0;
+        }
+        stage.addEventListener("pointermove", setPointer);
+        stage.addEventListener("pointerdown", setPointer);
+
+        // idle: the imaginary pointer swings slowly through the middle along a line that itself turns,
+        // so the circles drift apart, push each other away, and now and then slip past each other: the word flashes up and is gone
+        function getIdleTarget() { const a = clock * 0.13, r = R * 1.7 * Math.sin(clock * 0.8); return [Math.cos(a) * r, Math.sin(a) * r]; }
+
+        function step(dt) {
+            clock += dt; still += dt;
+            if (still > IDLE_AFTER) [T.x, T.y] = getIdleTarget();
+            const k = 1 - Math.exp(-dt * (still > IDLE_AFTER ? 1.2 : 30));    // idle takes over gently, the pointer takes back control at once
+            P.x += (T.x - P.x) * k; P.y += (T.y - P.y) * k;
+            const m = Math.hypot(q.x, q.y), d = 2 * m, D = RANGE * R;
+            let fx = 0, fy = 0;
+            if (d < D && m > 1e-6) {
+                const f = KS * PUSH * R * Math.min(1, m / (SOFT * R)) * (1 - d / D) ** 1.5;
+                fx = q.x / m * f; fy = q.y / m * f;                              // outwards: A is pushed away from B, B (the mirror of A) away from A
+            }
+            q.vx += (KS * (P.x - q.x) + fx - CA * q.vx) * dt; q.vy += (KS * (P.y - q.y) + fy - CA * q.vy) * dt;
+            q.x += q.vx * dt; q.y += q.vy * dt;
+        }
+
+        let last = 0, acc = 0;
+        function drawFrame(t) {
+            const dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
+            if (!isPaused()) {
+                acc += dt;
+                while (acc >= 1 / 240) { step(1 / 240); acc -= 1 / 240; }
+                stage.style.setProperty("--x", q.x.toFixed(2) + "px");
+                stage.style.setProperty("--y", q.y.toFixed(2) + "px");
+            }
+            requestAnimationFrame(drawFrame);
+        }
+        updateLayout();
+        requestAnimationFrame(drawFrame);
+    })();
+</script>

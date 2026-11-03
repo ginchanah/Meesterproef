@@ -9,31 +9,34 @@
 <script>
     // @ts-nocheck
 
-    // ==========================================
-    // 3. CSS KLEUREN INLADEN IN JAVASCRIPT
-    // ==========================================
-    // Haal de berekende stijlen van het hoofddocument (HTML) op
+    // =====================================
+    // MARK: 3. LOAD CSS COLOURS INTO JAVASCRIPT
+    // =====================================
+    // Get the computed styles of the main document (HTML)
     const rootStyles = getComputedStyle(document.documentElement);
 
-    // Lees de specifieke CSS-variabelen uit en verwijder eventuele extra spaties (.trim())
+    // Read the specific CSS variables and remove any extra spaces (.trim())
     const colorText = rootStyles.getPropertyValue("--text-color").trim();
     const colorEdges = rootStyles.getPropertyValue("--edges-color").trim();
     const colorNodes = rootStyles.getPropertyValue("--nodes-color").trim();
 
-    // ==========================================
-    // 4. BASIS INSTELLINGEN & VARIABELEN
-    // ==========================================
+    // =====================================
+    // MARK: 4. BASIC SETTINGS & VARIABLES
+    // =====================================
     const C = document.getElementById("c");
-    const ctx = C.getContext("2d"); // De 2D tekencontext
-    const container = C.closest(".animation-container"); // De container waarin het canvas zit
+    const ctx = C.getContext("2d"); // The 2D drawing context
+    const container = C.closest(".animation-container"); // The container the canvas sits in
 
-    const N = 420; // Totaal aantal bolletjes (nodes)
+    // Adjust the number of dots to the screen size
+    const isMobile = window.innerWidth < 768;
+    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+    const N = isMobile ? 180 : isTablet ? 300 : 420; // Fewer dots on smaller screens
 
-    // Het woord bepaalt de groepen (clusters). 7 letters = 7 clusters bolletjes.
+    // The word decides the groups (clusters). 7 letters = 7 clusters of dots.
     const word = "ECOLOGY";
     const CLUSTERS = word.length;
 
-    // Globale variabelen voor schermgrootte, middenpunt (cx, cy), radius, zoom en camera-positie (pan)
+    // Global variables for screen size, centre (cx, cy), radius, zoom and camera position (pan)
     let W,
         H,
         cx,
@@ -45,29 +48,30 @@
         drag = null,
         pan = null;
 
-    // ==========================================
-    // 5. HULPFUNCTIES
-    // ==========================================
+    // =====================================
+    // MARK: 5. HELPER FUNCTIONS
+    // =====================================
 
-    // Zorgt ervoor dat het canvas altijd de container vult, ook bij het aanpassen van het venster
-    function resize() {
-        const d = devicePixelRatio || 1; // Houdt rekening met retina/hoge resolutie schermen
+    // Makes sure the canvas always fills the container, also when the window is resized
+    function resizeCanvas() {
+        const d = devicePixelRatio || 1; // Takes retina/high resolution screens into account
         W = container.clientWidth;
         H = container.clientHeight;
         C.width = W * d;
         C.height = H * d;
         C.style.width = W + "px";
         C.style.height = H + "px";
-        ctx.setTransform(d, 0, 0, d, 0, 0); // Schaal de context mee
-        cx = W / 2; // X-midden
-        cy = H / 2; // Y-midden
-        R = Math.min(W, H) * 0.38; // Radius waarop de letters ongeveer verdeeld worden
+        ctx.setTransform(d, 0, 0, d, 0, 0); // Scale the context along
+        cx = W / 2; // X centre
+        cy = H / 2; // Y centre
+        // Smaller radius on mobile so the letters sit closer to the centre and more white space is left
+        R = isMobile ? Math.min(W, H) * 0.28 : isTablet ? Math.min(W, H) * 0.33 : Math.min(W, H) * 0.38;
     }
-    resize();
-    window.addEventListener("resize", resize); // Pas aan als het venster van grootte verandert
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas); // Adjust when the window changes size
 
-    // Genereert een 'Normale Verdeling' (Gaussiaans), zorgt dat bolletjes zich vaker in het midden van een letter concentreren
-    function gauss() {
+    // Generates a 'normal distribution' (Gaussian), so dots gather more often in the middle of a letter
+    function getGaussRandom() {
         let u = 0,
             v = 0;
         while (!u) u = Math.random();
@@ -75,56 +79,59 @@
         return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
     }
 
-    // ==========================================
-    // 6. DATA GENERATIE (CLUSTERS, NODES, EDGES)
-    // ==========================================
+    // =====================================
+    // MARK: 6. DATA GENERATION (CLUSTERS, NODES, EDGES)
+    // =====================================
 
-    // Bepaal de doellocaties (clusters) voor elke letter in een cirkelpatroon
+    // Decide the target locations (clusters) for every letter in a circle pattern
+    // Smaller spread per cluster on mobile for more compact letters
+    const clusterSpread = isMobile ? 15 + Math.random() * 30 : 30 + Math.random() * 60;
+
     const clusters = Array.from({ length: CLUSTERS }, (_, i) => {
-        const a = (i / CLUSTERS) * Math.PI * 2; // Hoek in de cirkel
-        const d = R * (0.3 + Math.random() * 0.7); // Afstand vanuit het centrum
+        const a = (i / CLUSTERS) * Math.PI * 2; // Angle in the circle
+        const d = R * (0.3 + Math.random() * 0.7); // Distance from the centre
         return {
             x: cx + Math.cos(a) * d,
             y: cy + Math.sin(a) * d,
-            s: 30 + Math.random() * 60, // Spreidingsgrootte van de letter
-            char: word[i], // Sla de specifieke letter op ("E", "C", "O", etc.)
+            s: isMobile ? 15 + Math.random() * 30 : 30 + Math.random() * 60, // Smaller spread on mobile
+            char: word[i], // Store the specific letter ("E", "C", "O", etc.)
         };
     });
 
-    // Maak de bolletjes (nodes) aan en wijs ze toe aan een willekeurig cluster (letter)
+    // Create the dots (nodes) and assign each to a random cluster (letter)
     const nodes = Array.from({ length: N }, () => {
-        const c = clusters[(Math.random() * CLUSTERS) | 0]; // Kies willekeurig cluster
+        const c = clusters[(Math.random() * CLUSTERS) | 0]; // Pick a random cluster
         const a = Math.random() * Math.PI * 2;
-        const r = Math.abs(gauss()) * c.s; // Gebruik Gauss voor concentratie in het midden
+        const r = Math.abs(getGaussRandom()) * c.s; // Use Gauss to concentrate them in the middle
         return {
             x: c.x + Math.cos(a) * r,
             y: c.y + Math.sin(a) * r,
-            vx: 0, // Snelheid X
-            vy: 0, // Snelheid Y
-            r: 2.2 + Math.random() * 1.8, // Radius (visuele grootte) van het bolletje
-            ci: clusters.indexOf(c), // Cluster index waartoe deze node behoort
+            vx: 0, // Velocity X
+            vy: 0, // Velocity Y
+            r: isMobile ? 1.6 + Math.random() * 1.2 : 2.2 + Math.random() * 1.8, // Smaller dots on mobile
+            ci: clusters.indexOf(c), // Index of the cluster this node belongs to
         };
     });
 
-    // Verbind de nodes met lijnen (edges)
+    // Connect the nodes with lines (edges)
     const edges = [];
-    const edgeSet = new Set(); // Voorkomt dubbele lijnen
+    const edgeSet = new Set(); // Prevents duplicate lines
 
     function addEdge(a, b) {
-        const k = a < b ? a + "-" + b : b + "-" + a; // Unieke sleutel
-        if (a === b || edgeSet.has(k)) return; // Stop als lijn al bestaat of node met zichzelf verbindt
+        const k = a < b ? a + "-" + b : b + "-" + a; // Unique key
+        if (a === b || edgeSet.has(k)) return; // Stop if the line already exists or a node connects to itself
         edgeSet.add(k);
         edges.push([a, b]);
     }
 
-    // Verbind nodes gebaseerd op afstand. Grote kans binnen dezelfde letter, kleine kans tussen verschillende letters.
+    // Connect nodes based on distance. High chance within the same letter, low chance between different letters.
     for (let i = 0; i < N; i++) {
         for (let j = i + 1; j < N; j++) {
             const dx = nodes[i].x - nodes[j].x;
             const dy = nodes[i].y - nodes[j].y;
             const d = Math.sqrt(dx * dx + dy * dy);
 
-            // P is de kans op een verbinding
+            // P is the chance of a connection
             const p =
                 nodes[i].ci === nodes[j].ci
                     ? Math.max(0, 0.35 - d / 300)
@@ -133,7 +140,7 @@
         }
     }
 
-    // Zorg dat geen enkel bolletje volledig losraakt (isoleerde nodes verbinden met hun dichtstbijzijnde buur)
+    // Make sure no dot gets fully disconnected (isolated nodes connect to their nearest neighbour)
     for (let i = 0; i < N; i++) {
         if (!edges.some(([a, b]) => a === i || b === i)) {
             let best = 0,
@@ -153,7 +160,7 @@
         }
     }
 
-    // Creëer 'Hubs': Koppel enkele willekeurige nodes aan heel veel andere nodes voor een web-effect
+    // Create 'hubs': connect a few random nodes to many other nodes for a web effect
     for (let h = 0; h < 8; h++) {
         const hub = (Math.random() * N) | 0;
         for (let i = 0; i < 8 + Math.random() * 12; i++) {
@@ -161,12 +168,12 @@
         }
     }
 
-    // ==========================================
-    // 7. INPUT HANDLERS (MUIS / TOUCH)
-    // ==========================================
+    // =====================================
+    // MARK: 7. INPUT HANDLERS (MOUSE / TOUCH)
+    // =====================================
 
-    // Vertaal muiscoördinaten naar "wereld"-coördinaten (houdt rekening met zoom en pan)
-    function s2w(sx, sy) {
+    // Translate mouse coordinates to "world" coordinates (takes zoom and pan into account)
+    function convertScreenToWorld(sx, sy) {
         const rect = C.getBoundingClientRect();
         const localX = sx - rect.left;
         const localY = sy - rect.top;
@@ -176,11 +183,11 @@
         };
     }
 
-    // Zoek het bolletje dat het dichtst bij de muisklik in de buurt is
+    // Find the dot closest to the mouse click
     function findNode(sx, sy) {
-        const { x, y } = s2w(sx, sy);
+        const { x, y } = convertScreenToWorld(sx, sy);
         let best = -1,
-            bd = 18 / zoom; // Detectie-radius past zich aan zoom aan
+            bd = 18 / zoom; // Detection radius adapts to the zoom
         for (let i = 0; i < N; i++) {
             const d = Math.hypot(nodes[i].x - x, nodes[i].y - y);
             if (d < bd) {
@@ -191,21 +198,21 @@
         return best;
     }
 
-    // Muis/Touch acties
+    // Mouse/touch actions
     C.onmousedown = (e) => {
         const i = findNode(e.clientX, e.clientY);
-        i >= 0 ? (drag = i) : (pan = { x: e.clientX, y: e.clientY }); // Sleep node, OF beweeg hele canvas
+        i >= 0 ? (drag = i) : (pan = { x: e.clientX, y: e.clientY }); // Drag a node, OR move the whole canvas
     };
 
     C.onmousemove = (e) => {
         if (drag !== null) {
-            // Verplaats een vastgepakte node
-            const p = s2w(e.clientX, e.clientY);
+            // Move a grabbed node
+            const p = convertScreenToWorld(e.clientX, e.clientY);
             nodes[drag].x = p.x;
             nodes[drag].y = p.y;
             nodes[drag].vx = nodes[drag].vy = 0;
         } else if (pan) {
-            // Pannen (schuiven) door het hele veld
+            // Pan (slide) across the whole field
             panX += (e.clientX - pan.x) / zoom;
             panY += (e.clientY - pan.y) / zoom;
             pan.x = e.clientX;
@@ -216,32 +223,64 @@
     C.onmouseup = C.onmouseleave = () => {
         drag = null;
         pan = null;
-    }; // Laat los
+    }; // Release
 
-    // ==========================================
-    // 8. NATUURKUNDE EN WEERGAVE LUS (ANIMATION LOOP)
-    // ==========================================
-    requestAnimationFrame(function loop() {
-        // Bereken de randen van het scherm in "wereld"-coördinaten
+    // =====================================
+    // MARK: TOUCH EVENT HANDLERS (MOBILE)
+    // =====================================
+    C.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        const t = e.touches[0];
+        const i = findNode(t.clientX, t.clientY);
+        i >= 0 ? (drag = i) : (pan = { x: t.clientX, y: t.clientY });
+    }, { passive: false });
+
+    C.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+        const t = e.touches[0];
+        if (drag !== null) {
+            const p = convertScreenToWorld(t.clientX, t.clientY);
+            nodes[drag].x = p.x;
+            nodes[drag].y = p.y;
+            nodes[drag].vx = nodes[drag].vy = 0;
+        } else if (pan) {
+            panX += (t.clientX - pan.x) / zoom;
+            panY += (t.clientY - pan.y) / zoom;
+            pan.x = t.clientX;
+            pan.y = t.clientY;
+        }
+    }, { passive: false });
+
+    C.addEventListener("touchend", () => {
+        drag = null;
+        pan = null;
+    });
+
+    // =====================================
+    // MARK: 8. PHYSICS AND RENDER LOOP (ANIMATION LOOP)
+    // =====================================
+    requestAnimationFrame(function runLoop() {
+        // Calculate the edges of the screen in "world" coordinates
         const minX = -W / 2 / zoom + cx - panX;
         const maxX = W / 2 / zoom + cx - panX;
         const minY = -H / 2 / zoom + cy - panY;
         const maxY = H / 2 / zoom + cy - panY;
 
-        // Hierin slaan we de gemiddelde positie op van de bolletjes in één letter
+        // This stores the average position of the dots in one letter
         const clusterCenters = Array.from({ length: CLUSTERS }, () => ({
             x: 0,
             y: 0,
             count: 0,
         }));
 
-        // 8A. Lijn-natuurkunde (Veringen)
-        // Trekt verbonden nodes naar elkaar toe
+        // 8A. Line physics (springs)
+        // Pulls connected nodes towards each other
         for (const [a, b] of edges) {
             const dx = nodes[b].x - nodes[a].x;
             const dy = nodes[b].y - nodes[a].y;
             const d = Math.sqrt(dx * dx + dy * dy) || 1;
-            const f = (d - 50) * 0.0004; // Veer-constante
+            const restLen = isMobile ? 25 : 50; // Shorter rest length on mobile for a more compact network
+            const f = (d - restLen) * 0.0004; // Spring constant
             const fx = (dx / d) * f;
             const fy = (dy / d) * f;
             if (a !== drag) {
@@ -254,37 +293,38 @@
             }
         }
 
-        // 8B. Node-natuurkunde
+        // 8B. Node physics
         for (let i = 0; i < N; i++) {
-            if (i === drag) continue; // Genegeerde node als de gebruiker deze vasthoudt
+            if (i === drag) continue; // Skip the node while the user is holding it
 
-            // Lichte aantrekkingskracht naar het absolute midden van het scherm
-            nodes[i].vx += (cx - nodes[i].x) * 0.00008;
-            nodes[i].vy += (cy - nodes[i].y) * 0.00008;
+            // Stronger attraction on mobile so the network stays more in the middle
+            const centerForce = isMobile ? 0.00025 : 0.00008;
+            nodes[i].vx += (cx - nodes[i].x) * centerForce;
+            nodes[i].vy += (cy - nodes[i].y) * centerForce;
 
-            // Bolletjes duwen elkaar lichtjes weg als ze te dichtbij komen
+            // Dots gently push each other away when they get too close
             for (let k = 0; k < 5; k++) {
-                const j = (Math.random() * N) | 0; // Check een paar willekeurige nodes per frame (optimalisatie)
+                const j = (Math.random() * N) | 0; // Check a few random nodes per frame (optimisation)
                 if (j === i) continue;
                 const dx = nodes[i].x - nodes[j].x,
                     dy = nodes[i].y - nodes[j].y,
                     d2 = dx * dx + dy * dy;
-                if (d2 < 2500 && d2 > 0.1) {
+                if (d2 < (isMobile ? 1200 : 2500) && d2 > 0.1) {
                     const f = 80 / d2;
                     nodes[i].vx += dx * f;
                     nodes[i].vy += dy * f;
                 }
             }
 
-            // Wrijving (voorkomt dat de nodes oneindig blijven versnellen)
+            // Friction (stops the nodes from accelerating forever)
             nodes[i].vx *= 0.92;
             nodes[i].vy *= 0.92;
 
-            // Pas snelheid toe op positie
+            // Apply velocity to position
             nodes[i].x += nodes[i].vx;
             nodes[i].y += nodes[i].vy;
 
-            // Stuiteren tegen de randen van het venster
+            // Bounce against the edges of the window
             if (nodes[i].x < minX + nodes[i].r) {
                 nodes[i].x = minX + nodes[i].r;
                 nodes[i].vx *= -1;
@@ -300,61 +340,63 @@
                 nodes[i].vy *= -1;
             }
 
-            // Tel de posities bij elkaar op om het zwaartepunt van een letter uit te rekenen
+            // Add up the positions to calculate the centre of mass of a letter
             clusterCenters[nodes[i].ci].x += nodes[i].x;
             clusterCenters[nodes[i].ci].y += nodes[i].y;
             clusterCenters[nodes[i].ci].count++;
         }
 
-        // ==========================================
-        // 9. TEKENEN OP HET CANVAS
-        // ==========================================
-        ctx.clearRect(0, 0, W, H); // Wis vorige frame
+        // =====================================
+        // MARK: 9. DRAW ON THE CANVAS
+        // =====================================
+        ctx.clearRect(0, 0, W, H); // Clear the previous frame
 
         ctx.save();
-        // Verplaats origin naar midden, pas zoom en pan toe
+        // Move the origin to the centre, apply zoom and pan
         ctx.translate(W / 2, H / 2);
         ctx.scale(zoom, zoom);
         ctx.translate(-cx + panX, -cy + panY);
 
-        // --- 9A. TEKEN DE LETTERS ACHTER DE ZWERM ---
-        ctx.font = 'bold 160px "Inter", sans-serif';
+        // ---------- 9A. Draw the letters behind the swarm ----------
+        // Dynamic letter size based on the screen
+        const fontSize = isMobile ? 60 : isTablet ? 100 : 160;
+        ctx.font = `bold ${fontSize}px "Inter", sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
-        ctx.strokeStyle = colorText; // Kleur uit CSS variabelen
+        ctx.strokeStyle = colorText; // Colour from CSS variables
         ctx.lineWidth = 1;
 
         for (let i = 0; i < CLUSTERS; i++) {
             if (clusterCenters[i].count > 0) {
-                // Berekent de perfecte X en Y van de letter, gebaseerd op waar zijn nodes uithangen
+                // Calculates the exact X and Y of the letter, based on where its nodes are
                 const px = clusterCenters[i].x / clusterCenters[i].count;
                 const py = clusterCenters[i].y / clusterCenters[i].count;
                 ctx.strokeText(clusters[i].char, px, py);
             }
         }
 
-        // --- 9B. TEKEN DE VERBINDINGSLIJNEN ---
+        // ---------- 9B. Draw the connecting lines ----------
         ctx.beginPath();
-        ctx.strokeStyle = colorEdges; // Kleur uit CSS variabelen
-        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = colorEdges; // Colour from CSS variables
+        ctx.lineWidth = isMobile ? 0.3 : 0.5;
         for (const [a, b] of edges) {
             ctx.moveTo(nodes[a].x, nodes[a].y);
             ctx.lineTo(nodes[b].x, nodes[b].y);
         }
         ctx.stroke();
 
-        // --- 9C. TEKEN DE BOLLETJES (NODES) ---
-        ctx.fillStyle = colorNodes; // Kleur uit CSS variabelen
+        // ---------- 9C. Draw the dots (nodes) ----------
+        ctx.fillStyle = colorNodes; // Colour from CSS variables
         for (const n of nodes) {
             ctx.beginPath();
             ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
             ctx.fill();
         }
 
-        ctx.restore(); // Herstel canvas status voor volgende iteratie
+        ctx.restore(); // Restore the canvas state for the next iteration
 
-        // Roep de loop opnieuw aan voor de volgende frame
-        requestAnimationFrame(loop);
+        // Call the loop again for the next frame
+        requestAnimationFrame(runLoop);
     });
 </script>

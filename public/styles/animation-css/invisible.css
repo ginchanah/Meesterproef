@@ -1,3 +1,7 @@
+/* =====================================
+MARK: Invisible Animation
+===================================== */
+
 .invisible-container {
     width: 100dvw;
     height: 90dvh;
@@ -12,7 +16,7 @@
     }
 
     p {
-        font-family: 'Courier Prime', monospace;
+        font-family: "Courier Prime", monospace;
         pointer-events: none;
         font-size: clamp(0.75em, 4vw, 1.75em);
         line-height: 0.75;

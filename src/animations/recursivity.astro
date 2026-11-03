@@ -1,0 +1,546 @@
+---
+
+---
+
+<div class="recursivity-container" id="recursivity-container">
+    <canvas id="recursivity-canvas"></canvas>
+</div>
+
+<script>
+    // @ts-nocheck
+    // =====================================
+    // MARK: Recursivity Animation
+    // =====================================
+    const container = document.getElementById("recursivity-container");
+    const cv = document.getElementById("recursivity-canvas");
+    if (container && cv) {
+        const ctx = cv.getContext("2d");
+        const WORD = "recursivity ";
+        const FONT = "11px Inter, system-ui, sans-serif";
+        const COLOR = "#f2f2f2";
+        const spacing = 13;
+        let W = 0,
+            H = 0,
+            dpr = 1,
+            cx = 0,
+            cy = 0,
+            s,
+            maxRx = 1,
+            rings = [],
+            timer = null,
+            t0 = 0;
+        let atlas = null;
+        const seqs = []; // [0] crisp glyphs, [1] glyphs with a baked-in soft glow
+        const PAD = 6; // extra sprite margin so the glow isn't clipped
+        let animId = null;
+        let isVisible = true;
+        let isRunning = true;
+
+        // Check motion preference and hook up animation button
+        const animationButton =
+            container.closest(".animation-section")?.querySelector(".animation-button") ||
+            document.querySelector(".animation-button");
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        function startTimer() {
+            clearInterval(timer);
+            if (isRunning && isVisible) {
+                timer = setInterval(generate, 12000);
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(timer);
+        }
+
+        if (animationButton) {
+            if (prefersReducedMotion) {
+                animationButton.classList.add("stop-animation");
+                isRunning = false;
+            } else {
+                animationButton.classList.add("play-animation");
+                isRunning = true;
+            }
+
+            animationButton.addEventListener("click", () => {
+                animationButton.classList.toggle("stop-animation");
+                animationButton.classList.toggle("play-animation");
+                isRunning = animationButton.classList.contains("play-animation");
+                if (isRunning && isVisible) {
+                    startTimer();
+                    if (!animId) animId = requestAnimationFrame(runLoop);
+                } else {
+                    stopTimer();
+                }
+            });
+        }
+
+        if ("IntersectionObserver" in window) {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    for (const entry of entries) {
+                        isVisible = entry.isIntersecting;
+                        if (isVisible && isRunning) {
+                            startTimer();
+                            if (!animId) animId = requestAnimationFrame(runLoop);
+                        } else {
+                            stopTimer();
+                        }
+                    }
+                },
+                { threshold: 0.05 }
+            );
+            observer.observe(container);
+        }
+
+        // Bake characters into a single GPU atlas to avoid thousands of texture re-binds per frame
+        function buildSprites() {
+            const m = document.createElement("canvas").getContext("2d");
+            m.font = FONT;
+            const charWidths = [...WORD].map((ch) => m.measureText(ch).width + 0.5);
+
+            const rowH = Math.ceil(16 + PAD * 2);
+            let totalW = 0;
+            for (let i = 0; i < WORD.length; i++) {
+                totalW += Math.ceil(charWidths[i]) + 4 + PAD * 2 + 4;
+            }
+
+            atlas = document.createElement("canvas");
+            atlas.width = Math.ceil(totalW * dpr);
+            atlas.height = Math.ceil(rowH * 2 * dpr);
+            const g = atlas.getContext("2d");
+            g.scale(dpr, dpr);
+            g.font = FONT;
+
+            [false, true].forEach((glow, si) => {
+                const pad = glow ? PAD : 0;
+                const yOffset = si * rowH;
+                let currentX = 0;
+
+                seqs[si] = [...WORD].map((ch, idx) => {
+                    const a = charWidths[idx];
+                    const w = Math.ceil(a) + 4 + pad * 2;
+                    const h = 16 + pad * 2;
+
+                    g.save();
+                    g.fillStyle = COLOR;
+                    if (glow) {
+                        g.shadowColor = "rgba(255,255,255,0.9)";
+                        g.shadowBlur = 5;
+                    }
+                    g.fillText(ch, currentX + 2 + pad, yOffset + 12 + pad);
+                    g.restore();
+
+                    const info = {
+                        sx: Math.round(currentX * dpr),
+                        sy: Math.round(yOffset * dpr),
+                        sw: Math.round(w * dpr),
+                        sh: Math.round(h * dpr),
+                        w,
+                        h,
+                        a,
+                        pad,
+                        blank: ch === " ",
+                    };
+                    currentX += w + 4;
+                    return info;
+                });
+            });
+        }
+
+        function resizeCanvas() {
+            if (!container || !cv) return false;
+            const rect = container.getBoundingClientRect();
+            W = Math.floor(container.clientWidth || rect.width || window.innerWidth);
+            H = Math.floor(container.clientHeight || rect.height || window.innerHeight);
+            if (W <= 0 || H <= 0) return false;
+
+            const isMobile = W < 768;
+            dpr = isMobile
+                ? Math.min(window.devicePixelRatio || 1, 1.25)
+                : Math.min(window.devicePixelRatio || 1, 1.75);
+            cv.width = Math.round(W * dpr);
+            cv.height = Math.round(H * dpr);
+            cx = W / 2;
+            cy = H / 2;
+            buildSprites();
+            return true;
+        }
+
+        // ---------- hover ripples ----------
+        const RIPPLE_LIFE = 2.0,
+            RIPPLE_SPEED = 170,
+            MAX_RIPPLES = 5;
+        const ripples = [];
+        let act = [],
+            ox = 0,
+            oy = 0;
+
+        function prepareRipples(now) {
+            act = [];
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                const age = (now - ripples[i].born) / 1000;
+                if (age > RIPPLE_LIFE) {
+                    ripples.splice(i, 1);
+                    continue;
+                }
+                const k = 1 - age / RIPPLE_LIFE;
+                act.push({
+                    x: ripples[i].x,
+                    y: ripples[i].y,
+                    front: age * RIPPLE_SPEED,
+                    w: 34 + age * 16,
+                    fade: k * k * Math.min(1, age * 6),
+                    amp: 6,
+                });
+            }
+        }
+
+        function getRippleAt(x, y) {
+            ox = oy = 0;
+            for (let i = 0; i < act.length; i++) {
+                const r = act[i],
+                    dx = x - r.x,
+                    dy = y - r.y,
+                    d2 = dx * dx + dy * dy;
+                const lo = r.front - r.w * 3,
+                    hi = r.front + r.w * 3;
+                if (d2 > hi * hi || (lo > 0 && d2 < lo * lo)) continue;
+                const d = Math.sqrt(d2) || 1,
+                    u = (d - r.front) / r.w;
+                const env = Math.exp(-u * u * 0.5) * r.fade;
+                const disp = r.amp * env * Math.cos(u * 2.2);
+                ox += (dx / d) * disp;
+                oy += (dy / d) * disp;
+            }
+        }
+
+        function getRippleGlowAt(x, y) {
+            let ob = 0;
+            for (let i = 0; i < act.length; i++) {
+                const r = act[i],
+                    dx = x - r.x,
+                    dy = y - r.y,
+                    d2 = dx * dx + dy * dy;
+                const lo = r.front - r.w * 3,
+                    hi = r.front + r.w * 3;
+                if (d2 > hi * hi || (lo > 0 && d2 < lo * lo)) continue;
+                const d = Math.sqrt(d2) || 1,
+                    u = (d - r.front) / r.w;
+                ob += Math.exp(-u * u * 0.5) * r.fade;
+            }
+            return ob;
+        }
+
+        function draw(t) {
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, cv.width, cv.height);
+
+            const p1 = s.p1 + t * 0.35,
+                p2 = s.p2 + t * 0.28,
+                p3 = s.p3 - t * 0.31,
+                p4 = s.p4 + t * 0.22;
+            const p5 = s.p5 + t * 0.9,
+                p6 = s.p6 - t * 0.7,
+                p7 = s.p7 + t * 0.8,
+                p8 = s.p8 - t * 1.0;
+            const f1 = s.f1,
+                f2 = s.f2,
+                a1 = s.amp1,
+                a2 = s.amp2;
+
+            prepareRipples(performance.now());
+            const hasRipples = act.length > 0;
+
+            const farX = Math.max(cx, W - cx) + 130,
+                farY = Math.max(cy, H - cy) + 130;
+            let currentAlpha = -1;
+
+            for (let rIdx = 0; rIdx < rings.length; rIdx++) {
+                const ring = rings[rIdx];
+                if ((farX / ring.rx) ** 2 + (farY / ring.ry) ** 2 < 1) continue;
+
+                const { n, cos, sin, xs, ys, lens } = ring;
+
+                let d =
+                    0.5 +
+                    0.35 * Math.sin(ring.i * 0.4 - t * 1.1) +
+                    0.15 * Math.sin(ring.i * 0.13 + t * 0.5);
+                d = d < 0 ? 0 : d > 1 ? 1 : d;
+                const ringAlpha = 0.16 + 0.84 * Math.pow(d, 1.6);
+                const gs = (0.78 + 0.5 * d) * (1 - (0.22 * ring.rx) / maxRx);
+                const seq = d > 0.78 ? seqs[1] : seqs[0];
+                const wW = ring.wordW * gs;
+                const w = Math.sin(ring.i * 0.22 - t * 1.6) * 4;
+                const rx = ring.rx + w,
+                    ry = ring.ry + w * 1.35;
+
+                for (let j = 0; j < n; j++) {
+                    const bx = cx + cos[j] * rx,
+                        by = cy + sin[j] * ry;
+                    xs[j] =
+                        bx +
+                        Math.sin(bx * f1 + p1) * Math.cos(by * f1 + p2) * a1 +
+                        Math.sin(bx * f2 + p5) * Math.cos(by * f2 + p6) * a2;
+                    ys[j] =
+                        by +
+                        Math.cos(bx * f1 + p3) * Math.sin(by * f1 + p4) * a1 +
+                        Math.cos(bx * f2 + p7) * Math.sin(by * f2 + p8) * a2;
+                    if (hasRipples) {
+                        getRippleAt(xs[j], ys[j]);
+                        xs[j] += ox;
+                        ys[j] += oy;
+                    }
+                }
+                xs[n] = xs[0];
+                ys[n] = ys[0];
+
+                let L = 0;
+                for (let j = 0; j < n; j++) {
+                    const l = Math.hypot(xs[j + 1] - xs[j], ys[j + 1] - ys[j]);
+                    lens[j] = l;
+                    L += l;
+                }
+
+                const scale = L / (Math.max(1, Math.round(L / wW)) * wW);
+                let k = 0,
+                    sp = seq[0],
+                    ad = sp.a * gs * scale,
+                    pos = -ring.phase * wW * scale,
+                    mid = pos + ad / 2,
+                    L0 = 0;
+
+                for (let j = 0; j < n; j++) {
+                    const x0 = xs[j],
+                        y0 = ys[j],
+                        x1 = xs[j + 1],
+                        y1 = ys[j + 1];
+
+                    const len = lens[j];
+                    if (len < 1e-6) continue;
+                    const L1 = L0 + len;
+
+                    // Fast reject if the whole segment is off-screen
+                    if (
+                        (x0 < -35 && x1 < -35) ||
+                        (x0 > W + 35 && x1 > W + 35) ||
+                        (y0 < -35 && y1 < -35) ||
+                        (y0 > H + 35 && y1 > H + 35)
+                    ) {
+                        while (mid <= L1) {
+                            pos += ad;
+                            k++;
+                            sp = seq[k % seq.length];
+                            ad = sp.a * gs * scale;
+                            mid = pos + ad / 2;
+                        }
+                        L0 = L1;
+                        continue;
+                    }
+
+                    const ca = (x1 - x0) / len,
+                        sa = (y1 - y0) / len;
+
+                    while (mid <= L1) {
+                        const f = mid - L0,
+                            mx = x0 + ca * f,
+                            my = y0 + sa * f;
+
+                        if (
+                            mid >= 0 &&
+                            !sp.blank &&
+                            mx > -20 &&
+                            mx < W + 20 &&
+                            my > -20 &&
+                            my < H + 20
+                        ) {
+                            const h = (sp.a * gs) / 2;
+                            const vx = (mx - W / 2) / (W / 2),
+                                vy = (my - H / 2) / (H / 2);
+                            const v =
+                                1 - 0.55 * Math.min(1, (vx * vx + vy * vy) / 1.6);
+                            let alpha = ringAlpha * v;
+
+                            if (hasRipples) {
+                                const ob = getRippleGlowAt(mx, my);
+                                alpha = Math.min(1, alpha + ob * 0.22);
+                            }
+
+                            const roundedAlpha = Math.round(alpha * 100) / 100;
+                            if (roundedAlpha !== currentAlpha) {
+                                ctx.globalAlpha = currentAlpha = roundedAlpha;
+                            }
+
+                            const gx = ca * dpr * gs,
+                                gy = sa * dpr * gs;
+                            ctx.setTransform(
+                                gx,
+                                gy,
+                                -gy,
+                                gx,
+                                (mx - ca * h) * dpr,
+                                (my - sa * h) * dpr,
+                            );
+                            ctx.drawImage(
+                                atlas,
+                                sp.sx,
+                                sp.sy,
+                                sp.sw,
+                                sp.sh,
+                                -2 - sp.pad,
+                                -12 - sp.pad,
+                                sp.w,
+                                sp.h,
+                            );
+                        }
+                        pos += ad;
+                        k++;
+                        sp = seq[k % seq.length];
+                        ad = sp.a * gs * scale;
+                        mid = pos + ad / 2;
+                    }
+                    L0 = L1;
+                }
+            }
+        }
+
+        function generate() {
+            cv.classList.add("restart");
+            void cv.getBoundingClientRect();
+            cv.classList.remove("restart");
+            rings = [];
+            const r = () => Math.random() * Math.PI * 2;
+            s = {
+                p1: r(),
+                p2: r(),
+                p3: r(),
+                p4: r(),
+                p5: r(),
+                p6: r(),
+                p7: r(),
+                p8: r(),
+                f1: 0.003 + Math.random() * 0.003,
+                amp1: 45 + Math.random() * 30,
+                f2: 0.01 + Math.random() * 0.01,
+                amp2: 10 + Math.random() * 15,
+            };
+
+            // Full diagonal reference preserved so depth scale (gs) is pixel-identical
+            maxRx = Math.hypot(W, H) * 1.1;
+
+            // Generate rings to cover visible canvas from center past corners
+            const cornerDist = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
+            const maxRadius = cornerDist + spacing * 4;
+            const numRings = Math.max(8, Math.floor(maxRadius / spacing));
+
+            for (let i = 1; i <= numRings; i++) {
+                const rx = i * spacing,
+                    ry = i * spacing * 1.35;
+                // Cap vertex density to prevent outer rings from lagging while keeping curves smooth
+                const n = Math.min(180, Math.max(60, i * 4));
+                const cos = new Float32Array(n),
+                    sin = new Float32Array(n);
+                for (let j = 0; j < n; j++) {
+                    const a = (j / n) * Math.PI * 2;
+                    cos[j] = Math.cos(a);
+                    sin[j] = Math.sin(a);
+                }
+                rings.push({
+                    i,
+                    rx,
+                    ry,
+                    n,
+                    cos,
+                    sin,
+                    xs: new Float32Array(n + 1),
+                    ys: new Float32Array(n + 1),
+                    lens: new Float32Array(n),
+                    phase: Math.random(),
+                    wordW: seqs[0].reduce((t, g) => t + g.a, 0),
+                });
+            }
+            t0 = performance.now();
+            draw(0);
+        }
+
+        function runLoop(now) {
+            if (!isRunning || !isVisible) {
+                animId = null;
+                return;
+            }
+            animId = requestAnimationFrame(runLoop);
+            draw((now - t0) / 1000);
+        }
+
+        function restart() {
+            generate();
+            startTimer();
+        }
+
+        let initialized = false;
+        function init() {
+            if (initialized) return;
+            initialized = true;
+            if (!resizeCanvas()) return;
+            restart();
+            if (isRunning && isVisible && !animId) {
+                animId = requestAnimationFrame(runLoop);
+            }
+        }
+
+        Promise.race([
+            document.fonts.load(FONT),
+            new Promise((r) => setTimeout(r, 1500)),
+        ]).then(init, init);
+
+        let last = null;
+        cv.addEventListener(
+            "pointermove",
+            (e) => {
+                const rect = cv.getBoundingClientRect();
+                const px = e.clientX - rect.left;
+                const py = e.clientY - rect.top;
+                const now = performance.now();
+                if (
+                    last &&
+                    Math.hypot(px - last.x, py - last.y) < 60 &&
+                    now - last.t < 180
+                )
+                    return;
+                last = { x: px, y: py, t: now };
+                ripples.push({ x: px, y: py, born: now });
+                if (ripples.length > MAX_RIPPLES) ripples.shift();
+            },
+            { passive: true }
+        );
+
+        cv.addEventListener(
+            "pointerdown",
+            (e) => {
+                const rect = cv.getBoundingClientRect();
+                const px = e.clientX - rect.left;
+                const py = e.clientY - rect.top;
+                ripples.push({ x: px, y: py, born: performance.now() });
+                if (ripples.length > MAX_RIPPLES) ripples.shift();
+            },
+            { passive: true }
+        );
+
+        let resizeTimer = null;
+        function handleResize() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (resizeCanvas()) {
+                    restart();
+                }
+            }, 120);
+        }
+
+        if ("ResizeObserver" in window && container) {
+            const ro = new ResizeObserver(handleResize);
+            ro.observe(container);
+        } else {
+            window.addEventListener("resize", handleResize);
+        }
+    }
+</script>

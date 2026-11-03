@@ -1,0 +1,33 @@
+/* =====================================
+MARK: Noise Animation
+Scoped to .noise-wrapper so it doesn't
+affect the rest of the page layout.
+===================================== */
+
+/* ---------- Ensure parent fills the animation-section height ---------- */
+.animation-section .hidden-section {
+    height: 100%;
+}
+
+/* ---------- WRAPPER (replaces old body styles) ---------- */
+.noise-wrapper {
+    /* shown until the first frame is drawn */
+    --page: #141414;
+
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--page);
+}
+
+.noise-canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    touch-action: none;   /* finger drags reach the script instead of scrolling */
+    cursor: crosshair;
+}

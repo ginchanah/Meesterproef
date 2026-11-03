@@ -1,0 +1,155 @@
+/* =====================================
+MARK: Neutrum Animation
+Scoped to .neutrum-wrapper so it doesn't
+affect the rest of the page layout.
+===================================== */
+
+/* ---------- Ensure parent fills the animation-section height ---------- */
+.animation-section .hidden-section {
+    height: 100%;
+}
+
+/* ---------- WRAPPER (replaces old :root and body styles) ---------- */
+.neutrum-wrapper {
+    /* look */
+    --bg: var(--color-background, #000000);
+    --ink: var(--color-text, #ffffff);
+    --font-family: ui-monospace, Menlo, Consolas, monospace;
+    --font-size: 21px;
+    --font-weight: 200;                 /* 700 = bold; 800 only shows if the font has it */
+    --space-width: 1;                   /* a space compared to a normal letter; smaller = tighter words */
+
+    /* shape (numbers are px, without unit) */
+    --rings: 10;                        /* rings per ripple, all created at once */
+    --first-ring: 40;
+    --ring-gap: 42;
+
+    /* view */
+    --perspective: 900px;
+    --tilt: 70deg;                      /* 0deg = looking straight down, 90deg = edge-on */
+
+    /* movement */
+    --height: 30px;                     /* how far a ring travels up and down */
+    --bounce-time: 3.4s;                /* length of one whole ripple; smaller = quicker bounce */
+    --wave-speed: 240;                  /* px per second the movement travels outward */
+
+    /* wiggle: how far each ring travels, from the centre outward */
+    --swing-reach: 200;                 /* distance where the swing has dropped to half */
+    --swing-curve: 1;                   /* 0.5 = stays big far out, 1 = gentle, 2 = drops quickly */
+
+    /* opacity: how bright each ring is, from the centre outward */
+    --opacity-max: 1;                   /* brightest a ring can get at the centre */
+    --opacity-reach: 100;               /* distance where the brightness has dropped to half */
+    --opacity-curve: 0.5;               /* 0.5 = stays bright far out, 1 = gentle, 2 = drops quickly */
+    --opacity-follows-swing: 0.5;       /* 0 = opacity uses its own falloff, 1 = opacity falls off exactly like the wiggle */
+
+    --spin-time: 52s;                   /* one slow turn of the text on a ring */
+
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font: var(--font-weight) var(--font-size) / 1 var(--font-family);
+    touch-action: none;
+    user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .neutrum-wrapper {
+        --height: 8px;
+        --bounce-time: 2.4s;
+        --spin-time: 400s;
+    }
+}
+
+/* ---------- one ripple: a tilted plane at the pointer ---------- */
+.neutrum-wrapper .ripple {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    translate: calc(var(--x) * 1px) calc(var(--y) * 1px);   /* --x, --y, --str, --rot are set by the script */
+    transform: perspective(var(--perspective)) rotateX(var(--tilt));
+    transform-style: preserve-3d;
+    pointer-events: none;
+}
+
+/* ---------- one ring of text: it moves up and down through the plane ---------- */
+.neutrum-wrapper .ring {
+    /* radius, arrival time, swing size and brightness, all from the ring's number --i */
+    --r: calc(var(--first-ring) + var(--i) * var(--ring-gap));
+    --delay: calc(var(--r) / var(--wave-speed) * 1s);
+    --swing-falloff: pow(calc(1 / (1 + var(--r) / var(--swing-reach))), var(--swing-curve));           /* 1 at the centre, smaller further out */
+    --opacity-falloff: pow(calc(1 / (1 + var(--r) / var(--opacity-reach))), var(--opacity-curve));
+    --opacity-mix: calc(var(--opacity-follows-swing) * var(--swing-falloff) + (1 - var(--opacity-follows-swing)) * var(--opacity-falloff));
+    --amp: calc(var(--height) * var(--str) * var(--swing-falloff));     /* wiggle size of this ring */
+    --peak: calc(var(--opacity-max) * var(--str) * var(--opacity-mix)); /* brightest this ring gets */
+    --spin-from: calc(var(--rot) + var(--i) * 75deg);
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    will-change: translate, opacity, rotate;
+
+    animation-name: bounce, fade, spin;
+    animation-duration: var(--bounce-time), var(--bounce-time), var(--spin-time);
+    animation-delay: var(--delay), var(--delay), 0s;
+    animation-timing-function: ease-in-out, linear, linear;
+    animation-fill-mode: both, both, none;      /* invisible until the movement reaches the ring */
+    animation-iteration-count: 1, 1, infinite;
+}
+
+.neutrum-wrapper .ring:nth-child(even) {
+    animation-direction: normal, normal, reverse;
+}
+
+/* ---------- the ring's text, painted once into an image by the script ---------- */
+.neutrum-wrapper .ring img {
+    position: absolute;
+    display: block;
+    max-width: none;
+    pointer-events: none;
+}
+
+/* ---------- Keyframes ----------
+   bounce: a damped up-and-down, one stop per peak, eased in between.
+   fade:   opacity hits the same peaks at the same moments as bounce, scaled
+           to the ring's brightness, so brightness tracks the wiggle size.
+   spin:   slow rotation of the text around the ring.                     */
+@keyframes bounce {
+    0%    { translate: 0 0 0px; }
+    4.9%  { translate: 0 0 calc(var(--amp) *  0.649); }
+    14.7% { translate: 0 0 calc(var(--amp) * -1); }
+    24.5% { translate: 0 0 calc(var(--amp) *  0.855); }
+    34.3% { translate: 0 0 calc(var(--amp) * -0.616); }
+    44.1% { translate: 0 0 calc(var(--amp) *  0.406); }
+    53.9% { translate: 0 0 calc(var(--amp) * -0.255); }
+    63.7% { translate: 0 0 calc(var(--amp) *  0.155); }
+    73.5% { translate: 0 0 calc(var(--amp) * -0.092); }
+    83.3% { translate: 0 0 calc(var(--amp) *  0.053); }
+    100%  { translate: 0 0 0px; }
+}
+
+@keyframes fade {
+    0%    { opacity: 0; }
+    4.9%  { opacity: calc(var(--peak) * 0.649); }
+    14.7% { opacity: var(--peak); }
+    24.5% { opacity: calc(var(--peak) * 0.855); }
+    34.3% { opacity: calc(var(--peak) * 0.616); }
+    44.1% { opacity: calc(var(--peak) * 0.406); }
+    53.9% { opacity: calc(var(--peak) * 0.255); }
+    63.7% { opacity: calc(var(--peak) * 0.155); }
+    73.5% { opacity: calc(var(--peak) * 0.092); }
+    83.3% { opacity: calc(var(--peak) * 0.053); }
+    100%  { opacity: 0; }
+}
+
+@keyframes spin {
+    from { rotate: var(--spin-from); }
+    to   { rotate: calc(var(--spin-from) + 360deg); }
+}

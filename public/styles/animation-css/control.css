@@ -22,10 +22,10 @@ MARK: Control Animation
         overflow: hidden;
     }
 
-    #anim-control {
+    .anim-control {
         height: 100%;
 
-        /* Basis kleuren */
+        /* Base colours */
         --bg: #121212;
         --text: #ece9e1;
     }
@@ -41,7 +41,7 @@ MARK: Control Animation
     }
 
     /* ---------- Canvas ---------- */
-    #anim-control canvas {
+    .anim-control canvas {
         display: block;
         width: 100%;
         height: 100%;

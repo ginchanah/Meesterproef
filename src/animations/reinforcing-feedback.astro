@@ -2,7 +2,7 @@
 
 ---
 
-<div id="animation-wrapper">
+<div class="reinforcing-feedback-wrapper" id="animation-wrapper">
     <div class="word" id="word">
         <p class="span-split">reinforcing feedback</p>
     </div>
@@ -103,9 +103,9 @@
             s.hoverInfluence = 0;
         });
 
-        // ---------------------
+        // =====================================
         // MARK: MOUSE INFLUENCE
-        // ---------------------
+        // =====================================
 
         letters.forEach((letter, i) => {
             const rect = letter.getBoundingClientRect();
@@ -127,9 +127,9 @@
             }
         });
 
-        // ----------------------
+        // =====================================
         // MARK: NEIGHBOUR SPREAD
-        // ----------------------
+        // =====================================
 
         if (isMoving) {
             state.forEach((s, i) => {
@@ -145,9 +145,9 @@
             });
         }
 
-        // --------------------
+        // =====================================
         // MARK: AVERAGE ENERGY
-        // --------------------
+        // =====================================
 
         let totalEnergy = 0;
 
@@ -157,9 +157,9 @@
 
         const averageEnergy = totalEnergy / state.length;
 
-        // --------------------
+        // =====================================
         // MARK: LETTERS
-        // --------------------
+        // =====================================
 
         state.forEach((s, i) => {
             const weight = Math.min(maxWeight, baseWeight + s.energy * weightMultiplier);
@@ -167,10 +167,7 @@
             let scaleX = 1;
             let scaleY = 1;
 
-            // --------------------------------
-            // PHASE 1
-            // Uniform growth
-            // --------------------------------
+            // ---------- Phase 1: uniform growth ----------
 
             if (s.energy > scaleStartEnergy) {
                 const growth = 1 + Math.pow((s.energy - scaleStartEnergy) / scaleDivisor, scaleCurve);
@@ -182,10 +179,7 @@
             scaleX = Math.min(scaleX, maxScaleX);
             scaleY = Math.min(scaleY, maxScaleY);
 
-            // --------------------------------
-            // PHASE 2
-            // Vertical takeover
-            // --------------------------------
+            // ---------- Phase 2: vertical takeover ----------
 
             if (scaleY > stretchStartScale) {
                 const stretchProgress =
@@ -201,9 +195,9 @@
             letters[i].style.transform = `scale(${scaleX},${scaleY})`;
         });
 
-        // --------------------
+        // =====================================
         // MARK: COLLAPSE EVENT
-        // --------------------
+        // =====================================
 
         if (averageEnergy > collapseThreshold && !resetting) {
             resetting = true;

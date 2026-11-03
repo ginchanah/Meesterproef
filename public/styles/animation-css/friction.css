@@ -1,0 +1,65 @@
+/* =====================================
+MARK: Friction Animation
+Scoped to .friction-wrapper so it doesn't
+affect the rest of the page layout.
+===================================== */
+
+/* ---------- Ensure parent fills the animation-section height ---------- */
+.animation-section .hidden-section {
+    height: 100%;
+}
+
+/* ---------- WRAPPER (replaces old :root and body styles) ---------- */
+.friction-wrapper {
+    /* colours: background and discs/word */
+    --bg: var(--color-background, #000000);
+    --ink: var(--color-text, #ffffff);
+
+    --r: 40cqmin;         /* radius of the circles (40% of the animation area's shortest side) */
+    --x: 0px;             /* offset of circle A from the centre (set by the script); circle B sits at the opposite offset */
+    --y: 0px;
+
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: clip;         /* clip, not hidden: hidden makes this a scroll container, which can swallow the page's wheel scroll */
+    background: var(--bg);
+    container-type: size;   /* so cqmin above measures the wrapper, not the window */
+    touch-action: none;
+
+    /* every disc is as wide as 2r, centred on the middle of the area, and clipped to a circle */
+    .disc {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: calc(var(--r) * 2);
+        height: calc(var(--r) * 2);
+        margin: calc(var(--r) * -1) 0 0 calc(var(--r) * -1);
+        border-radius: 50%;
+        clip-path: circle(50%);
+        background: var(--ink);
+    }
+
+    .a { transform: translate(var(--x), var(--y)); }
+    .b { transform: translate(calc(var(--x) * -1), calc(var(--y) * -1)); }
+
+    /* copy of A in the background colour, drawn inside B: it starts at B's top-left corner, so it needs to move by A's position minus B's position = 2 offsets */
+    .lens {
+        left: 0;
+        top: 0;
+        margin: 0;
+        background: var(--bg);
+        transform: translate(calc(var(--x) * 2), calc(var(--y) * 2));
+    }
+
+    /* the word must stay in the middle of the area: from inside the lens that is one offset back the other way */
+    .word {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        color: var(--ink);
+        white-space: nowrap;
+        font: 700 calc(var(--r) * 0.4) / 1 "Helvetica Neue", Arial, sans-serif;     /* 0.4·r wide enough: the word is ~1.5·r wide */
+        transform: translate(-50%, -50%) translate(calc(var(--x) * -1), calc(var(--y) * -1));
+    }
+}

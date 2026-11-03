@@ -1,9 +1,13 @@
+/* =====================================
+MARK: Reinforcing Feedback Animation
+===================================== */
+
 :root {
     --color-white: #ffffff;
     --color-black: #000000;
 }
 
-#animation-wrapper *{
+.reinforcing-feedback-wrapper *{
     margin:0;
     padding:0;
     box-sizing:border-box;
@@ -11,7 +15,8 @@
     color: inherit;
 }
 
-#animation-wrapper{
+/* .animation-section in front keeps this rule stronger than the pause rule in detail-page.css (like the old id selector) */
+.animation-section .reinforcing-feedback-wrapper{
     width:100vw;
     height:80vh;
     display:flex;
@@ -35,13 +40,13 @@
 
 }
 
-#animation-wrapper .word{
+.reinforcing-feedback-wrapper .word{
     display:flex;
     align-items:center;
     cursor:default;
 }
 
-#animation-wrapper .word span{
+.reinforcing-feedback-wrapper .word span{
 
     font-size:8vw;
 
@@ -56,6 +61,6 @@
         transform .15s linear;
 }
 
-#animation-wrapper .space{
+.reinforcing-feedback-wrapper .space{
     width:.4em;
 }

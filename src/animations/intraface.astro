@@ -5,7 +5,7 @@
 <div class="intraface-wrapper">
     <div class="scene">
         <div class="cube">
-            <!-- 6 Vlakken -->
+            <!-- 6 faces -->
             <div class="face front">
                 <div class="ascii-container">
                     <div class="ascii-layer base"></div><div
@@ -65,10 +65,10 @@
     // MARK: Intraface Animation
     // =====================================
 
-    // Vind de wrapper
+    // Find the wrapper
     const wrapper = document.querySelector(".intraface-wrapper");
 
-    // Theme wissel functionaliteit (automatisch + klik)
+    // Theme switching (automatic + on click)
     let themeInterval;
 
     function toggleTheme() {
@@ -79,18 +79,18 @@
         themeInterval = setInterval(toggleTheme, 4000);
     }
 
-    // Start de timer de eerste keer
+    // Start the timer for the first time
     startThemeInterval();
 
-    // Invert als de gebruiker op de wrapper klikt
+    // Invert when the user clicks the wrapper
     wrapper.addEventListener("click", () => {
         toggleTheme();
-        // Reset de timer zodat hij niet direct na de klik weer omdraait
+        // Reset the timer so it doesn't flip back right after the click
         clearInterval(themeInterval);
         startThemeInterval();
     });
 
-    // Karakter sets voor de dynamic generator
+    // Character sets for the dynamic generator
     const symbolsFull = "@%#*+=-::";
     const symbolsHeavy = "@%#*";
     const symbolsLight = "+=-::";
@@ -143,7 +143,7 @@
             .join("  ");
     }
 
-    // Zoek alleen faces binnen de wrapper (niet de hele pagina)
+    // Only look for faces inside the wrapper (not the whole page)
     const faceElements = wrapper.querySelectorAll(".face");
     const faceData = [];
 
@@ -164,23 +164,35 @@
         });
     });
 
-    setInterval(() => {
-        faceData.forEach((data) => {
-            // Verschuif en voeg nieuw woord toe (voor de basis laag)
-            data.words.shift();
-            data.words.push(generateFragment(data.type));
+    // Pre-compute the glitch-2 "intraface" text (it never changes)
+    const intrafaceText = new Array(100).fill("intraface").join("  ");
+    faceData.forEach((data) => {
+        data.glitch2Layer.textContent = intrafaceText;
+    });
 
-            // Basis en Glitch-1 (niet-inverted) tonen de normale matrix-achtige code
-            data.baseLayer.textContent = data.words.join("  ");
-            data.glitch1Layer.textContent = generateTypingGlitchLayer(
-                data.words,
-            );
+    // Use requestAnimationFrame instead of setInterval for a smoother animation
+    let lastUpdate = 0;
+    const UPDATE_INTERVAL = 120; // ms between text updates
 
-            // Glitch-2 (de inverterende witte vlakken) toont uitsluitend 'intraface'
-            const intrafaceArray = new Array(data.words.length).fill(
-                "intraface",
-            );
-            data.glitch2Layer.textContent = intrafaceArray.join("  ");
-        });
-    }, 150);
+    function animateIntraface(timestamp) {
+        if (timestamp - lastUpdate >= UPDATE_INTERVAL) {
+            lastUpdate = timestamp;
+
+            faceData.forEach((data) => {
+                // Shift and add a new word (for the base layer)
+                data.words.shift();
+                data.words.push(generateFragment(data.type));
+
+                // Base and glitch-1 (not inverted) show the normal matrix-like code
+                data.baseLayer.textContent = data.words.join("  ");
+                data.glitch1Layer.textContent = generateTypingGlitchLayer(
+                    data.words,
+                );
+            });
+        }
+
+        requestAnimationFrame(animateIntraface);
+    }
+
+    requestAnimationFrame(animateIntraface);
 </script>

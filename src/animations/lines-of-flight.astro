@@ -150,7 +150,7 @@
     // It updates the 3D tilt and moves every row of text.
     // =====================================
     const animate = () => {
-        // --- Part 1: Update the 3D tilt of the text plane ---
+        // ---------- Part 1: Update the 3D tilt of the text plane ----------
 
         // Default tilt when the mouse is not on screen
         let targetY = 30;
@@ -173,7 +173,7 @@
             textPlane.style.transform = `rotateY(${rotationY}deg) rotateX(${rotationX}deg)`;
         }
 
-        // --- Part 2: Move each row of scrolling text ---
+        // ---------- Part 2: Move each row of scrolling text ----------
         rows.forEach((row, i) => {
             // Start with this row's base speed
             let speed = speeds[i];
