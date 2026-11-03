@@ -19,12 +19,12 @@
             ambientEvery: 4500    // ms
         };
 
-        const water = document.getElementById('neutrum-water');
-        const section = water.closest('.animation-section');
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const water = document.getElementById("neutrum-water");
+        const section = water.closest(".animation-section");
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         // the settings live on the wrapper in neutrum.css, not on :root
         const wrapperStyle = getComputedStyle(water);
-        const num = name => parseFloat(wrapperStyle.getPropertyValue(name));
+        const readNumber = name => parseFloat(wrapperStyle.getPropertyValue(name));
         const TWO_PI = Math.PI * 2;
 
         const ripples = [];
@@ -32,10 +32,10 @@
         let lastX = null, lastY = null, lastSpawn = 0, lastActivity = 0;
 
         // the play/stop button of the detail page adds .stop-animation when paused
-        const isPaused = () => document.hidden || (section && section.querySelector('.stop-animation'));
+        const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
 
         // pointer position measured against the animation itself, since it sits inside the page
-        function pos(e) {
+        function getPointerPosition(e) {
             const r = water.getBoundingClientRect();
             return { x: e.clientX - r.left, y: e.clientY - r.top };
         }
@@ -44,29 +44,29 @@
         // image, so a ripple is one element per ring instead of one per letter.
         function buildPrototype() {
             const text = water.dataset.text;
-            const rings = num('--rings');
-            const first = num('--first-ring');
-            const gap = num('--ring-gap');
-            const spaceWidth = num('--space-width');
+            const rings = readNumber("--rings");
+            const first = readNumber("--first-ring");
+            const gap = readNumber("--ring-gap");
+            const spaceWidth = readNumber("--space-width");
 
             const cs = getComputedStyle(water);
             const fontSize = parseFloat(cs.fontSize);
-            const font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+            const font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
             // measure the letters with the same font CSS uses
-            const m = document.createElement('canvas').getContext('2d');
+            const m = document.createElement("canvas").getContext("2d");
             m.font = font;
             const widths = [];
             let total = 0;
             for (const ch of text) {
-                const cw = ch === ' ' ? m.measureText('n').width * spaceWidth : m.measureText(ch).width;
+                const cw = ch === " " ? m.measureText("n").width * spaceWidth : m.measureText(ch).width;
                 widths.push(cw);
                 total += cw;
             }
 
-            const proto = document.createElement('div');
-            proto.className = 'ripple';
+            const proto = document.createElement("div");
+            proto.className = "ripple";
 
             for (let i = 0; i < rings; i++) {
                 const r = first + i * gap;
@@ -76,22 +76,22 @@
 
                 // paint this ring's letters once
                 const half = Math.ceil(r + fontSize);
-                const canvas = document.createElement('canvas');
+                const canvas = document.createElement("canvas");
                 canvas.width = canvas.height = Math.round(half * 2 * dpr);
-                const g = canvas.getContext('2d');
+                const g = canvas.getContext("2d");
                 g.scale(dpr, dpr);
                 g.translate(half, half);
                 g.font = font;
                 g.fillStyle = cs.color;
-                g.textAlign = 'center';
-                g.textBaseline = 'middle';
+                g.textAlign = "center";
+                g.textBaseline = "middle";
 
                 let offset = 0;
                 for (let rep = 0; rep < reps; rep++) {
                     let k = 0;
                     for (const ch of text) {
                         const cw = widths[k++];
-                        if (ch !== ' ') {
+                        if (ch !== " ") {
                             g.save();
                             g.rotate(((offset + cw / 2) * scale) / r);   // radians, clockwise from the top
                             g.fillText(ch, 0, -r);
@@ -102,74 +102,74 @@
                 }
 
                 const img = new Image();
-                img.decoding = 'async';
-                img.alt = '';
-                img.src = canvas.toDataURL('image/png');
+                img.decoding = "async";
+                img.alt = "";
+                img.src = canvas.toDataURL("image/png");
                 img.style.cssText =
-                    'width:' + (half * 2) + 'px;height:' + (half * 2) + 'px;left:' + (-half) + 'px;top:' + (-half) + 'px';
+                    "width:" + (half * 2) + "px;height:" + (half * 2) + "px;left:" + (-half) + "px;top:" + (-half) + "px";
 
-                const ring = document.createElement('div');
-                ring.className = 'ring';
-                ring.style.setProperty('--i', i);
+                const ring = document.createElement("div");
+                ring.className = "ring";
+                ring.style.setProperty("--i", i);
                 ring.appendChild(img);
                 proto.appendChild(ring);
             }
             return proto;
         }
 
-        function remove(el) {
+        function removeRipple(el) {
             el.remove();
             const idx = ripples.indexOf(el);
             if (idx !== -1) ripples.splice(idx, 1);
         }
 
-        function spawn(x, y, strength) {
+        function spawnRipple(x, y, strength) {
             if (!prototype || isPaused()) return;
             const el = prototype.cloneNode(true);
-            el.style.setProperty('--x', x);
-            el.style.setProperty('--y', y);
-            el.style.setProperty('--str', Math.max(0.35, Math.min(1, strength)));
-            el.style.setProperty('--rot', Math.round(Math.random() * 360) + 'deg');
+            el.style.setProperty("--x", x);
+            el.style.setProperty("--y", y);
+            el.style.setProperty("--str", Math.max(0.35, Math.min(1, strength)));
+            el.style.setProperty("--rot", Math.round(Math.random() * 360) + "deg");
             water.appendChild(el);
             ripples.push(el);
 
             // the outermost ring is the last to finish bouncing: then the ripple is gone
-            el.lastElementChild.addEventListener('animationend', e => {
-                if (e.animationName === 'bounce') remove(el);
+            el.lastElementChild.addEventListener("animationend", e => {
+                if (e.animationName === "bounce") removeRipple(el);
             });
             lastSpawn = performance.now();
         }
 
-        function onMove(e) {
+        function handleMove(e) {
             const now = performance.now();
-            const p = pos(e);
+            const p = getPointerPosition(e);
             lastActivity = now;
             if (lastX === null) { lastX = p.x; lastY = p.y; }
             const dist = Math.hypot(p.x - lastX, p.y - lastY);
             if (dist >= CONFIG.spawnDistance && now - lastSpawn >= CONFIG.spawnInterval) {
                 const dt = Math.max(16, now - lastSpawn);
-                spawn(p.x, p.y, (dist / dt) / 1.2);   // faster pointer = bigger swing
+                spawnRipple(p.x, p.y, (dist / dt) / 1.2);   // faster pointer = bigger swing
                 lastX = p.x; lastY = p.y;
             }
         }
 
-        function onDown(e) {
-            const p = pos(e);
+        function handleDown(e) {
+            const p = getPointerPosition(e);
             lastActivity = performance.now();
             lastX = p.x; lastY = p.y;
-            spawn(p.x, p.y, 1);
+            spawnRipple(p.x, p.y, 1);
         }
 
         // only the animation reacts, not the rest of the page
-        water.addEventListener('pointermove', onMove);
-        water.addEventListener('pointerdown', onDown);
+        water.addEventListener("pointermove", handleMove);
+        water.addEventListener("pointerdown", handleDown);
 
         if (CONFIG.ambient && !reduceMotion) {
             setInterval(() => {
                 if (isPaused()) return;
                 const now = performance.now();
                 if (now - lastActivity > CONFIG.ambientEvery && now - lastSpawn > CONFIG.ambientEvery) {
-                    spawn(water.clientWidth * (0.2 + Math.random() * 0.6),
+                    spawnRipple(water.clientWidth * (0.2 + Math.random() * 0.6),
                           water.clientHeight * (0.25 + Math.random() * 0.5), 0.6);
                 }
             }, 500);
@@ -180,7 +180,7 @@
         const ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
         ready.then(() => {
             prototype = buildPrototype();
-            spawn(water.clientWidth / 2, water.clientHeight / 2, 0.8);
+            spawnRipple(water.clientWidth / 2, water.clientHeight / 2, 0.8);
         });
     })();
 </script>

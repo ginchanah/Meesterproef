@@ -18,7 +18,7 @@ MARK: specific animation styling
     background: #111;
 }
 
-#intra-section-1, #intra-section-2, #intra-section-3 {
+.intra-section {
     --animation-height: 140vh;
 
 
@@ -100,21 +100,21 @@ MARK: specific animation styling
 
 
 @media (max-width: 1193px) {
-    #intra-section-3 {
+    .intra-section-3 {
         display: none;
     }
 }
 @media (max-width: 670px) {
-    #intra-section-2 {
+    .intra-section-2 {
         display: none;
     }
 }
 
-#intra-section-2 {
+.intra-section-2 {
     color: red;
 }
 
-.backgroundp {
+.background-p {
     color: #111;
     isolation: isolate;
 }

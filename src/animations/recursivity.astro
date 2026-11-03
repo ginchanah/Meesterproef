@@ -7,7 +7,10 @@
 </div>
 
 <script>
-    //@ts-nocheck
+    // @ts-nocheck
+    // =====================================
+    // MARK: Recursivity Animation
+    // =====================================
     const container = document.getElementById("recursivity-container");
     const cv = document.getElementById("recursivity-canvas");
     if (container && cv) {
@@ -65,7 +68,7 @@
                 isRunning = animationButton.classList.contains("play-animation");
                 if (isRunning && isVisible) {
                     startTimer();
-                    if (!animId) animId = requestAnimationFrame(loop);
+                    if (!animId) animId = requestAnimationFrame(runLoop);
                 } else {
                     stopTimer();
                 }
@@ -79,7 +82,7 @@
                         isVisible = entry.isIntersecting;
                         if (isVisible && isRunning) {
                             startTimer();
-                            if (!animId) animId = requestAnimationFrame(loop);
+                            if (!animId) animId = requestAnimationFrame(runLoop);
                         } else {
                             stopTimer();
                         }
@@ -145,7 +148,7 @@
             });
         }
 
-        function size() {
+        function resizeCanvas() {
             if (!container || !cv) return false;
             const rect = container.getBoundingClientRect();
             W = Math.floor(container.clientWidth || rect.width || window.innerWidth);
@@ -164,7 +167,7 @@
             return true;
         }
 
-        // ---- hover ripples ----
+        // ---------- hover ripples ----------
         const RIPPLE_LIFE = 2.0,
             RIPPLE_SPEED = 170,
             MAX_RIPPLES = 5;
@@ -173,7 +176,7 @@
             ox = 0,
             oy = 0;
 
-        function prepRipples(now) {
+        function prepareRipples(now) {
             act = [];
             for (let i = ripples.length - 1; i >= 0; i--) {
                 const age = (now - ripples[i].born) / 1000;
@@ -193,7 +196,7 @@
             }
         }
 
-        function rippleAt(x, y) {
+        function getRippleAt(x, y) {
             ox = oy = 0;
             for (let i = 0; i < act.length; i++) {
                 const r = act[i],
@@ -212,7 +215,7 @@
             }
         }
 
-        function rippleGlowAt(x, y) {
+        function getRippleGlowAt(x, y) {
             let ob = 0;
             for (let i = 0; i < act.length; i++) {
                 const r = act[i],
@@ -246,7 +249,7 @@
                 a1 = s.amp1,
                 a2 = s.amp2;
 
-            prepRipples(performance.now());
+            prepareRipples(performance.now());
             const hasRipples = act.length > 0;
 
             const farX = Math.max(cx, W - cx) + 130,
@@ -284,7 +287,7 @@
                         Math.cos(bx * f1 + p3) * Math.sin(by * f1 + p4) * a1 +
                         Math.cos(bx * f2 + p7) * Math.sin(by * f2 + p8) * a2;
                     if (hasRipples) {
-                        rippleAt(xs[j], ys[j]);
+                        getRippleAt(xs[j], ys[j]);
                         xs[j] += ox;
                         ys[j] += oy;
                     }
@@ -359,7 +362,7 @@
                             let alpha = ringAlpha * v;
 
                             if (hasRipples) {
-                                const ob = rippleGlowAt(mx, my);
+                                const ob = getRippleGlowAt(mx, my);
                                 alpha = Math.min(1, alpha + ob * 0.22);
                             }
 
@@ -460,12 +463,12 @@
             draw(0);
         }
 
-        function loop(now) {
+        function runLoop(now) {
             if (!isRunning || !isVisible) {
                 animId = null;
                 return;
             }
-            animId = requestAnimationFrame(loop);
+            animId = requestAnimationFrame(runLoop);
             draw((now - t0) / 1000);
         }
 
@@ -478,10 +481,10 @@
         function init() {
             if (initialized) return;
             initialized = true;
-            if (!size()) return;
+            if (!resizeCanvas()) return;
             restart();
             if (isRunning && isVisible && !animId) {
-                animId = requestAnimationFrame(loop);
+                animId = requestAnimationFrame(runLoop);
             }
         }
 
@@ -524,20 +527,20 @@
         );
 
         let resizeTimer = null;
-        function onResize() {
+        function handleResize() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                if (size()) {
+                if (resizeCanvas()) {
                     restart();
                 }
             }, 120);
         }
 
         if ("ResizeObserver" in window && container) {
-            const ro = new ResizeObserver(onResize);
+            const ro = new ResizeObserver(handleResize);
             ro.observe(container);
         } else {
-            window.addEventListener("resize", onResize);
+            window.addEventListener("resize", handleResize);
         }
     }
 </script>

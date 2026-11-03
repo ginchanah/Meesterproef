@@ -1,3 +1,7 @@
+/* =====================================
+MARK: Object Animation
+===================================== */
+
 .object-container {
     position: relative;
     width: 100%;
@@ -241,7 +245,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    font-family: var(--inter-regular), system-ui, -apple-system, sans-serif;
     font-size: 20px;
     font-weight: 900;
     letter-spacing: 4px;

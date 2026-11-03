@@ -1,7 +1,11 @@
+/* =====================================
+MARK: Latent Space Animation
+===================================== */
+
 .latent-space-container {
-    /* Kleur variabelen */
-    --color-background: #000; /* Kleur van de ruimte/achtergrond */
-    --color-particles: #fff; /* Kleur van de bolletjes */
+    /* Colour variables */
+    --color-background: #000; /* Colour of the space/background */
+    --color-particles: #fff; /* Colour of the dots */
 
     position: relative;
     width: 100%;

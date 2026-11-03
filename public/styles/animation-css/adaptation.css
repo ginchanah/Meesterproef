@@ -19,7 +19,7 @@ MARK: Layout Components
         --animation-height: 80vh;
     }
 
-    #anim-5 {
+    .anim-5 {
         height: 100%;
     }
 

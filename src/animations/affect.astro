@@ -8,6 +8,9 @@
 
 <script>
     // @ts-nocheck
+    // =====================================
+    // MARK: Affect Animation
+    // =====================================
     const container = document.getElementById("affect-container");
     const cv = document.getElementById("affect-canvas");
     const ctx = cv.getContext("2d");
@@ -64,12 +67,12 @@
             isRunning = animationButton.classList.contains("play-animation");
             if (isRunning && isVisible && !animId) {
                 lastTime = performance.now();
-                animId = requestAnimationFrame(frame);
+                animId = requestAnimationFrame(drawFrame);
             }
         });
     }
 
-    function build() {
+    function buildScene() {
         if (!container || !cv) return false;
 
         const rect = container.getBoundingClientRect();
@@ -186,7 +189,7 @@
         return true;
     }
 
-    function frame(now) {
+    function drawFrame(now) {
         if (!isRunning || !isVisible) {
             animId = null;
             return;
@@ -194,7 +197,7 @@
 
         // GUARD: Do not execute physics if build() has not successfully initialized arrays
         if (!bx || !insideSegs || totalPoints === 0) {
-            animId = requestAnimationFrame(frame);
+            animId = requestAnimationFrame(drawFrame);
             return;
         }
 
@@ -302,7 +305,7 @@
         ctx.arc(agent.x, agent.y, isMobile ? 3 : 4, 0, Math.PI * 2);
         ctx.fill();
 
-        animId = requestAnimationFrame(frame);
+        animId = requestAnimationFrame(drawFrame);
     }
 
     function updatePointer(e) {
@@ -338,7 +341,7 @@
                     isVisible = entry.isIntersecting;
                     if (isVisible && isRunning && !animId) {
                         lastTime = performance.now();
-                        animId = requestAnimationFrame(frame);
+                        animId = requestAnimationFrame(drawFrame);
                     }
                 }
             },
@@ -348,32 +351,32 @@
     }
 
     let resizeTimer = null;
-    function onResize() {
+    function handleResize() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            if (build() && isRunning && isVisible && !animId) {
+            if (buildScene() && isRunning && isVisible && !animId) {
                 lastTime = performance.now();
-                animId = requestAnimationFrame(frame);
+                animId = requestAnimationFrame(drawFrame);
             }
         }, 120);
     }
 
     if ("ResizeObserver" in window && container) {
-        const ro = new ResizeObserver(onResize);
+        const ro = new ResizeObserver(handleResize);
         ro.observe(container);
     } else {
-        window.addEventListener("resize", onResize);
+        window.addEventListener("resize", handleResize);
     }
 
     const startAnimation = () => {
-        const built = build();
+        const built = buildScene();
         if (!built) {
             // Retry once layout resolves if dimensions were 0 on initial pass
             requestAnimationFrame(() => {
-                build();
+                buildScene();
                 if (isRunning && isVisible && !animId) {
                     lastTime = performance.now();
-                    animId = requestAnimationFrame(frame);
+                    animId = requestAnimationFrame(drawFrame);
                 }
             });
             return;
@@ -381,7 +384,7 @@
 
         if (isRunning && isVisible && !animId) {
             lastTime = performance.now();
-            animId = requestAnimationFrame(frame);
+            animId = requestAnimationFrame(drawFrame);
         }
     };
 

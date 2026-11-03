@@ -4,12 +4,12 @@ Scoped to .friction-wrapper so it doesn't
 affect the rest of the page layout.
 ===================================== */
 
-/* --- Ensure parent fills the animation-section height --- */
+/* ---------- Ensure parent fills the animation-section height ---------- */
 .animation-section .hidden-section {
     height: 100%;
 }
 
-/* --- WRAPPER (replaces old :root and body styles) --- */
+/* ---------- WRAPPER (replaces old :root and body styles) ---------- */
 .friction-wrapper {
     /* colours: background and discs/word */
     --bg: var(--color-background, #000000);

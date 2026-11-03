@@ -4,12 +4,12 @@ Scoped to .noise-wrapper so it doesn't
 affect the rest of the page layout.
 ===================================== */
 
-/* --- Ensure parent fills the animation-section height --- */
+/* ---------- Ensure parent fills the animation-section height ---------- */
 .animation-section .hidden-section {
     height: 100%;
 }
 
-/* --- WRAPPER (replaces old body styles) --- */
+/* ---------- WRAPPER (replaces old body styles) ---------- */
 .noise-wrapper {
     /* shown until the first frame is drawn */
     --page: #141414;
@@ -21,7 +21,7 @@ affect the rest of the page layout.
     background: var(--page);
 }
 
-#noise-canvas {
+.noise-canvas {
     position: absolute;
     inset: 0;
     display: block;

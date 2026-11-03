@@ -4,12 +4,12 @@ Scoped to .intraface-wrapper so it doesn't
 affect the rest of the page layout.
 ===================================== */
 
-/* --- Ensure parent fills the animation-section height --- */
+/* ---------- Ensure parent fills the animation-section height ---------- */
 .animation-section .hidden-section {
     height: 100%;
 }
 
-/* --- WRAPPER (replaces old body styles) --- */
+/* ---------- WRAPPER (replaces old body styles) ---------- */
 .intraface-wrapper {
     background-color: #050505;
     width: 100%;
@@ -17,18 +17,18 @@ affect the rest of the page layout.
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: "Courier New", Courier, monospace;
     overflow: hidden;
     transition: background-color 0.5s;
     cursor: pointer;
 }
 
-/* Automatische achtergrondwissel op basis van de .inverted class op de wrapper */
+/* Automatic background switch based on the .inverted class on the wrapper */
 .intraface-wrapper.inverted {
     background-color: #fafafa;
 }
 
-/* --- 3D KUBUS --- */
+/* ---------- 3D KUBUS ---------- */
 .intraface-wrapper .scene {
     width: 300px;
     height: 300px;
@@ -64,7 +64,7 @@ affect the rest of the page layout.
     100% { transform: rotateX(360deg) rotateY(360deg); }
 }
 
-/* --- ASCII GLITCH EFFECT --- */
+/* ---------- ASCII GLITCH EFFECT ---------- */
 .intraface-wrapper .ascii-container {
     position: absolute;
     top: 0;
@@ -78,7 +78,7 @@ affect the rest of the page layout.
     word-break: break-all; 
     font-weight: bold;
     overflow: hidden; 
-    transform: scaleX(-1); /* Spiegel de tekst */
+    transform: scaleX(-1); /* Mirror the text */
 }
 
 .intraface-wrapper .ascii-layer {
@@ -92,7 +92,7 @@ affect the rest of the page layout.
     contain: layout style paint;
 }
 
-/* Standaard kleuren */
+/* Default colours */
 .intraface-wrapper .base {
     z-index: 1;
     color: #fff;
@@ -111,7 +111,7 @@ affect the rest of the page layout.
     animation: glitch-anim-2 3s infinite linear alternate-reverse;
 }
 
-/* --- OMGEKEERDE KLEUREN (op de wrapper, niet op body) --- */
+/* ---------- Inverted colours (on the wrapper, not on body) ---------- */
 .intraface-wrapper.inverted .face {
     background-color: #fff;
     border: 1px solid #ccc;
@@ -129,7 +129,7 @@ affect the rest of the page layout.
     color: #fff;
 }
 
-/* Glitch animaties (dit creëert de bewegende vlakjes via clip-path) */
+/* Glitch animations (this creates the moving blocks with clip-path) */
 @keyframes glitch-anim-1 {
     0% { clip-path: inset(10% 0 80% 0); transform: translate(-4px, 0); }
     20% { clip-path: inset(80% 0 10% 0); transform: translate(4px, 0); }

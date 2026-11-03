@@ -3,11 +3,14 @@
 ---
 
 <div class="interface-wrapper">
-    <div id="interface-stage"></div>
+    <div class="interface-stage" id="interface-stage"></div>
 </div>
 
 <script>
     // @ts-nocheck
+    // =====================================
+    // MARK: Interface Animation
+    // =====================================
     const DELAY = 150;         // ms between each automatic switch (higher = fewer switching)
     const GROUP_COUNT = 50;    // roughly how many switches are on at once
     const TOP_WORD = "INTER";
@@ -169,7 +172,7 @@
         }, DELAY);
     }
 
-    function start() {
+    function startGrid() {
         setSizes();
         startSwitching(buildGrid());
     }
@@ -187,7 +190,7 @@
         lastWidth = W;
         lastHeight = H;
         clearTimeout(resizeTimer);
-        if (first) start();
-        else resizeTimer = setTimeout(start, 200);
+        if (first) startGrid();
+        else resizeTimer = setTimeout(startGrid, 200);
     }).observe(stage);
 </script>

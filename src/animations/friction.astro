@@ -21,8 +21,8 @@
     // @ts-nocheck
     (() => {
         // The only thing HTML and CSS cannot do: the physics. This moves circle A and writes its offset into --x / --y; CSS does the rest.
-        const stage = document.getElementById('friction-stage');
-        const section = stage.closest('.animation-section');
+        const stage = document.getElementById("friction-stage");
+        const section = stage.closest(".animation-section");
         const q = { x: 0, y: 0, vx: 0, vy: 0 }, P = { x: 0, y: 0 }, T = { x: 0, y: 0 };   // q: A's offset from the centre, P: smoothed pointer, T: pointer
         let R = 1, still = 99, clock = 0;
 
@@ -35,33 +35,33 @@
               RANGE = 5.0;    // the push starts when the two centres are RANGE radii apart
 
         // the play/stop button of the detail page adds .stop-animation when paused
-        const isPaused = () => document.hidden || (section && section.querySelector('.stop-animation'));
+        const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
 
-        function layout() {
-            const r = stage.querySelector('.a').offsetWidth / 2;   // the radius is decided in the CSS
+        function updateLayout() {
+            const r = stage.querySelector(".a").offsetWidth / 2;   // the radius is decided in the CSS
             if (!r) return;                                         // ignore hidden / zero-size layouts
             const k = r / R; R = r;
             q.x *= k; q.y *= k; P.x *= k; P.y *= k; T.x *= k; T.y *= k;
         }
-        new ResizeObserver(layout).observe(stage);
+        new ResizeObserver(updateLayout).observe(stage);
 
         // pointer position measured from the centre of the animation, since it sits inside the page
-        function point(e) {
+        function setPointer(e) {
             const r = stage.getBoundingClientRect();
             T.x = e.clientX - r.left - r.width / 2;
             T.y = e.clientY - r.top - r.height / 2;
             still = 0;
         }
-        stage.addEventListener('pointermove', point);
-        stage.addEventListener('pointerdown', point);
+        stage.addEventListener("pointermove", setPointer);
+        stage.addEventListener("pointerdown", setPointer);
 
         // idle: the imaginary pointer swings slowly through the middle along a line that itself turns,
         // so the circles drift apart, push each other away, and now and then slip past each other: the word flashes up and is gone
-        function idleTarget() { const a = clock * 0.13, r = R * 1.7 * Math.sin(clock * 0.8); return [Math.cos(a) * r, Math.sin(a) * r]; }
+        function getIdleTarget() { const a = clock * 0.13, r = R * 1.7 * Math.sin(clock * 0.8); return [Math.cos(a) * r, Math.sin(a) * r]; }
 
         function step(dt) {
             clock += dt; still += dt;
-            if (still > IDLE_AFTER) [T.x, T.y] = idleTarget();
+            if (still > IDLE_AFTER) [T.x, T.y] = getIdleTarget();
             const k = 1 - Math.exp(-dt * (still > IDLE_AFTER ? 1.2 : 30));    // idle takes over gently, the pointer takes back control at once
             P.x += (T.x - P.x) * k; P.y += (T.y - P.y) * k;
             const m = Math.hypot(q.x, q.y), d = 2 * m, D = RANGE * R;
@@ -75,17 +75,17 @@
         }
 
         let last = 0, acc = 0;
-        function frame(t) {
+        function drawFrame(t) {
             const dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
             if (!isPaused()) {
                 acc += dt;
                 while (acc >= 1 / 240) { step(1 / 240); acc -= 1 / 240; }
-                stage.style.setProperty('--x', q.x.toFixed(2) + 'px');
-                stage.style.setProperty('--y', q.y.toFixed(2) + 'px');
+                stage.style.setProperty("--x", q.x.toFixed(2) + "px");
+                stage.style.setProperty("--y", q.y.toFixed(2) + "px");
             }
-            requestAnimationFrame(frame);
+            requestAnimationFrame(drawFrame);
         }
-        layout();
-        requestAnimationFrame(frame);
+        updateLayout();
+        requestAnimationFrame(drawFrame);
     })();
 </script>
