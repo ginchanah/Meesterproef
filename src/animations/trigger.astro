@@ -2,14 +2,21 @@
 
 ---
 
-<canvas id="c"></canvas>
+<div class="trigger-wrapper">
+    <canvas class="trigger-canvas" id="trigger-canvas"></canvas>
+</div>
+
 <script>
     // @ts-nocheck
-    const canvas = document.getElementById("c");
+    // =====================================
+    // MARK: Trigger Animation
+    // =====================================
+    const canvas = document.getElementById("trigger-canvas");
+    const section = canvas.closest(".animation-section");
     const ctx = canvas.getContext("2d");
 
-    let width,
-        height,
+    let width = 0,
+        height = 0,
         scale = 1;
     let particles = [];
     let textPoints = [];
@@ -89,7 +96,7 @@
             for (let x = 0; x < width; x += step)
                 if (data[(y * width + x) * 4 + 3] > 128) pts.push([x, y]);
 
-        // shuffle zodat de deeltjes willekeurig naar letters vliegen
+        // shuffle so the particles fly to random spots in the letters
         for (let i = pts.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [pts[i], pts[j]] = [pts[j], pts[i]];
@@ -117,49 +124,59 @@
         assignTargets();
     }
 
-    function resize() {
-        width = window.innerWidth;
-        height = window.innerHeight;
+    function resizeCanvas() {
+        const w = canvas.clientWidth, h = canvas.clientHeight;
+        if (!w || !h) return; // ignore hidden / zero-size layouts
+        if (w === width && h === height) return; // nothing changed: keep the current particles
+        width = w;
+        height = h;
         canvas.width = width;
         canvas.height = height;
         scale = Math.min(1, Math.min(width, height) / 660);
         initParticles();
     }
-    window.addEventListener("resize", resize);
-    resize();
+    // rebuild whenever the animation area changes size (window resize, rotation)
+    new ResizeObserver(resizeCanvas).observe(canvas);
+    resizeCanvas();
 
-    // --- INTERACTIE: klik/tik wisselt tussen schijf en woord ---
-    function toggle() {
+    // ---------- Interaction: a click/tap switches between the disc and the word ----------
+    function toggleShape() {
         spelled = !spelled;
-        if (spelled) assignTargets(); // nieuwe willekeurige verdeling bij elke trigger
+        if (spelled) assignTargets(); // a new random distribution on every trigger
     }
-    window.addEventListener("mousemove", (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-    });
-    document.addEventListener("click", toggle); // werkt voor muis en tik
-    window.addEventListener(
-        "touchstart",
-        (e) => {
-            mouse.x = e.touches[0].clientX;
-            mouse.y = e.touches[0].clientY;
-        },
-        { passive: true },
-    );
-    window.addEventListener(
-        "touchmove",
-        (e) => {
-            mouse.x = e.touches[0].clientX;
-            mouse.y = e.touches[0].clientY;
-        },
-        { passive: true },
-    );
-    window.addEventListener("touchend", () => {
+    // pointer position measured against the canvas, since it sits inside the page
+    function setMouse(clientX, clientY) {
+        const r = canvas.getBoundingClientRect();
+        mouse.x = clientX - r.left;
+        mouse.y = clientY - r.top;
+    }
+    function forgetMouse() {
         mouse.x = -1000;
         mouse.y = -1000;
-    });
+    }
+    canvas.addEventListener("mousemove", (e) => setMouse(e.clientX, e.clientY));
+    canvas.addEventListener("mouseleave", forgetMouse);
+    canvas.addEventListener("click", toggleShape); // works for mouse and tap
+    canvas.addEventListener(
+        "touchstart",
+        (e) => setMouse(e.touches[0].clientX, e.touches[0].clientY),
+        { passive: true },
+    );
+    canvas.addEventListener(
+        "touchmove",
+        (e) => setMouse(e.touches[0].clientX, e.touches[0].clientY),
+        { passive: true },
+    );
+    canvas.addEventListener("touchend", forgetMouse);
+
+    // the play/stop button of the detail page adds .stop-animation when paused
+    const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
 
     function animate() {
+        if (!width || isPaused()) {
+            requestAnimationFrame(animate);
+            return;
+        }
         ctx.fillStyle = "rgba(0,0,0,0.3)";
         ctx.fillRect(0, 0, width, height);
         ctx.fillStyle = "white";

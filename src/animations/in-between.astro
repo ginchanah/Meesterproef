@@ -2,10 +2,17 @@
 
 ---
 
-<canvas id="c"></canvas>
+<div class="in-between-wrapper">
+    <canvas class="in-between-canvas" id="in-between-canvas"></canvas>
+</div>
+
 <script>
     // @ts-nocheck
-    const cv = document.getElementById("c");
+    // =====================================
+    // MARK: In-between Animation
+    // =====================================
+    const cv = document.getElementById("in-between-canvas");
+    const section = cv.closest(".animation-section");
     const ctx = cv.getContext("2d");
     const E = (50 * Math.PI) / 180,
         cE = Math.cos(E),
@@ -171,7 +178,8 @@
         dScale = (NB - 1) / (dmax - dmin);
     }
 
-    function resize() {
+    function resizeCanvas() {
+        if (!cv.clientWidth || !cv.clientHeight) return; // ignore hidden / zero-size layouts
         const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
         W = cv.width = Math.round(cv.clientWidth * dpr);
         H = cv.height = Math.round(cv.clientHeight * dpr);
@@ -197,7 +205,7 @@
         lastCX = 0,
         moved = 0;
     const rip = [];
-    function pos(e) {
+    function getPointerPosition(e) {
         const r = cv.getBoundingClientRect(),
             k = W / r.width;
         return [(e.clientX - r.left) * k, (e.clientY - r.top) * k];
@@ -205,14 +213,14 @@
 
     cv.addEventListener("pointerdown", (e) => {
         cv.setPointerCapture(e.pointerId);
-        [px, py] = pos(e);
+        [px, py] = getPointerPosition(e);
         drag = true;
         moved = 0;
         lastCX = e.clientX;
         cv.classList.add("drag");
     });
     cv.addEventListener("pointermove", (e) => {
-        [px, py] = pos(e);
+        [px, py] = getPointerPosition(e);
         if (drag) {
             const dx = e.clientX - lastCX;
             lastCX = e.clientX;
@@ -221,24 +229,24 @@
             vel = Math.max(-8, Math.min(8, vel * 0.8 + dx * 0.012 * 60 * 0.2));
         }
     });
-    function up(e, tap) {
+    function releaseDrag(e, tap) {
         if (!drag) return;
         drag = false;
         cv.classList.remove("drag");
         if (e.pointerType !== "mouse") paT = 0;
     }
-    cv.addEventListener("pointerup", (e) => up(e, true));
-    cv.addEventListener("pointercancel", (e) => up(e, false));
+    cv.addEventListener("pointerup", (e) => releaseDrag(e, true));
+    cv.addEventListener("pointercancel", (e) => releaseDrag(e, false));
     cv.addEventListener("pointerleave", (e) => {
         if (e.pointerType === "mouse") paT = 0;
     });
+    // the wheel spins the shape; the page still scrolls, so nobody gets stuck on the animation
     cv.addEventListener(
         "wheel",
         (e) => {
-            e.preventDefault();
             vel += e.deltaY * 0.004;
         },
-        { passive: false },
+        { passive: true },
     );
 
     // ---------- per-frame ----------
@@ -378,14 +386,23 @@
 
     let t0 = performance.now(),
         last = t0;
-    function frame(now) {
+    // the play/stop button of the detail page adds .stop-animation when paused
+    const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
+
+    let pausedTime = 0;
+    function drawFrame(now) {
         const dt = Math.min(0.05, (now - last) / 1000);
         last = now;
-        update((now - t0) / 1000, dt);
-        draw();
-        requestAnimationFrame(frame);
+        if (!rings || isPaused()) {
+            pausedTime += dt; // the clock stands still while paused
+        } else {
+            update((now - t0) / 1000 - pausedTime, dt);
+            draw();
+        }
+        requestAnimationFrame(drawFrame);
     }
-    resize();
-    addEventListener("resize", resize);
-    requestAnimationFrame(frame);
+    // rebuild whenever the animation area changes size (window resize, rotation)
+    new ResizeObserver(resizeCanvas).observe(cv);
+    resizeCanvas();
+    requestAnimationFrame(drawFrame);
 </script>

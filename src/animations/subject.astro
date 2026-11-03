@@ -2,103 +2,113 @@
 
 ---
 
-<div
-  id="scene"
-  aria-label="Three nested cubes with their faces pulled apart, slowly rotating"
->
-  <div id="rig"><p id="word">SUBJECT</p></div>
+<!-- the wrapper is the size container, so the scene inside can size itself to the animation area -->
+<div class="subject-wrapper" id="subject-wrapper">
+    <div class="subject-scene" aria-label="Three nested cubes with their faces pulled apart, slowly rotating">
+        <div class="subject-rig" id="subject-rig"><p class="subject-word" id="subject-word">SUBJECT</p></div>
+    </div>
 </div>
+
 <script>
-  // @ts-nocheck
-  (function () {
-    // Three nested cubes: face size (s) and how far each face sits from the centre (o), in scene units.
-    var CUBES = [
-      { s: 28, o: 38 },
-      { s: 18, o: 25 },
-      { s: 12, o: 14 },
-    ];
-    var FACES = [
-      "translateZ(var(--o))",
-      "rotateY(180deg) translateZ(var(--o))",
-      "rotateY(90deg) translateZ(var(--o))",
-      "rotateY(-90deg) translateZ(var(--o))",
-      "rotateX(90deg) translateZ(var(--o))",
-      "rotateX(-90deg) translateZ(var(--o))",
-    ];
+    // @ts-nocheck
+    // =====================================
+    // MARK: Subject Animation
+    // =====================================
+    (function () {
+        // Three nested cubes: face size (s) and how far each face sits from the centre (o), in scene units.
+        var CUBES = [
+            { s: 28, o: 38 },
+            { s: 18, o: 25 },
+            { s: 12, o: 14 },
+        ];
+        var FACES = [
+            "translateZ(var(--o))",
+            "rotateY(180deg) translateZ(var(--o))",
+            "rotateY(90deg) translateZ(var(--o))",
+            "rotateY(-90deg) translateZ(var(--o))",
+            "rotateX(90deg) translateZ(var(--o))",
+            "rotateX(-90deg) translateZ(var(--o))",
+        ];
 
-    var rig = document.getElementById("rig");
-    var word = document.getElementById("word");
-    CUBES.forEach(function (c) {
-      var cube = document.createElement("div");
-      cube.className = "cube";
-      FACES.forEach(function (t) {
-        var f = document.createElement("div");
-        f.className = "face";
-        f.style.setProperty("--s", c.s);
-        f.style.setProperty("--o", "calc(" + c.o + " * var(--u))");
-        f.style.transform = t;
-        cube.appendChild(f);
-      });
-      rig.appendChild(cube);
-    });
+        var wrapper = document.getElementById("subject-wrapper");
+        var section = wrapper.closest(".animation-section");
+        var rig = document.getElementById("subject-rig");
+        var word = document.getElementById("subject-word");
+        CUBES.forEach(function (c) {
+            var cube = document.createElement("div");
+            cube.className = "cube";
+            FACES.forEach(function (t) {
+                var f = document.createElement("div");
+                f.className = "face";
+                f.style.setProperty("--s", c.s);
+                f.style.setProperty("--o", "calc(" + c.o + " * var(--u))");
+                f.style.transform = t;
+                cube.appendChild(f);
+            });
+            rig.appendChild(cube);
+        });
 
-    var SPEED = 56; // degrees per second, matches the source clip
-    var yaw = 20,
-      pitch = 0;
-    var dragging = false,
-      lastX = 0,
-      lastY = 0,
-      velYaw = 0;
-    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var SPEED = 56; // degrees per second, matches the source clip
+        var yaw = 20,
+            pitch = 0;
+        var dragging = false,
+            lastX = 0,
+            lastY = 0,
+            velYaw = 0;
+        var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    function render() {
-      rig.style.transform = "rotateX(" + pitch + "deg) rotateY(" + yaw + "deg)";
-      // keep the word facing the viewer while the panels turn around it
-      word.style.transform =
-        "rotateY(" +
-        -yaw +
-        "deg) rotateX(" +
-        -pitch +
-        "deg) translate(-50%, -50%)";
-    }
+        // the play/stop button of the detail page adds .stop-animation when paused
+        var isPaused = function () { return document.hidden || (section && section.querySelector(".stop-animation")); };
 
-    document.addEventListener("pointerdown", function (e) {
-      dragging = true;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      document.body.classList.add("dragging");
-    });
-    window.addEventListener("pointermove", function (e) {
-      if (!dragging) return;
-      var dx = e.clientX - lastX,
-        dy = e.clientY - lastY;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      yaw += dx * 0.4;
-      velYaw = dx * 0.4;
-      pitch = Math.max(-60, Math.min(60, pitch - dy * 0.3));
-    });
-    function release() {
-      dragging = false;
-      document.body.classList.remove("dragging");
-    }
-    window.addEventListener("pointerup", release);
-    window.addEventListener("pointercancel", release);
+        function renderRig() {
+            rig.style.transform = "rotateX(" + pitch + "deg) rotateY(" + yaw + "deg)";
+            // keep the word facing the viewer while the panels turn around it
+            word.style.transform =
+                "rotateY(" +
+                -yaw +
+                "deg) rotateX(" +
+                -pitch +
+                "deg) translate(-50%, -50%)";
+        }
 
-    var prev = performance.now();
-    function frame(now) {
-      var dt = Math.min(0.05, (now - prev) / 1000);
-      prev = now;
-      if (!dragging) {
-        if (!reduce) yaw += SPEED * dt;
-        yaw += velYaw;
-        velYaw *= 0.92; // inertia after a flick
-        pitch += (0 - pitch) * Math.min(1, dt * 2.5); // ease back to level
-      }
-      render();
-      requestAnimationFrame(frame);
-    }
-    render();
-    requestAnimationFrame(frame);
-  })();
+        // a drag only starts on the animation; once started it may continue outside it
+        wrapper.addEventListener("pointerdown", function (e) {
+            dragging = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            wrapper.classList.add("dragging");
+        });
+        window.addEventListener("pointermove", function (e) {
+            if (!dragging) return;
+            var dx = e.clientX - lastX,
+                dy = e.clientY - lastY;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            yaw += dx * 0.4;
+            velYaw = dx * 0.4;
+            pitch = Math.max(-60, Math.min(60, pitch - dy * 0.3));
+        });
+        function releaseDrag() {
+            dragging = false;
+            wrapper.classList.remove("dragging");
+        }
+        window.addEventListener("pointerup", releaseDrag);
+        window.addEventListener("pointercancel", releaseDrag);
+
+        var prev = performance.now();
+        function drawFrame(now) {
+            var dt = Math.min(0.05, (now - prev) / 1000);
+            prev = now;
+            if (!dragging && !isPaused()) {
+                if (!reduce) yaw += SPEED * dt;
+                yaw += velYaw;
+                velYaw *= 0.92; // inertia after a flick
+                pitch += (0 - pitch) * Math.min(1, dt * 2.5); // ease back to level
+            }
+            renderRig();
+            requestAnimationFrame(drawFrame);
+        }
+        renderRig();
+        requestAnimationFrame(drawFrame);
+    })();
 </script>

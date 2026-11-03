@@ -2,5 +2,437 @@
 
 ---
 
-<!-- TODO: add the animation -->
-<p>Coming soon</p>
+<!-- ===================================== -->
+<!-- MARK: Interaction Animation           -->
+<!-- ===================================== -->
+<!-- the letters of INTER / ACTION are physics bodies: grab, throw and stack them -->
+<div class="interaction-stage" id="interaction-stage"></div>
+
+<script>
+    // @ts-nocheck
+    // =====================================
+    // MARK: Interaction Animation
+    // =====================================
+    // Matter.js is installed with npm (package.json), so Astro bundles it with the site
+    import Matter from "matter-js";
+
+    const LINES = ["INTER", "ACTION"];
+    const FONT = "\"Helvetica Neue\", Helvetica, Arial, sans-serif";
+
+    const SAMPLE_STEP = 2;    // px between alpha samples when tracing a glyph
+    const PAD = 2;            // transparent margin so the trace can close around the ink
+
+    // Which letter starts off balance: row, letter index, tilt in radians.
+    // Row 0 index 0 is INTER's I: it sits on the apex of ACTION's A.
+    const TIP = { row: 0, index: 0, angle: 0.1 };
+
+    // The ceiling sits well above the visible stage, so letters can be thrown out of
+    // frame and come back. The sides stay flush, so nothing lands out of reach.
+    const OVERFLOW = { sides: 0, top: 2.6 };
+
+    // ---------- Sinking ----------
+    const IDLE_MS = 5000;       // no input for this long before anything sinks
+    const GAP_MS = 2500;        // pause after a letter respawns, before the next sinks
+    const SINK_PX_PER_S = 24;   // sink speed
+
+    const { Engine, Runner, Bodies, Body, Composite, Query, Vertices,
+            Mouse, MouseConstraint, Events } = Matter;
+
+    const stage = document.getElementById("interaction-stage");
+    const section = stage.closest(".animation-section");
+
+    const engine = Engine.create();
+    engine.enableSleeping = true;
+    const runner = Runner.create();
+    Runner.run(runner, engine);
+
+    const measure = document.createElement("canvas").getContext("2d");
+    const getFont = size => `700 ${size}px ${FONT}`;
+
+    let glyphs = [], bodies = [], walls = [];
+
+    // ---------- Sinking state ----------
+    let lastInput = performance.now();
+    let lastTick = performance.now();
+    let nextSinkAt = 0;
+    let sinker = null;        // only one letter sinks at a time
+    let lastDropped = null;   // the letter that just respawned
+    const done = new Set();   // letters that already sank this round
+
+    // the play/stop button of the detail page adds .stop-animation when paused
+    const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
+
+
+    // =====================================
+    // MARK: Draw the glyph, cropped tight to its ink
+    // =====================================
+    function renderGlyph(char, font, dpr, colour) {
+        measure.font = font;
+        const m = measure.measureText(char);
+
+        const left = m.actualBoundingBoxLeft;
+        const ascent = m.actualBoundingBoxAscent;
+        const w = Math.ceil(m.actualBoundingBoxRight + left) + PAD * 2;
+        const h = Math.ceil(ascent + m.actualBoundingBoxDescent) + PAD * 2;
+
+        const canvas = document.createElement("canvas");
+        canvas.className = "glyph";
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.scale(dpr, dpr);
+        ctx.font = font;
+        ctx.textBaseline = "alphabetic";
+        ctx.fillStyle = colour;
+        ctx.fillText(char, PAD + left, PAD + ascent);
+
+        return { canvas, ctx, w, h, dpr, left, ascent, advance: m.width };
+    }
+
+
+    // =====================================
+    // MARK: Walk the alpha boundary (marching squares)
+    // =====================================
+    function traceOutline({ ctx, w, h, dpr }) {
+        const img = ctx.getImageData(0, 0, Math.round(w * dpr), Math.round(h * dpr));
+        const iw = img.width, ih = img.height;
+        const gw = Math.ceil(w / SAMPLE_STEP), gh = Math.ceil(h / SAMPLE_STEP);
+        const grid = new Uint8Array(gw * gh);
+
+        for (let gy = 0; gy < gh; gy++) {
+            for (let gx = 0; gx < gw; gx++) {
+                const px = Math.min(Math.round(gx * SAMPLE_STEP * dpr), iw - 1);
+                const py = Math.min(Math.round(gy * SAMPLE_STEP * dpr), ih - 1);
+                grid[gy * gw + gx] = img.data[(py * iw + px) * 4 + 3] > 110 ? 1 : 0;
+            }
+        }
+
+        const getCell = (x, y) => (x < 0 || y < 0 || x >= gw || y >= gh) ? 0 : grid[y * gw + x];
+
+        let sx = -1, sy = -1;
+        outer: for (let y = 0; y < gh; y++)
+            for (let x = 0; x < gw; x++)
+                if (grid[y * gw + x]) { sx = x; sy = y; break outer; }
+        if (sx < 0) return null;
+
+        const pts = [];
+        let x = sx, y = sy, dx = 0, dy = 0, pdx = 0, pdy = 0, guard = 0;
+
+        do {
+            const state =
+                (getCell(x - 1, y - 1) ? 1 : 0) | (getCell(x, y - 1) ? 2 : 0) |
+                (getCell(x - 1, y) ? 4 : 0) | (getCell(x, y) ? 8 : 0);
+
+            dx = 0; dy = 0;
+            switch (state) {
+                case 1: case 5: case 13: dy = -1; break;
+                case 2: case 3: case 7: dx = 1; break;
+                case 4: case 12: case 14: dx = -1; break;
+                case 8: case 10: case 11: dy = 1; break;
+                case 6: dy = (pdx === -1) ? -1 : 1; break;
+                case 9: dx = (pdy === -1) ? 1 : -1; break;
+                default: return null;
+            }
+
+            if (dx !== pdx || dy !== pdy) pts.push({ x: x * SAMPLE_STEP, y: y * SAMPLE_STEP });
+            x += dx; y += dy; pdx = dx; pdy = dy;
+        } while ((x !== sx || y !== sy) && ++guard < 40000);
+
+        return pts.length > 6 ? pts : null;
+    }
+
+
+    // =====================================
+    // MARK: Build
+    // =====================================
+    function fitSize() {
+        const REF = 100;
+        measure.font = getFont(REF);
+        const widest = Math.max(...LINES.map(l => measure.measureText(l).width));
+
+        const byWidth = (stage.clientWidth * 0.88) / widest * REF;
+        const byHeight = stage.clientHeight * 0.36;
+        return Math.max(48, Math.min(byWidth, byHeight));
+    }
+
+    function buildLetters() {
+        glyphs.forEach(g => g.canvas.remove());
+        Composite.remove(engine.world, bodies);
+        glyphs = []; bodies = [];
+
+        // reset sinking state, so a resize doesn't leave stale references behind
+        sinker = null; done.clear(); lastDropped = null;
+
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const size = fitSize();
+        const font = getFont(size);
+        // the letter colour is set as --ink on the stage in interaction.css
+        const colour = getComputedStyle(stage).getPropertyValue("--ink").trim() || "#fff";
+
+        measure.font = font;
+
+        // stack by actual cap height, so INTER rests directly on ACTION
+        const lineHeight = measure.measureText("H").actualBoundingBoxAscent + 2;
+
+        // a small gap under everything, so the word drops a fraction and settles
+        const drop = Math.max(4, size * 0.05);
+
+        // ACTION is centred. Every line above it is placed so its first letter centres
+        // on ACTION's first letter, which puts the I on the A's narrow apex.
+        const last = LINES.length - 1;
+        const baseX = (stage.clientWidth - measure.measureText(LINES[last]).width) / 2;
+        const getFirstAdvance = line => measure.measureText(line[0]).width;
+
+        LINES.forEach((line, row) => {
+            let penX = baseX + (getFirstAdvance(LINES[last]) - getFirstAdvance(line)) / 2;
+            const baselineY = stage.clientHeight - (last - row) * lineHeight - 1 - drop;
+
+            [...line].forEach((char, i) => {
+                const g = renderGlyph(char, font, dpr, colour);
+                stage.appendChild(g.canvas);
+
+                // convex hull of the traced outline: angled edges survive, notches fill in
+                const raw = traceOutline(g);
+                const verts = raw ? Vertices.hull(raw) : null;
+
+                const body = verts && verts.length >= 3
+                    ? Bodies.fromVertices(0, 0, [verts])
+                    : Bodies.rectangle(0, 0, g.w, g.h);
+
+                Body.set(body, {
+                    restitution: 0.25,
+                    friction: 0.6,
+                    frictionAir: 0.012,
+                    density: 0.0018
+                });
+
+                // vector from the canvas's top-left corner to the body's centre of mass
+                const minX = verts ? Math.min(...verts.map(p => p.x)) : 0;
+                const minY = verts ? Math.min(...verts.map(p => p.y)) : 0;
+                const offX = minX - body.bounds.min.x;
+                const offY = minY - body.bounds.min.y;
+
+                Body.setPosition(body, {
+                    x: penX - PAD - g.left + offX,
+                    y: baselineY - PAD - g.ascent + offY
+                });
+
+                if (row === TIP.row && i === TIP.index) {
+                    // tilt it, then set it back down so its lowest point just touches the baseline
+                    Body.setAngle(body, TIP.angle);
+                    Body.translate(body, { x: 0, y: baselineY - 2 - body.bounds.max.y });
+                }
+
+                glyphs.push({ canvas: g.canvas, body, offX, offY });
+                bodies.push(body);
+                Composite.add(engine.world, body);
+
+                penX += g.advance;
+            });
+        });
+    }
+
+
+    // =====================================
+    // MARK: Walls, input, loop
+    // =====================================
+    function buildWalls() {
+        Composite.remove(engine.world, walls);
+
+        const w = stage.clientWidth, h = stage.clientHeight, t = 400;
+        const left = -w * OVERFLOW.sides;
+        const right = w + w * OVERFLOW.sides;
+        const top = -h * OVERFLOW.top;
+        const bottom = h;
+
+        const spanX = (right - left) + t * 2;
+        const spanY = (bottom - top) + t * 2;
+
+        walls = [
+            Bodies.rectangle((left + right) / 2, bottom + t / 2, spanX, t, { isStatic: true }),
+            Bodies.rectangle((left + right) / 2, top - t / 2, spanX, t, { isStatic: true }),
+            Bodies.rectangle(left - t / 2, (top + bottom) / 2, t, spanY, { isStatic: true }),
+            Bodies.rectangle(right + t / 2, (top + bottom) / 2, t, spanY, { isStatic: true })
+        ];
+        Composite.add(engine.world, walls);
+    }
+
+    const mouse = Mouse.create(stage);
+    const mouseConstraint = MouseConstraint.create(engine, {
+        mouse,
+        constraint: {
+            stiffness: 0.14,
+            damping: 0.04,
+            // at 0 the full torque applies and the centre of mass swings under the grab point
+            angularStiffness: 0,
+            render: { visible: false }
+        }
+    });
+    Composite.add(engine.world, mouseConstraint);
+    // Matter's wheel handler calls preventDefault, which blocks scrolling: remove it, so the page still scrolls
+    // over the animation. Matter registers it as "mousewheel" and "DOMMouseScroll" (not "wheel"), so remove both.
+    mouse.element.removeEventListener("mousewheel", mouse.mousewheel);
+    mouse.element.removeEventListener("DOMMouseScroll", mouse.mousewheel);
+
+    Events.on(mouseConstraint, "startdrag", () => stage.classList.add("holding"));
+    Events.on(mouseConstraint, "enddrag", () => stage.classList.remove("holding"));
+
+    // Matter only listens on the stage: if the cursor leaves it mid-drag, Matter never
+    // sees the button release. Force a drop instead.
+    function releaseLetter() {
+        if (!mouseConstraint.body) return;
+        mouse.button = -1;
+        stage.classList.remove("holding");
+    }
+
+    stage.addEventListener("mouseleave", releaseLetter);
+    window.addEventListener("blur", releaseLetter);
+    stage.addEventListener("touchcancel", releaseLetter);
+
+    // Hover is hit-tested against the physics shapes, so the cursor only changes over real ink.
+    let hovering = false;
+
+    stage.addEventListener("mousemove", e => {
+        if (mouseConstraint.body) return;
+        const r = stage.getBoundingClientRect();
+        const point = { x: e.clientX - r.left, y: e.clientY - r.top };
+        const hit = Query.point(bodies, point).length > 0;
+        if (hit !== hovering) stage.classList.toggle("hover", hovering = hit);
+    });
+
+    stage.addEventListener("mouseleave", () => {
+        hovering = false;
+        stage.classList.remove("hover");
+    });
+
+    function drawGlyphs() {
+        // the physics stops while paused; the sink clock must not jump when it resumes
+        const paused = isPaused();
+        runner.enabled = !paused;
+        if (paused) lastTick = performance.now();
+
+        for (const { canvas, body, offX, offY } of glyphs) {
+            const a = body.angle, cos = Math.cos(a), sin = Math.sin(a);
+            canvas.style.transform =
+                `translate(${body.position.x - (offX * cos - offY * sin)}px, ` +
+                `${body.position.y - (offX * sin + offY * cos)}px) rotate(${a}rad)`;
+        }
+        requestAnimationFrame(drawGlyphs);
+    }
+
+
+    // =====================================
+    // MARK: Sinking
+    // Idle letters on the ground sink one at a time, then
+    // drop back in somewhere else. Every letter goes once per round.
+    // =====================================
+
+    // only input on the animation itself counts as activity
+    ["pointerdown", "pointermove", "keydown", "touchstart"].forEach(type =>
+        stage.addEventListener(type, () => { lastInput = performance.now(); }, { passive: true })
+    );
+
+    function isGrounded(b) {
+        return b !== mouseConstraint.body &&
+            b.speed < 0.3 &&
+            b.bounds.max.y >= stage.clientHeight - 4;
+    }
+
+    function respawnLetter(b) {
+        Body.setStatic(b, false);
+        Body.setVelocity(b, { x: 0, y: 0 });
+        Body.setAngularVelocity(b, 0);
+        Body.setAngle(b, (Math.random() - 0.5) * 0.6);
+
+        // random x inside the stage, at least a quarter of the stage away from where it sank
+        const W = stage.clientWidth;
+        const hw = (b.bounds.max.x - b.bounds.min.x) / 2;
+        const cx = (b.bounds.min.x + b.bounds.max.x) / 2;
+        const minShift = Math.max(hw * 2, W * 0.25);
+        const pickX = () => hw + Math.random() * Math.max(0, W - hw * 2);
+
+        let targetX = pickX();
+        for (let i = 0; i < 20 && Math.abs(targetX - cx) < minShift; i++) targetX = pickX();
+        // fallback: mirror it to the other side
+        if (Math.abs(targetX - cx) < minShift) targetX = Math.min(W - hw, Math.max(hw, W - cx));
+
+        Body.translate(b, { x: targetX - cx, y: -60 - b.bounds.max.y });
+        Matter.Sleeping.set(b, false);
+
+        sinker = null;
+        lastDropped = b;
+        nextSinkAt = performance.now() + GAP_MS;
+    }
+
+    function pickSinker() {
+        const grounded = bodies.filter(isGrounded);
+        if (!grounded.length) return null;
+
+        // everyone has had a turn -> new round (the letter that just dropped sits it out)
+        if (done.size >= bodies.length) {
+            done.clear();
+            if (lastDropped) done.add(lastDropped);
+        }
+
+        let pool = grounded.filter(b => !done.has(b));
+        // fallback: the remaining letters are stacked and not grounded yet,
+        // so any grounded letter except the one that just dropped may go
+        if (!pool.length) pool = grounded.filter(b => b !== lastDropped);
+        if (!pool.length) return null;
+
+        return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    Events.on(engine, "beforeUpdate", () => {
+        const now = performance.now();
+        const dt = (now - lastTick) / 1000;
+        lastTick = now;
+
+        if (sinker) {
+            Body.translate(sinker, { x: 0, y: SINK_PX_PER_S * dt });
+
+            // keep letters resting on the sinker awake, so they follow it down
+            for (const b of bodies) if (b.isSleeping) Matter.Sleeping.set(b, false);
+
+            // fully below the stage -> drop it in again
+            if (sinker.bounds.min.y > stage.clientHeight + 2) respawnLetter(sinker);
+            return;
+        }
+
+        if (now - lastInput < IDLE_MS || now < nextSinkAt) return;
+
+        const next = pickSinker();
+        if (!next) return;
+
+        sinker = next;
+        done.add(sinker);
+        Body.setStatic(sinker, true);   // static + translate = glides down through the floor
+    });
+
+
+    // =====================================
+    // MARK: Start
+    // =====================================
+    function init() {
+        if (!stage.clientWidth || !stage.clientHeight) return;   // ignore hidden / zero-size layouts
+        buildWalls();
+        buildLetters();
+    }
+
+    init();
+    drawGlyphs();
+
+    // rebuild whenever the animation area changes size (window resize, rotation)
+    let resizeTimer;
+    let lastWidth = stage.clientWidth, lastHeight = stage.clientHeight;
+    new ResizeObserver(() => {
+        const w = stage.clientWidth, h = stage.clientHeight;
+        if (!w || !h || (w === lastWidth && h === lastHeight && glyphs.length)) return;
+        lastWidth = w; lastHeight = h;
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(init, glyphs.length ? 200 : 0);
+    }).observe(stage);
+</script>

@@ -2,227 +2,446 @@
 
 ---
 
-<div class="reinforcing-feedback-wrapper" id="animation-wrapper">
-    <div class="word" id="word">
-        <p class="span-split">reinforcing feedback</p>
-    </div>
+<!-- ===================================== -->
+<!-- MARK: Reinforcing Feedback Animation  -->
+<!-- ===================================== -->
+<!-- doubling field: every dot keeps splitting until the screen is full, then the field dissolves and starts again -->
+<div class="reinforcing-feedback-wrapper">
+    <canvas class="reinforcing-feedback-canvas" id="reinforcing-feedback-canvas"></canvas>
+    <div class="reinforcing-feedback-title" id="reinforcing-feedback-title"><span>REINFORCING</span><span>FEEDBACK</span></div>
 </div>
 
 <script>
-    // ====================================
-    // MARK: TUNING VARIABLES
-    // ====================================
+    // @ts-nocheck
+    // =====================================
+    // MARK: Reinforcing Feedback Animation
+    // =====================================
+    (() => {
+        const canvas = document.getElementById("reinforcing-feedback-canvas");
+        const ctx = canvas.getContext("2d");                 // transparent: it only holds what moves. Everything that has settled lives on canvases underneath
+        const titleEl = document.getElementById("reinforcing-feedback-title");
+        const wrapper = canvas.closest(".reinforcing-feedback-wrapper");
+        const section = canvas.closest(".animation-section");
 
-    // Mouse interaction
-    const mouseStopDelay = 60;
-    const interactionRadius = 200;
-    const influencePower = 4;
-    const energyGain = 1.4;
+        // ---------- Parameters ----------
+        const DENSITY = 30000;     // where the resolution starts: about this many dot-spacings fit on the screen. Higher = more, smaller dots
+        const AUTO_RES = true;     // after every cycle the resolution goes up if the device had room to spare, and down if it struggled
+        const DENSITY_MIN = 6000, DENSITY_MAX = 120000;
+        const MIN_SPACING = 3.5;   // never let dots get closer than this many px
+        const PERIOD = 650;        // ms between one dot's splits (every dot has the same clock)
+        const SPEEDUP = 0.35;      // by the end of the ramp the clock is this much shorter (0.35 = 35% faster)
+        const SPEEDUP_MS = 20000;  // how long the ramp lasts, counted from the start of a cycle
+        const JITTER = 0.25;       // +/- random variation of that clock
+        const ATTEMPTS = 14;       // tries to find free space for a child before the dot gives up
+        const HOLD_MS = 1000;      // how long the full field stays before it dissolves
+        const DISSOLVE_MS = 2800;  // how long the dissolve wave takes to cross the field
+        const EMPTY_MS = 5000;     // pause on the empty screen before a new seed appears
+        const MAX_GROW_MS = 70000; // safety: never stay in the growing state forever
+        const MAX_DOTS = 100000;
+        const SHADE_PERIOD = 0.7;  // finished rings get brighter and dimmer per generation: this is how fast (radians per generation)
+        const SPAWN_MAX = 3.5;     // minimum reach of a child, in dot-spacings (never less than half the title's text size either)
+        const GROW_MS = 350;       // a new dot grows to full size in this time
+        const LINK_MS = 700, PULSE_MS = 500;
+        const FX_MAX = 2500;       // most link/pulse effects alive at once: when it is busy, some births skip theirs
+        const BUCKETS = 6;         // fades are drawn in this many steps, so each step is one draw call instead of one per dot
+        const MASK_CELL = 1;       // px per mask cell
+        const TREE = 0.16;         // opacity of the family tree: every parent -> child line stays faintly visible (0 = off)
 
-    // Neighbour spread
-    const neighbourSpread = 0.5;
-    const neighbourGain = 0.1;
+        let W = 0, H = 0, dpr = 1, MIN_D = 10, MIN2 = 100, DOT_R = 4, REACH = 100;
+        let FG = "", BG = "", TXT = "", FONT = "";   // read from the CSS variables --fg, --bg, --text, --font on the wrapper
+        const LINES = ["REINFORCING", "FEEDBACK"];
+        let title = null;                            // {fs, lh, cy}
+        let mask = null, maskW = 0, maskH = 0;       // cells where dots may not start: the letter shapes plus some air
+        let layer = null, lctx = null;               // canvas under this one: every full-size dot (filled or hollow) is drawn here once
+        let tree = null, tctx = null;                // canvas under that: the faint family tree. The browser stacks them, so none of this is redrawn per frame
+        let treeOpacity = 1, fxCap = FX_MAX, slow = 0;
+        let density = DENSITY;                       // the resolution in use now
+        let cyc = { sum: 0, n: 0, worst: 0, win: [], winSum: 0 };   // frame times of this cycle
+        const pend = new Float32Array(4 * MAX_DOTS); let pendN = 0;   // links born this frame, drawn onto the tree in one go
 
-    // Weight
-    const baseWeight = 100;
-    const maxWeight = 900;
-    const weightMultiplier = 25;
-    const weightStep = 10;
+        // ---------- Dots live in typed arrays (no objects, no garbage) ----------
+        const X = new Float32Array(MAX_DOTS), Y = new Float32Array(MAX_DOTS);
+        const BORN = new Float64Array(MAX_DOTS), NEXT = new Float64Array(MAX_DOTS);
+        const GEN = new Uint16Array(MAX_DOTS);       // how many splits from the seed
+        const ACTIVE = new Uint8Array(MAX_DOTS);     // still reproducing
+        const BAKED = new Uint8Array(MAX_DOTS);      // already drawn full-size on the layer
+        let count = 0;
+        let act = new Int32Array(MAX_DOTS), act2 = new Int32Array(MAX_DOTS), actN = 0;   // reproducing dots (two buffers, swapped)
+        const young = new Int32Array(MAX_DOTS);      // dots that are still growing, in birth order
+        let yHead = 0, yTail = 0;
 
-    // Scaling
-    const scaleStartEnergy = 20;
-    const scaleDivisor = 15;
-    const scaleCurve = 1.4;
+        // Spatial grid: one dot per cell at most (cell = spacing / sqrt 2), so a space check is 25 array reads
+        let cs = 1, gw = 0, gh = 0, occ = new Int32Array(1);
 
-    const maxScaleX = 5;
-    const maxScaleY = 5;
+        // Short-lived effects: ring buffers in birth order, so the oldest are always at the front
+        const fxL = { x1: new Float32Array(FX_MAX), y1: new Float32Array(FX_MAX), x2: new Float32Array(FX_MAX), y2: new Float32Array(FX_MAX), t: new Float64Array(FX_MAX), head: 0, n: 0 };
+        const fxP = { x1: new Float32Array(FX_MAX), y1: new Float32Array(FX_MAX), t: new Float64Array(FX_MAX), head: 0, n: 0 };
 
-    // Vertical takeover
-    const stretchStartScale = 3;
-    const stretchRange = 0.5;
-    const stretchMultiplier = 25;
-    const stretchBaseScale = 4;
+        let ready = false;         // false until the canvas has a real size (the animation area may start at height 0)
+        let T = 0;                 // simulation time (ms)
+        let state = "empty";       // empty -> grow -> hold -> dissolve -> empty
+        let stateT = 0, erased = 0;
 
-    // Collapse
-    const collapseThreshold = 60;
-    const resetDelay = 600;
+        // the play/stop button of the detail page adds .stop-animation when paused
+        const isPaused = () => document.hidden || (section && section.querySelector(".stop-animation"));
 
-    // Colors
-    const lightBackground = "var(--color-white)";
-    const lightText = "var(--color-black)";
-    const darkBackground = "var(--color-black)";
-    const darkText = "var(--color-white)";
+        // ---------- Setup ----------
+        function createUnderCanvas() {                                     // a canvas of the same size, stacked below the main one
+            const c = document.createElement("canvas");
+            c.className = "under";
+            canvas.parentNode.insertBefore(c, canvas);
+            return c;
+        }
+        function resizeCanvas() {
+            dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            W = canvas.clientWidth; H = canvas.clientHeight;
+            if (W < 2 || H < 2) { ready = false; return; }      // nothing to draw on yet: the resize observer calls us again
+            canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            const cssVar = n => getComputedStyle(wrapper).getPropertyValue(n).trim();
+            FG = cssVar("--fg"); BG = cssVar("--bg"); TXT = cssVar("--text"); FONT = cssVar("--font");
 
-    // ====================================
+            if (!tree) { tree = createUnderCanvas(); layer = createUnderCanvas(); tctx = tree.getContext("2d"); lctx = layer.getContext("2d"); }
+            for (const c of [tree, layer]) { c.width = canvas.width; c.height = canvas.height; }
+            tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const letters = [...document.querySelectorAll(".word span")];
+            MIN_D = Math.max(MIN_SPACING, Math.sqrt(W * H / density));   // dots keep this distance: this sets the field's capacity
+            MIN2 = MIN_D * MIN_D;
+            DOT_R = Math.min(5, MIN_D * 0.37);                           // dot size relative to the spacing
+            cs = MIN_D / Math.SQRT2;
+            gw = Math.ceil(W / cs) + 1; gh = Math.ceil(H / cs) + 1;
+            occ = new Int32Array(gw * gh);
+            layoutText();
+            clearAll();
+            ready = true;
+        }
 
-    const wrapper = document.getElementById("animation-wrapper");
+        // ---------- Title in the middle ----------
+        // Lays out the title and builds a mask of its letter shapes (grown by some air). Dots may not start
+        // inside the mask, so they form around the letters, not around a box. The title itself is normal HTML text: only its size is set here.
+        function layoutText() {
+            ctx.save();
+            ctx.font = "800 100px " + FONT;
+            const w100 = Math.max(...LINES.map(l => ctx.measureText(l).width));
+            ctx.restore();
+            const LH = 1.0;
+            const fs = Math.max(24, Math.min(W * 0.9 / w100 * 100, H * 0.62 / (LINES.length * LH)));
+            const lh = fs * LH, cy = H / 2;
+            title = { fs, lh, cy };
+            REACH = Math.max(MIN_D * SPAWN_MAX, fs * 0.5);   // a child can jump over a letter stroke into the holes inside letters
 
-    // Start black background with white text
-
-    
-
-    const state = letters.map(() => ({
-        energy: 0,
-        hoverInfluence: 0,
-    }));
-
-    let mouseX = -1000;
-    let mouseY = -1000;
-
-    let isMoving = false;
-    let moveTimeout;
-
-    let resetting = false;
-
-    let darkMode = true;
-
-    document.addEventListener("mousemove", (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-
-        isMoving = true;
-
-        clearTimeout(moveTimeout);
-
-        moveTimeout = setTimeout(() => {
-            isMoving = false;
-        }, mouseStopDelay);
-    });
-
-    function resetSystem() {
-        state.forEach((s) => {
-            s.energy = 0;
-            s.hoverInfluence = 0;
-        });
-    }
-
-    function animate() {
-        state.forEach((s) => {
-            s.hoverInfluence = 0;
-        });
-
-        // =====================================
-        // MARK: MOUSE INFLUENCE
-        // =====================================
-
-        letters.forEach((letter, i) => {
-            const rect = letter.getBoundingClientRect();
-
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-
-            const dx = mouseX - cx;
-            const dy = mouseY - cy;
-
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < interactionRadius) {
-                const influence = Math.pow(1 - dist / interactionRadius, influencePower);
-
-                state[i].energy += influence * energyGain;
-
-                state[i].hoverInfluence = influence;
-            }
-        });
-
-        // =====================================
-        // MARK: NEIGHBOUR SPREAD
-        // =====================================
-
-        if (isMoving) {
-            state.forEach((s, i) => {
-                const spread = s.hoverInfluence * neighbourSpread;
-
-                if (state[i - 1]) {
-                    state[i - 1].energy += spread * neighbourGain;
-                }
-
-                if (state[i + 1]) {
-                    state[i + 1].energy += spread * neighbourGain;
-                }
+            const air = DOT_R * 1.15 + 1;   // gap between a dot's centre and the edge of a letter
+            maskW = Math.ceil(W / MASK_CELL); maskH = Math.ceil(H / MASK_CELL);
+            const m = document.createElement("canvas");
+            m.width = maskW; m.height = maskH;
+            const mc = m.getContext("2d", { willReadFrequently: true });
+            mc.scale(1 / MASK_CELL, 1 / MASK_CELL);
+            mc.fillStyle = "#000"; mc.fillRect(0, 0, W, H);
+            mc.font = "800 " + fs + "px " + FONT;
+            mc.textAlign = "center"; mc.textBaseline = "middle";
+            mc.lineJoin = "round"; mc.lineWidth = air * 2;
+            mc.fillStyle = "#fff"; mc.strokeStyle = "#fff";
+            LINES.forEach((l, i) => {
+                const y = cy + (i - (LINES.length - 1) / 2) * lh;
+                mc.strokeText(l, W / 2, y);    // the fat outline is the "air"
+                mc.fillText(l, W / 2, y);
             });
+            const px = mc.getImageData(0, 0, maskW, maskH).data;
+            mask = new Uint8Array(maskW * maskH);
+            for (let i = 0; i < mask.length; i++) mask[i] = px[i * 4] > 100 ? 1 : 0;
+
+            titleEl.style.fontSize = fs + "px";
+        }
+        const isBlocked = (x, y) => {
+            const ix = (x / MASK_CELL) | 0, iy = (y / MASK_CELL) | 0;
+            return ix >= 0 && iy >= 0 && ix < maskW && iy < maskH && mask[iy * maskW + ix] === 1;
+        };
+
+        function setTreeOpacity(a) {                           // the browser fades the whole tree canvas: free for us
+            if (Math.abs(a - treeOpacity) < 0.01 && a !== 0 && a !== 1) return;
+            treeOpacity = a; tree.style.opacity = a;
         }
 
-        // =====================================
-        // MARK: AVERAGE ENERGY
-        // =====================================
+        function clearAll() {
+            count = 0; actN = 0; yHead = yTail = 0; erased = 0;
+            fxL.head = fxL.n = fxP.head = fxP.n = 0;
+            occ.fill(-1);
+            if (lctx) lctx.clearRect(0, 0, W, H);
+            if (tctx) tctx.clearRect(0, 0, W, H);
+            pendN = 0;
+            setTreeOpacity(1);
+            state = "empty"; stateT = 0;
+        }
 
-        let totalEnergy = 0;
+        // ---------- Space check ----------
+        const isInside = (x, y) => x > 16 && x < W - 16 && y > 16 && y < H - 16 && !isBlocked(x, y);   // not on or next to the letters
+        function isFree(x, y) {
+            const gx = (x / cs) | 0, gy = (y / cs) | 0;
+            const x0 = Math.max(0, gx - 2), x1 = Math.min(gw - 1, gx + 2), y0 = Math.max(0, gy - 2), y1 = Math.min(gh - 1, gy + 2);
+            for (let j = y0; j <= y1; j++) for (let i = x0; i <= x1; i++) {
+                const d = occ[j * gw + i];
+                if (d >= 0) { const dx = X[d] - x, dy = Y[d] - y; if (dx * dx + dy * dy < MIN2) return false; }
+            }
+            return true;
+        }
 
-        state.forEach((s) => {
-            totalEnergy += s.energy;
+        function addDot(x, y, parent) {
+            const i = count++;
+            GEN[i] = parent >= 0 ? GEN[parent] + 1 : 0;
+            X[i] = x; Y[i] = y; BORN[i] = T; NEXT[i] = T + getNextDelay(); ACTIVE[i] = 1; BAKED[i] = 0;
+            occ[((y / cs) | 0) * gw + ((x / cs) | 0)] = i;
+            young[yTail++] = i;
+            return i;
+        }
+        function plantSeed(x, y) {
+            if (!isInside(x, y) || !isFree(x, y) || count >= MAX_DOTS) return false;
+            act[actN++] = addDot(x, y, -1);
+            return true;
+        }
+
+        // ---------- Input: a click plants a seed ----------
+        canvas.addEventListener("pointerdown", e => {
+            if (state === "hold" || state === "dissolve" || isPaused()) return;   // let the field finish its cycle
+            const r = canvas.getBoundingClientRect();
+            if (plantSeed(e.clientX - r.left, e.clientY - r.top) && state === "empty") { state = "grow"; stateT = 0; }
         });
 
-        const averageEnergy = totalEnergy / state.length;
+        // ---------- Simulation ----------
+        // Time until a dot's next split. The clock slowly gets shorter during a cycle (subtle speed-up).
+        function getNextDelay() {
+            const ramp = state === "grow" ? Math.min(1, stateT / SPEEDUP_MS) : 0;
+            return PERIOD * (1 - SPEEDUP * ramp) * (1 + (Math.random() * 2 - 1) * JITTER);
+        }
 
-        // =====================================
-        // MARK: LETTERS
-        // =====================================
+        // A finished dot becomes a hollow ring on the layer; after that it costs nothing per frame
+        function deactivate(i) {
+            ACTIVE[i] = 0;
+            if (BAKED[i]) {                                       // it was drawn filled: wipe that first
+                lctx.globalCompositeOperation = "destination-out";
+                lctx.beginPath(); lctx.arc(X[i], Y[i], DOT_R + 0.9, 0, Math.PI * 2); lctx.fill();
+                lctx.globalCompositeOperation = "source-over";
+            }
+            lctx.strokeStyle = FG; lctx.lineWidth = Math.max(0.8, DOT_R * 0.3);
+            lctx.globalAlpha = 0.3 + 0.7 * (0.5 + 0.5 * Math.cos(GEN[i] * SHADE_PERIOD));   // waves of brighter and dimmer rings spread out from the seed
+            lctx.beginPath(); lctx.arc(X[i], Y[i], DOT_R, 0, Math.PI * 2); lctx.stroke();
+            lctx.globalAlpha = 1;
+        }
 
-        state.forEach((s, i) => {
-            const weight = Math.min(maxWeight, baseWeight + s.energy * weightMultiplier);
+        function pushLink(x1, y1, x2, y2) {
+            if (fxL.n >= fxCap) return;                          // busy: skip this one
+            const k = (fxL.head + fxL.n++) % FX_MAX;
+            fxL.t[k] = T; fxL.x1[k] = x1; fxL.y1[k] = y1; fxL.x2[k] = x2; fxL.y2[k] = y2;
+        }
+        function pushPulse(x, y) {
+            if (fxP.n >= fxCap) return;
+            const k = (fxP.head + fxP.n++) % FX_MAX;
+            fxP.t[k] = T; fxP.x1[k] = x; fxP.y1[k] = y;
+        }
 
-            let scaleX = 1;
-            let scaleY = 1;
+        function splitDot(p) {
+            for (let a = 0; a < ATTEMPTS; a++) {
+                const ang = Math.random() * Math.PI * 2;
+                const dd = MIN_D * 1.1 + Math.random() * (REACH - MIN_D * 1.1);
+                const x = X[p] + Math.cos(ang) * dd, y = Y[p] + Math.sin(ang) * dd;
+                if (isInside(x, y) && isFree(x, y)) {
+                    const c = addDot(x, y, p);
+                    pushLink(X[p], Y[p], x, y);
+                    if (TREE) { pend[pendN++] = X[p]; pend[pendN++] = Y[p]; pend[pendN++] = x; pend[pendN++] = y; }
+                    pushPulse(X[p], Y[p]);
+                    NEXT[p] = T + getNextDelay();
+                    return c;
+                }
+            }
+            deactivate(p);      // no space left for this dot: it stops reproducing
+            return -1;
+        }
 
-            // ---------- Phase 1: uniform growth ----------
+        function step(dt, frameMs) {
+            T += dt; stateT += dt;
+            slow = frameMs > 30 ? slow + 1 : Math.max(0, slow - 2);   // a run of slow frames: do less
+            if (slow > 20) { fxCap = Math.max(300, fxCap >> 1); slow = 10; }   // fewer link and pulse effects
+            else if (slow === 0 && fxCap < FX_MAX) fxCap = Math.min(FX_MAX, fxCap + 8);
 
-            if (s.energy > scaleStartEnergy) {
-                const growth = 1 + Math.pow((s.energy - scaleStartEnergy) / scaleDivisor, scaleCurve);
-
-                scaleX = growth;
-                scaleY = growth;
+            if (state === "grow") {
+                let n = 0;
+                for (let k = 0; k < actN; k++) {
+                    const d = act[k];
+                    if (T < NEXT[d]) { act2[n++] = d; continue; }
+                    if (count >= MAX_DOTS) { deactivate(d); continue; }
+                    const c = splitDot(d);
+                    if (c >= 0) { act2[n++] = d; act2[n++] = c; }
+                }
+                [act, act2] = [act2, act]; actN = n;
+                if (count > 0 && (actN === 0 || stateT > MAX_GROW_MS)) {   // the field only stops when there is no free space left anywhere
+                    state = "hold"; stateT = 0;
+                    for (let k = 0; k < actN; k++) deactivate(act[k]);
+                    actN = 0;
+                }
+            } else if (state === "hold") {
+                if (stateT >= HOLD_MS) { state = "dissolve"; stateT = 0; }
+            } else if (state === "dissolve") {
+                if (stateT >= DISSOLVE_MS) { clearAll(); finishCycle(); }
+            } else if (state === "empty") {
+                // Loop: after a pause the field seeds itself with a single dot
+                if (stateT >= EMPTY_MS) {
+                    const x = 0.15 * W + Math.random() * 0.7 * W, y = 0.15 * H + Math.random() * 0.6 * H;
+                    if (plantSeed(x, y)) { state = "grow"; stateT = 0; }
+                }
             }
 
-            scaleX = Math.min(scaleX, maxScaleX);
-            scaleY = Math.min(scaleY, maxScaleY);
+            // expire effects (oldest first)
+            while (fxL.n && T - fxL.t[fxL.head] >= LINK_MS) { fxL.head = (fxL.head + 1) % FX_MAX; fxL.n--; }
+            while (fxP.n && T - fxP.t[fxP.head] >= PULSE_MS) { fxP.head = (fxP.head + 1) % FX_MAX; fxP.n--; }
 
-            // ---------- Phase 2: vertical takeover ----------
-
-            if (scaleY > stretchStartScale) {
-                const stretchProgress =
-                    (scaleY - stretchStartScale) / stretchRange;
-
-                scaleY = stretchBaseScale + stretchProgress * stretchMultiplier;
+            // dots that have finished growing are drawn once onto the layer and leave the live list
+            lctx.fillStyle = FG;
+            lctx.beginPath();
+            let any = false;
+            while (yHead < yTail && T - BORN[young[yHead]] >= GROW_MS) {
+                const i = young[yHead++];
+                if (ACTIVE[i]) { lctx.moveTo(X[i] + DOT_R, Y[i]); lctx.arc(X[i], Y[i], DOT_R, 0, Math.PI * 2); BAKED[i] = 1; any = true; }
             }
+            if (any) lctx.fill();
 
-            letters[i].style.fontVariationSettings = `"wght" ${
-                Math.round(weight / weightStep) * weightStep
-            }`;
+            if (pendN) {                                          // this frame's births join the family tree
+                tctx.strokeStyle = FG; tctx.globalAlpha = TREE; tctx.lineWidth = 0.7;
+                tctx.beginPath();
+                for (let i = 0; i < pendN; i += 4) { tctx.moveTo(pend[i], pend[i + 1]); tctx.lineTo(pend[i + 2], pend[i + 3]); }
+                tctx.stroke();
+                pendN = 0;
+            }
+        }
 
-            letters[i].style.transform = `scale(${scaleX},${scaleY})`;
-        });
+        // ---------- Drawing ----------
+        const getBucket = f => Math.min(BUCKETS - 1, (f * BUCKETS) | 0);    // f: 0 = new, 1 = gone
 
-        // =====================================
-        // MARK: COLLAPSE EVENT
-        // =====================================
+        function drawLinks() {
+            ctx.lineWidth = 1;
+            let b = -1;
+            for (let j = 0; j < fxL.n; j++) {
+                const k = (fxL.head + j) % FX_MAX, f = (T - fxL.t[k]) / LINK_MS, nb = getBucket(f);
+                if (nb !== b) { if (b >= 0) ctx.stroke(); b = nb; ctx.globalAlpha = 0.5 * (1 - (b + 0.5) / BUCKETS); ctx.beginPath(); }
+                ctx.moveTo(fxL.x1[k], fxL.y1[k]); ctx.lineTo(fxL.x2[k], fxL.y2[k]);
+            }
+            if (b >= 0) ctx.stroke();
+        }
+        function drawPulses() {
+            ctx.lineWidth = 1;
+            let b = -1;
+            for (let j = 0; j < fxP.n; j++) {
+                const k = (fxP.head + j) % FX_MAX, f = (T - fxP.t[k]) / PULSE_MS, nb = getBucket(f);
+                if (nb !== b) { if (b >= 0) ctx.stroke(); b = nb; ctx.globalAlpha = 0.6 * (1 - (b + 0.5) / BUCKETS); ctx.beginPath(); }
+                const r = DOT_R + f * MIN_D * 1.2;
+                ctx.moveTo(fxP.x1[k] + r, fxP.y1[k]); ctx.arc(fxP.x1[k], fxP.y1[k], r, 0, Math.PI * 2);
+            }
+            if (b >= 0) ctx.stroke();
+        }
 
-        if (averageEnergy > collapseThreshold && !resetting) {
-            resetting = true;
+        function draw() {
+            ctx.clearRect(0, 0, W, H);                           // the only full-screen operation per frame
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = FG; ctx.fillStyle = FG;
 
-            darkMode = !darkMode;
+            // the family tree fades out while the field dissolves
+            setTreeOpacity(state === "dissolve" ? Math.max(0, 1 - stateT / (DISSOLVE_MS * 0.6)) : 1);
 
-            if (darkMode) {
-                wrapper.style.backgroundColor = darkBackground;
+            drawLinks();
+            drawPulses();
+            ctx.globalAlpha = 1;
 
-                wrapper.style.color = darkText;
+            if (state !== "dissolve") {
+                ctx.beginPath();                                   // only the dots that are still growing are drawn live
+                for (let q = yHead; q < yTail; q++) {
+                    const i = young[q];
+                    if (!ACTIVE[i]) continue;
+                    const r = DOT_R * Math.min(1, (T - BORN[i]) / GROW_MS);
+                    ctx.moveTo(X[i] + r, Y[i]); ctx.arc(X[i], Y[i], r, 0, Math.PI * 2);
+                }
+                ctx.fill();
             } else {
-                wrapper.style.backgroundColor = lightBackground;
+                // Dissolving: a wave runs through the dots, oldest first. Dots in front of the wave stay on the layer;
+                // dots inside the wave flash and burst into a widening ring; behind it they are gone.
+                const n = count;
+                const band = Math.max(40, n * 0.1);                // how many dots are bursting at the same time
+                const pos = (stateT / DISSOLVE_MS) * (n + band);
 
-                wrapper.style.color = lightText;
+                const upTo = Math.min(n, Math.floor(pos) + 1);     // wipe the dots the wave has reached from the layer
+                if (erased < upTo) {
+                    lctx.globalCompositeOperation = "destination-out";
+                    lctx.beginPath();
+                    for (; erased < upTo; erased++) { const i = erased; lctx.moveTo(X[i] + DOT_R + 0.9, Y[i]); lctx.arc(X[i], Y[i], DOT_R + 0.9, 0, Math.PI * 2); }
+                    lctx.fill();
+                    lctx.globalCompositeOperation = "source-over";
+                }
+
+                const lo = Math.max(0, Math.ceil(pos - band)), hi = Math.min(n - 1, Math.floor(pos));
+                ctx.lineWidth = Math.max(0.8, DOT_R * 0.3);
+                ctx.globalAlpha = 1;
+                ctx.beginPath();                                   // flash: the dots just hit by the wave fill in
+                for (let i = Math.max(lo, Math.ceil(pos - band * 0.25)); i <= hi; i++) {
+                    ctx.moveTo(X[i] + DOT_R * 1.15, Y[i]); ctx.arc(X[i], Y[i], DOT_R * 1.15, 0, Math.PI * 2);
+                }
+                ctx.fill();
+                let b = -1;                                        // then a ring expands and fades
+                for (let i = hi; i >= lo; i--) {                   // newest hit first: f runs 0 -> 1
+                    const f = (pos - i) / band, nb = Math.min(BUCKETS - 1, (f * BUCKETS) | 0);
+                    if (nb !== b) { if (b >= 0) ctx.stroke(); b = nb; ctx.globalAlpha = 1 - (b + 0.5) / BUCKETS; ctx.beginPath(); }
+                    const r = DOT_R * (1 + 2.6 * f);
+                    ctx.moveTo(X[i] + r, Y[i]); ctx.arc(X[i], Y[i], r, 0, Math.PI * 2);
+                }
+                if (b >= 0) ctx.stroke();
             }
-
-            setTimeout(() => {
-                resetSystem();
-
-                resetting = false;
-            }, resetDelay);
+            ctx.globalAlpha = 1;
         }
 
-        requestAnimationFrame(animate);
-    }
+        // ---------- Resolution: as high as the device can carry ----------
+        // Frame times are collected during growth and dissolve. At the end of a cycle the density is raised when the
+        // frames were smooth, and lowered when they were not. If a device is hopelessly slow, it restarts at once, coarser.
+        function measureFrame(frameMs) {
+            if (state !== "grow" && state !== "hold" && state !== "dissolve") return;
+            cyc.sum += frameMs; cyc.n++;
+            cyc.win.push(frameMs); cyc.winSum += frameMs;
+            if (cyc.win.length > 45) cyc.winSum -= cyc.win.shift();
+            if (cyc.win.length === 45) {
+                const avg = cyc.winSum / 45;
+                cyc.worst = Math.max(cyc.worst, avg);
+                if (AUTO_RES && state === "grow" && avg > 60 && count > 800) retune(0.6);    // far too slow: start again, coarser
+            }
+        }
+        function retune(factor) {
+            const next = Math.max(DENSITY_MIN, Math.min(DENSITY_MAX, Math.round(density * factor)));
+            cyc = { sum: 0, n: 0, worst: 0, win: [], winSum: 0 };
+            if (next === density) return;
+            density = next;
+            resizeCanvas();                                           // rebuilds the grid, the dot size and the title mask, and empties the screen
+        }
+        function finishCycle() {                               // called when the dissolve is over
+            if (!AUTO_RES || cyc.n < 120) { cyc = { sum: 0, n: 0, worst: 0, win: [], winSum: 0 }; return; }
+            const mean = cyc.sum / cyc.n, worst = cyc.worst;
+            if (worst > 24) retune(0.75);                       // it stuttered: fewer, bigger dots
+            else if (mean < 17.5 && worst < 19) retune(1.35);   // smooth at 60 fps with room over: more, smaller dots
+            else cyc = { sum: 0, n: 0, worst: 0, win: [], winSum: 0 };
+        }
 
-    animate();
+        // ---------- Loop ----------
+        let last = performance.now();
+        function drawFrame(now) {
+            const frameMs = now - last, dt = Math.min(frameMs, 50);
+            last = now;
+            // paused frames are skipped completely, so they don't count as slow frames either
+            if (ready && !isPaused()) { measureFrame(frameMs); step(dt, frameMs); draw(); }
+            requestAnimationFrame(drawFrame);
+        }
+
+        let resizeTimer = 0;                                   // resizing rebuilds everything: wait until the area stops changing
+        const scheduleRebuild = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(resizeCanvas, 150); };
+        new ResizeObserver(scheduleRebuild).observe(canvas);           // also fires when the animation area is resized after loading
+        resizeCanvas();
+        // Inter is loaded in general.css; measure the title again once it is ready
+        if (document.fonts && document.fonts.load) {
+            document.fonts.load("800 40px Inter").then(() => { if (ready) layoutText(); }).catch(() => {});
+        }
+        requestAnimationFrame(drawFrame);
+    })();
 </script>

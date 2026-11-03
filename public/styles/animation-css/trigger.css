@@ -1,22 +1,32 @@
-  :root {
-      box-sizing: border-box;
-      color-scheme: dark;
-  }
+/* =====================================
+MARK: Trigger Animation
+Scoped to .trigger-wrapper so it doesn't
+affect the rest of the page layout.
+===================================== */
 
-  html,
-  body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-      user-select: none;
-      -webkit-user-select: none;
-  }
+/* ---------- Ensure parent fills the animation-section height ---------- */
+.animation-section .hidden-section {
+    height: 100%;
+}
 
-  canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      touch-action: none;
-  }
+/* ---------- Wrapper (replaces old :root and body styles) ---------- */
+.trigger-wrapper {
+    color-scheme: dark;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: clip;
+    background: #000;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ---------- Canvas ---------- */
+.trigger-canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+}

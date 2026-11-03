@@ -1,33 +1,35 @@
-  :root {
-      color-scheme: light;
-      box-sizing: border-box;
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
+/* =====================================
+MARK: In-between Animation
+Scoped to .in-between-wrapper so it doesn't
+affect the rest of the page layout.
+===================================== */
 
-  html {
-      scroll-padding-top: env(safe-area-inset-top, 0px);
-  }
+/* ---------- Ensure parent fills the animation-section height ---------- */
+.animation-section .hidden-section {
+    height: 100%;
+}
 
-  html,
-  body {
-      height: 100%;
-      margin: 0;
-      background: #fff;
-  }
+/* ---------- Wrapper (replaces old :root and body styles) ---------- */
+.in-between-wrapper {
+    color-scheme: light;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: clip;
+    background: #fff;
+}
 
-  body {
-      overflow: hidden;
-  }
+/* ---------- Canvas ---------- */
+.in-between-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+    cursor: grab;
+}
 
-  canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      touch-action: none;
-      cursor: grab;
-  }
-
-  canvas.drag {
-      cursor: grabbing;
-  }
+.in-between-canvas.drag {
+    cursor: grabbing;
+}

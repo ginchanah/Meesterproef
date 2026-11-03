@@ -1,1 +1,42 @@
-/* TODO: add the styling for the animation */
+/* =====================================
+MARK: Interaction Animation
+Scoped to .interaction-stage so it doesn't
+affect the rest of the page layout.
+===================================== */
+
+/* ---------- Ensure parent fills the animation-section height ---------- */
+.animation-section .hidden-section {
+    height: 100%;
+}
+
+/* ---------- Stage (replaces old :root and body styles) ---------- */
+.interaction-stage {
+    --ink: var(--color-text, #ffffff);   /* letter colour, read by the script */
+
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--color-background, #000000);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    touch-action: none;
+    cursor: default;
+}
+
+.interaction-stage.hover {
+    cursor: grab;
+}
+
+.interaction-stage.holding {
+    cursor: grabbing;
+}
+
+/* ---------- Letters ---------- */
+.interaction-stage .glyph {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;   /* required: the script rotates letters about the top-left */
+    will-change: transform;
+    pointer-events: none;
+}

@@ -1,66 +1,68 @@
 /* =====================================
 MARK: Reinforcing Feedback Animation
+Doubling field. Scoped to .reinforcing-feedback-wrapper
+so it doesn't affect the rest of the page layout.
 ===================================== */
 
-:root {
-    --color-white: #ffffff;
-    --color-black: #000000;
+/* ---------- Ensure parent fills the animation-section height ---------- */
+.animation-section .hidden-section {
+    height: 100%;
 }
 
-.reinforcing-feedback-wrapper *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+/* ---------- Wrapper (replaces old :root and body styles) ---------- */
+.reinforcing-feedback-wrapper {
+    --black: #000;
+    --white: #fff;
+    --bg: var(--black);
+    --fg: var(--white);
+    --text: var(--black);   /* title colour: same as the background on purpose, so the title only shows as the gap in the dots */
+    --font: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;   /* Inter is loaded in general.css */
 
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: clip;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+}
+
+/* ---------- Canvases ---------- */
+/* three canvases are stacked: the family tree, the settled dots, and on top whatever moves. The browser composites them. */
+.reinforcing-feedback-wrapper canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.reinforcing-feedback-wrapper canvas.under {
+    pointer-events: none;
+}
+
+.reinforcing-feedback-canvas {
+    touch-action: none;
+    cursor: crosshair;
+}
+
+/* ---------- Title ---------- */
+/* the title is normal text on top, in the background colour: it shows as the gap in the dots */
+.reinforcing-feedback-title {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    user-select: none;
+    color: var(--text);
+    text-align: center;
+    font: 800 100px/1 var(--font);
+}
+
+/* general.css gives every element the text colour (* { color }): the spans must keep the title's colour */
+.reinforcing-feedback-title span {
     color: inherit;
-}
-
-/* .animation-section in front keeps this rule stronger than the pause rule in detail-page.css (like the old id selector) */
-.animation-section .reinforcing-feedback-wrapper{
-    width:100vw;
-    height:80vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    background:var(--color-black);
-    color: var(--color-white);
-
-    overflow:hidden;
-
-    font-family: var(--inter-regular);
-
-    transition:
-        background-color 1.2s ease,
-        color 1.2s ease;
-
-    & span {
-        color: inherit;
-    }
-
-}
-
-.reinforcing-feedback-wrapper .word{
-    display:flex;
-    align-items:center;
-    cursor:default;
-}
-
-.reinforcing-feedback-wrapper .word span{
-
-    font-size:8vw;
-
-    font-variation-settings:"wght" 100;
-
-    display:inline-block;
-
-    transform-origin:center center;
-
-    transition:
-        font-variation-settings .15s linear,
-        transform .15s linear;
-}
-
-.reinforcing-feedback-wrapper .space{
-    width:.4em;
 }

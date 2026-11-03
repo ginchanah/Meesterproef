@@ -1,0 +1,118 @@
+/* =====================================
+MARK: Cybernetics Animation
+Information transfer 15: wires with beads running along them.
+Everything that moves is plain CSS. Scoped to .cybernetics-wrapper
+so it doesn't affect the rest of the page layout.
+===================================== */
+
+/* ---------- Ensure parent fills the animation-section height ---------- */
+.animation-section .hidden-section {
+    height: 100%;
+}
+
+/* ---------- Wrapper (replaces old :root and body styles) ---------- */
+.cybernetics-wrapper {
+    --bg: var(--color-background, #000000);
+    --line: var(--color-text, #ffffff);
+    --bead: var(--line);
+    --gap: 150;             /* distance between beads; must match the -150 in @keyframes cybernetics-flow */
+    --weight: 13px;         /* the line itself */
+    --size: 26px;           /* the big beads */
+    --small: var(--weight); /* the small beads sit inside the line, so they are invisible at rest */
+    --d: 1.8s;              /* time for a bead to move one gap; each bundle overrides it */
+    --boost: 3;             /* extra speed while hovering: 1 + 3 = 4x */
+
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    overflow: clip;
+    background: var(--bg);
+}
+
+/* the drawing is centred and fits the area; wires carry on past its edges, so there is never a cut-off */
+.cybernetics-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ---------- Wires ---------- */
+.cybernetics-wrapper .lines {
+    fill: none;
+    stroke: var(--line);
+    stroke-width: var(--weight);
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+.cybernetics-wrapper .edge {
+    --weight: 5px;          /* the thin outer rows of a bundle */
+}
+
+/* ---------- Beads: a dashed line with zero-length dashes and round caps ---------- */
+.cybernetics-wrapper .beads {
+    fill: none;
+    stroke: var(--bead);
+    stroke-linecap: round;
+    stroke-dasharray: 0 var(--gap);
+    pointer-events: none;
+    /* two flows are added together: the first always runs, the second only while hovering */
+    animation: cybernetics-flow var(--d) linear infinite, cybernetics-flow calc(var(--d) / var(--boost)) linear infinite;
+    animation-composition: replace, add;
+    animation-delay: var(--t, 0s), 0s;
+    animation-play-state: running, paused;
+}
+
+.cybernetics-wrapper .bundle:hover .beads {
+    animation-play-state: running, running;
+}
+
+.cybernetics-wrapper .big {
+    stroke-width: var(--size);
+}
+
+.cybernetics-wrapper .small {
+    stroke-width: var(--small);
+    animation-delay: calc(var(--t, 0s) - var(--d) / 2), 0s;   /* half a gap behind the big ones */
+    transition: stroke-width .5s cubic-bezier(.2, .8, .3, 1);
+}
+
+.cybernetics-wrapper .bundle:hover .small {
+    stroke-width: var(--size);
+}
+
+/* wide invisible stroke so thin wires are easy to hover */
+.cybernetics-wrapper .hit {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 50;
+    pointer-events: stroke;
+    cursor: crosshair;
+}
+
+/* ---------- The three circles: the closer to the centre, the faster the beads ---------- */
+.cybernetics-wrapper .l0 { --d: 2s; }
+.cybernetics-wrapper .l1 { --d: 1.6s; }
+.cybernetics-wrapper .l2 { --d: 1.25s; }
+.cybernetics-wrapper .l3 { --d: .96s; }
+.cybernetics-wrapper .l4 { --d: .71s; }
+.cybernetics-wrapper .l5 { --d: .52s; }
+
+.cybernetics-wrapper .nodes {
+    fill: var(--line);
+    pointer-events: none;
+}
+
+/* ---------- Keyframes (prefixed so they can't clash with another animation's "flow") ---------- */
+@keyframes cybernetics-flow {
+    from { stroke-dashoffset: 0; }
+    to   { stroke-dashoffset: -150; }   /* = --gap */
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cybernetics-wrapper .beads {
+        animation-duration: 20s, 20s;
+    }
+}

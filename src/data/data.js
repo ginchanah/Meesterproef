@@ -131,6 +131,11 @@ export const data = {
       categories: ["Control", "Relation"],
     },
     {
+      title: "Cybernetics",
+      slug: "cybernetics",
+      categories: [""], // TODO: add the categories
+    },
+    {
       title: "Ecology",
       slug: "ecology",
       categories: ["System"],
@@ -456,6 +461,11 @@ export const data = {
       categories: ["Relation"],
     },
     {
+      title: "Subject",
+      slug: "subject",
+      categories: [""], // TODO: add the categories
+    },
+    {
       title: "System",
       slug: "system",
       categories: ["Process", "Agency", "System"],
@@ -523,6 +533,11 @@ export const data = {
         src: "/assets/media/system-3.png",
         alt: "A visual typographic representation of the word system"
       }
+    },
+    {
+      title: "Trigger",
+      slug: "trigger",
+      categories: [""], // TODO: add the categories
     },
     {
       title: "Layout Demo",
